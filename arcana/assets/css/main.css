@@ -2049,6 +2049,43 @@
 				width: 100%;
 			}
 
+		.image.inset_left {
+			display: block;
+			/*float: left;*/
+			width: 100%;
+			/*margin: 0 2em 2em 0;*/
+			/*position: relative;*/
+			/*top: 0.25em;*/
+		}
+
+			.image.inset_left img {
+				display: block;
+				float: left;
+				width: 20%;
+				margin: 0 2em 2em 0;
+				position: relative;
+				top: 0.25em;
+			}
+
+		.image.inset_right {
+			display: block;
+			/*float: left;*/
+			width: 100%;
+			/*margin: 0 2em 2em 0;*/
+			/*position: relative;*/
+			/*top: 0.25em;*/
+		}
+
+			.image.inset_right img {
+				display: block;
+				float: right;
+				width: 20%;
+				margin: 0 2em 2em 0;
+				position: relative;
+				top: 0.25em;
+			}
+
+
 /* Icon */
 
 	.icon {
