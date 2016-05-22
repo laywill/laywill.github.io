@@ -2149,6 +2149,44 @@
 			padding-left: 0.5em;
 		}
 
+	ul.chevron {
+    	/*font-family: 'FontAwesome';*/
+    	/*content: '\f067';*/
+		padding-left: 1em;
+	}
+	
+		ul.chevron li:before {
+	    	font-family: 'FontAwesome';
+	    	content: '\f138';
+			padding-left: 0.5em;
+			margin: 0 10px 0 0px;
+		}
+
+	ul.camera {
+    	/*font-family: 'FontAwesome';*/
+    	/*content: '\f067';*/
+		padding-left: 1em;
+	}
+
+		ul.camera li:before {
+	    	font-family: 'FontAwesome';
+	    	content: '\f030';
+			padding-left: 0.5em;
+			margin: 0 10px 0 0px;
+		}
+
+	ul.terminal {
+    	/*font-family: 'FontAwesome';*/
+    	/*content: '\f067';*/
+		padding-left: 1em;
+	}
+		ul.terminal li:before {
+	    	font-family: 'FontAwesome';
+	    	content: '\f120';
+			padding-left: 0.5em;
+			margin: 0 10px 0 0px;
+		}
+
 	ul.links li {
 		line-height: 2.5em;
 	}
