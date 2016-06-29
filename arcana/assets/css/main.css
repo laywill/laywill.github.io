@@ -2030,6 +2030,20 @@
 				width: 100%;
 			}
 
+		.image.right {
+			display: block;
+			float: right;
+			margin: 0 2em 2em 0;
+			position: relative;
+			top: 0.25em;
+		}
+
+			.image.right img {
+				display: block;
+				width: 100%;
+			}
+
+
 		.image.fit {
 			display: block;
 		}
@@ -2128,6 +2142,7 @@
 			.icon.major:before {
 				font-size: 36px;
 			}
+			
 
 /* Lists */
 
@@ -2596,7 +2611,8 @@
 /* Wrapper */
 
 	.wrapper {
-		padding: 5em 0 3em 0;
+		/*padding: 5em 0 3em 0;*/
+		padding: 3em 0 3em 0;
 	}
 
 		.wrapper.style1 {
@@ -2633,10 +2649,17 @@
 
 	#cta {
 		text-align: center;
-		padding: 3.5em 0;
+		/*padding: 3.5em 0;*/
+		padding: 1.5em 0;
 	}
 
 		#cta header h2 {
+			display: inline-block;
+			vertical-align: middle;
+			margin: 0;
+		}
+
+		#cta header h3 {
 			display: inline-block;
 			vertical-align: middle;
 			margin: 0;
@@ -2646,6 +2669,28 @@
 			vertical-align: middle;
 			margin-left: 1em;
 		}
+
+
+/* CTA_left */
+
+	#cta_left {
+		text-align: left;
+		/*padding: 3.5em 0;*/
+		padding: 1.5em 0 0 0 ;
+	}
+
+		#cta_left header h2 {
+			display: inline-block;
+			vertical-align: middle;
+			margin-left: 2em;
+		}
+
+		#cta_left header h3 {
+			display: inline-block;
+			vertical-align: middle;
+			margin-left: 2em;
+		}
+
 
 /* Footer */
 
