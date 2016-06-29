@@ -1,15 +1,35 @@
 /*
-	Phantom by HTML5 UP
+	Arcana by HTML5 UP
 	html5up.net | @n33co
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
 /* Form */
 
-	form .field {
-		float: none !important;
-		width: 100% !important;
-		padding-left: 0 !important;
+	input[type="text"],
+	input[type="password"],
+	input[type="email"],
+	textarea {
+		position: relative;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+/* Image */
+
+	.image {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
+	}
+
+		.image img {
+			position: relative;
+			-ms-behavior: url("assets/js/ie/PIE.htc");
+		}
+
+/* Icon */
+
+	.icon.major {
+		position: relative;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
 	}
 
 /* Button */
@@ -17,57 +37,31 @@
 	input[type="submit"],
 	input[type="reset"],
 	input[type="button"],
-	button,
 	.button {
-		border: solid 2px #585858 !important;
+		position: relative;
+		-ms-behavior: url("assets/js/ie/PIE.htc");
 	}
 
-		input[type="submit"]:hover,
-		input[type="reset"]:hover,
-		input[type="button"]:hover,
-		button:hover,
-		.button:hover {
-			border-color: #f2849e !important;
-		}
+/* Box */
 
-		input[type="submit"].special,
-		input[type="reset"].special,
-		input[type="button"].special,
-		button.special,
-		.button.special {
-			border: none !important;
-		}
-
-/* Tiles */
-
-	.tiles article > .image:before, .tiles article > .image:after {
-		display: none;
+	.box.post .inner {
+		margin-left: 35%;
 	}
 
-/* Header */
+/* Dropotron */
 
-	#header .logo .symbol {
-		display: none;
+	.dropotron {
+		-ms-behavior: url("assets/js/ie/PIE.htc");
 	}
 
-	#header nav ul li a[href="#menu"] {
-		text-indent: 0;
-		width: auto;
-		font-size: 0.8em;
+/* Banner */
+
+	#banner {
+		-ms-behavior: url("assets/js/ie/backgroundsize.min.htc");
 	}
 
-		#header nav ul li a[href="#menu"]:before, #header nav ul li a[href="#menu"]:after {
-			display: none;
-		}
+/* Wrapper */
 
-/* Footer */
-
-	#footer > .inner section {
-		width: 50%;
-		margin-left: 3em;
+	.wrapper.style2 {
+		background: #fdfdfd url("images/bg01.png");
 	}
-
-		#footer > .inner section:first-child {
-			margin-left: 0;
-			width: 40%;
-		}
