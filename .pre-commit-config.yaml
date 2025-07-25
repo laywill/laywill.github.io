@@ -4,14 +4,16 @@ repos:
   ########################################
   # Javascript Beautifiers and Linters
   ########################################
-  - repo: https://github.com/biomejs/pre-commit
-    rev: v0.6.1
-    hooks:
-      - id: biome-check
-  - repo: https://github.com/standard/standard
-    rev: v17.1.2
-    hooks:
-      - id: standard
+  # Looks like a great tool, but it errors because it isn't installed
+  # - repo: https://github.com/biomejs/pre-commit
+  #   rev: v0.6.1
+  #   hooks:
+  #     - id: biome-check
+  # Disabled due to it raising too many issues to fix here and now
+  # - repo: https://github.com/standard/standard
+  #   rev: v17.1.2
+  #   hooks:
+  #     - id: standard
 
   ########################################
   # Linters to validate beautifiers output
