@@ -1,0 +1,33 @@
+---
+# Hooks to use in this repository
+repos:
+  ########################################
+  # Javascript Beautifiers and Linters
+  ########################################
+  # Looks like a great tool, but it errors because it isn't installed
+  # - repo: https://github.com/biomejs/pre-commit
+  #   rev: v0.6.1
+  #   hooks:
+  #     - id: biome-check
+  # Disabled due to it raising too many issues to fix here and now
+  # - repo: https://github.com/standard/standard
+  #   rev: v17.1.2
+  #   hooks:
+  #     - id: standard
+
+  ########################################
+  # Linters to validate beautifiers output
+  ########################################
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-illegal-windows-names
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]

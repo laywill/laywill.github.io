@@ -1,0 +1,28 @@
+{
+    "allowCompoundWords": true,
+    "dictionaries": [
+        "bash",
+        "companies",
+        "en-GB",
+        "en_US",
+        "filetypes",
+        "fonts",
+        "misc",
+        "powershell",
+        "python",
+        "softwareTerms"
+    ],
+    "flagWords": [
+        "hte"
+    ],
+    "language": "en-GB",
+    "version": "0.2",
+    "words": [
+        "devcontainers",
+        "devcontainer",
+        "laywill"
+    ],
+    "ignoreWords": [
+        "laywill.github.io",
+    ]
+}

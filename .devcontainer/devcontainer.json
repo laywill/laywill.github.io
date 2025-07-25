@@ -1,0 +1,29 @@
+{
+    "name": "laywill.github.io Dev Container",
+    // We only need Python for linting at the moment, so version 3 is sufficient
+    "image": "mcr.microsoft.com/devcontainers/python:3",
+    // Features to add to the dev container
+    "features": {
+        // Git is essential for pre-commit hooks
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": false
+        }
+    },
+    // Configure tool-specific properties
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // YAML support for our config files
+                "redhat.vscode-yaml"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python3"
+            }
+        }
+    },
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && pip install pre-commit && pre-commit install",
+    // Set `remoteUser` to `root` to connect as root instead.
+    "remoteUser": "vscode"
+}
