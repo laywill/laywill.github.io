@@ -9,11 +9,11 @@ repos:
   #   rev: v0.6.1
   #   hooks:
   #     - id: biome-check
-  # Disabled due to it raising too many issues to fix here and now
-  # - repo: https://github.com/standard/standard
-  #   rev: v17.1.2
-  #   hooks:
-  #     - id: standard
+  - repo: https://github.com/standard/standard
+    rev: v17.1.2
+    hooks:
+      - id: standard
+        args: [--fix, --no-ignore]
 
   ########################################
   # Linters to validate beautifiers output

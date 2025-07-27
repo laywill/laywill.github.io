@@ -4,6 +4,7 @@
   Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
+/* global skel */
 (function ($) {
   skel.breakpoints({
     xlarge: '(max-width: 1680px)',
@@ -42,7 +43,7 @@
     // Browser fixes.
 
     // IE: Flexbox min-height bug.
-    if (skel.vars.browser == 'ie') {
+    if (skel.vars.browser === 'ie') {
       (function () {
         let flexboxFixTimeoutId
 
@@ -82,8 +83,8 @@
               $this.css('background-position', 'right')
               break
 
-            default:
             case 'center':
+            default:
               $this.css('background-position', 'center')
               break
           }
@@ -280,7 +281,7 @@
         const $modal = $(this)
 
         // Escape? Hide modal.
-        if (event.keyCode == 27) { $modal.trigger('click') }
+        if (event.keyCode === 27) { $modal.trigger('click') }
       })
       .prepend('<div class="modal" tabIndex="-1"><div class="inner"><img src="" /></div></div>')
       .find('img')
@@ -297,4 +298,4 @@
         }, 275)
       })
   })
-})(jQuery)
+})(window.jQuery)

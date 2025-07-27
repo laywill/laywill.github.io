@@ -7,7 +7,7 @@
 */
 
 (function ($) {
-  const $window = $(window)
+  // $window removed as it's not used
 
   // Styles.
   $(
@@ -38,21 +38,20 @@
     const $this = $(this)
     let $styleProperty; let $stylePropertyClasses
     let $controls; let $x; let $y; let $z
-    let options
-    let current; var i; let j; let k; let s; let n; let count
+    let current; let i; let j; let k; let n; let count
 
     // No elements?
-    if (this.length == 0) { return $this }
+    if (this.length === 0) { return $this }
 
     // Multiple elements?
     if (this.length > 1) {
-      for (var i = 0; i < this.length; i++) { $(this[i]).demo_controls(styles, userOptions) }
+      for (let idx = 0; idx < this.length; idx++) { $(this[idx]).demo_controls(styles, userOptions) }
 
       return $this
     }
 
     // Options.
-    options = $.extend({
+    const options = $.extend({
       target: null,
       palette: true
     }, userOptions)
@@ -152,7 +151,7 @@
         for (j in styles[i]) {
           $x = $(
             '<span class="property" data-name="' + j + '" data-requires="' + i + '">' +
-            (n == count ? '<span>and </span>' : '') +
+            (n === count ? '<span>and </span>' : '') +
             '<a href="#" class="title">' + j + '</a>' +
             '<span class="classes">' +
             '</span>' + (n < count ? ', ' : '') +
@@ -167,7 +166,7 @@
             $z = $('<span data-class="' + k + '">, ' + styles[i][j][k].replace('*', '') + '</span>')
               .appendTo($y)
 
-            if (styles[i][j][k].substr(-1, 1) == '*') { $z.addClass('default') }
+            if (styles[i][j][k].substr(-1, 1) === '*') { $z.addClass('default') }
 
             if (current &&
               $this.hasClass(k)) { $z.addClass('active') }
@@ -190,8 +189,8 @@
       let $next
 
       // Determine next.
-      if ($current.length == 0 ||
-        $current.index() == $classes.length - 1) { $next = $classes.first() } else { $next = $current.next() }
+      if ($current.length === 0 ||
+        $current.index() === $classes.length - 1) { $next = $classes.first() } else { $next = $current.next() }
 
       // Turn on animate all.
       $this.addClass('demo-animate-all')
@@ -217,8 +216,8 @@
       let $next
 
       // Determine next.
-      if ($current.length == 0 ||
-        $current.index() == $classes.length - 1) { $next = $classes.first() } else { $next = $current.next() }
+      if ($current.length === 0 ||
+        $current.index() === $classes.length - 1) { $next = $classes.first() } else { $next = $current.next() }
 
       // Turn on animate all.
       $this.addClass('demo-animate-all')
@@ -233,7 +232,7 @@
       $controls.find('.property[data-requires="' + $current.data('class') + '"] > .classes > .active').each(function () {
         $(this).removeClass('active')
 
-        if ($(this).data('class') != '-') { $this.removeClass($(this).data('class')) }
+        if ($(this).data('class') !== '-') { $this.removeClass($(this).data('class')) }
       })
 
       // Activate next.
@@ -246,7 +245,7 @@
       $controls.find('.property[data-requires="' + $next.data('class') + '"] > .classes > .default').each(function () {
         $(this).addClass('active')
 
-        if ($(this).data('class') != '-') { $this.addClass($(this).data('class')) }
+        if ($(this).data('class') !== '-') { $this.addClass($(this).data('class')) }
       })
 
       // Turn off animate all.
@@ -516,4 +515,4 @@
     target: 'previous',
     palette: false
   })
-})(jQuery)
+})(window.jQuery)
