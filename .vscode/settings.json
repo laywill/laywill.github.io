@@ -33,4 +33,12 @@
     "[javascript]": {
         "editor.tabSize": 2
     },
+    // HTML Specific settings
+    "[html]": {
+        "editor.tabSize": 2
+    },
+    // CSS Specific settings
+    "[css]": {
+        "editor.tabSize": 2
+    },
 }
