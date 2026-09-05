@@ -13,9 +13,7 @@
  * Palette source: VS Code Dark+ (default dark theme).
  */
 
-/* ------------------------------------------------------------------ */
-/* Self-hosted font faces                                             */
-/* ------------------------------------------------------------------ */
+/* Self-hosted font faces */
 
 @font-face {
   font-family: "Raleway";
@@ -58,9 +56,7 @@
 }
 
 :root {
-  /* -------------------------------------------------------------- */
-  /* Colour — VS Code Dark+ palette                                  */
-  /* -------------------------------------------------------------- */
+  /* Colour tokens — VS Code Dark+ palette */
 
   /* Base tokens */
   --bg-editor: #1e1e1e;
@@ -85,9 +81,7 @@
      file ever hard-codes a hex value. */
   --fg-inverse: #ffffff;
 
-  /* -------------------------------------------------------------- */
-  /* Typography — font families                                     */
-  /* -------------------------------------------------------------- */
+  /* Typography — font families */
 
   /* Display / headings — matches CV header treatment */
   --font-display: "Raleway", "Segoe UI", sans-serif;
@@ -96,17 +90,15 @@
   /* Code / IDE motifs (terminal, status bar, tags) */
   --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
 
-  /* -------------------------------------------------------------- */
-  /* Typography — modular type scale (ratio 1.25, base 16px)        */
-  /* -------------------------------------------------------------- */
+  /* Typography — modular type scale (ratio 1.25, base 16px) */
 
-  --font-size-sm: 0.8rem; /* 12.8px — captions, metadata */
-  --font-size-base: 1rem; /* 16px   — body minimum per typography.md */
-  --font-size-md: 1.25rem; /* 20px   — lead paragraphs */
-  --font-size-lg: 1.563rem; /* 25px   — h3 */
-  --font-size-xl: 1.953rem; /* 31px   — h2 */
-  --font-size-2xl: 2.441rem; /* 39px   — h1 */
-  --font-size-3xl: 3.052rem; /* 49px   — display / hero name */
+  --font-size-sm: 0.8rem; /* 12.8px, captions/metadata */
+  --font-size-base: 1rem; /* 16px, body minimum per typography.md */
+  --font-size-md: 1.25rem; /* 20px, lead paragraphs */
+  --font-size-lg: 1.563rem; /* 25px, h3 */
+  --font-size-xl: 1.953rem; /* 31px, h2 */
+  --font-size-2xl: 2.441rem; /* 39px, h1 */
+  --font-size-3xl: 3.052rem; /* 49px, display / hero name */
 
   --line-height-tight: 1.2; /* headings */
   --line-height-normal: 1.5; /* UI text */
