@@ -19,13 +19,13 @@ Under construction. Work is organised as GitHub issues grouped under epic issues
 
 Design and architecture decisions live in [`docs/overhaul/`](docs/overhaul/):
 
-| File | Contents |
-| --- | --- |
-| [design-brief.md](docs/overhaul/design-brief.md) | Purpose, audience, CTA hierarchy, design principles and anti-patterns |
-| [colour-scheme.md](docs/overhaul/colour-scheme.md) | VS Code Dark+ palette tokens and semantic mapping |
-| [typography.md](docs/overhaul/typography.md) | Font choices and CV-matching name treatment |
-| [content-audit.md](docs/overhaul/content-audit.md) | What dies, what migrates, the new sitemap |
-| [architecture.md](docs/overhaul/architecture.md) | Technical architecture and cutover runbook |
+| File                                               | Contents                                                              |
+|----------------------------------------------------|-----------------------------------------------------------------------|
+| [design-brief.md](docs/overhaul/design-brief.md)   | Purpose, audience, CTA hierarchy, design principles and anti-patterns |
+| [colour-scheme.md](docs/overhaul/colour-scheme.md) | VS Code Dark+ palette tokens and semantic mapping                     |
+| [typography.md](docs/overhaul/typography.md)       | Font choices and CV-matching name treatment                           |
+| [content-audit.md](docs/overhaul/content-audit.md) | What dies, what migrates, the new sitemap                             |
+| [architecture.md](docs/overhaul/architecture.md)   | Technical architecture and cutover runbook                            |
 
 ## Contributing conventions
 

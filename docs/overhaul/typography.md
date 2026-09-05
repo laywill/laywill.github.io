@@ -2,11 +2,11 @@
 
 ## Typefaces
 
-| Role | Face | Rationale |
-| --- | --- | --- |
-| Display / William's name / headings | **Raleway** | Matches the CV (Deedy-Resume-derived template in [laywill/cv](https://github.com/laywill/cv)); name treatment should visually echo the CV header |
-| Body | **Lato** | Matches the CV body; warm, readable, not part of the Inter/Roboto default-stack cliché |
-| Code / IDE motifs | **JetBrains Mono** | Authentic IDE typeface; carries the developer-dark theme; used for terminal/status-bar/tag elements |
+| Role                                | Face               | Rationale                                                                                                                                        |
+|-------------------------------------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| Display / William's name / headings | **Raleway**        | Matches the CV (Deedy-Resume-derived template in [laywill/cv](https://github.com/laywill/cv)); name treatment should visually echo the CV header |
+| Body                                | **Lato**           | Matches the CV body; warm, readable, not part of the Inter/Roboto default-stack cliché                                                           |
+| Code / IDE motifs                   | **JetBrains Mono** | Authentic IDE typeface; carries the developer-dark theme; used for terminal/status-bar/tag elements                                              |
 
 These are a deliberate default, not a sacred one — the E3 design study may argue for changes, but any replacement must (a) keep the name treatment consistent with the CV, and (b) avoid the generic system-sans look.
 
