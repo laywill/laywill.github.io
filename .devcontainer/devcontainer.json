@@ -1,0 +1,37 @@
+{
+  "name": "williamlay.co.uk (v2 - Astro)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "editorconfig.editorconfig",
+        "streetsidesoftware.code-spell-checker",
+        "astro-build.astro-vscode",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "redhat.vscode-yaml",
+        "davidanson.vscode-markdownlint"
+      ]
+    }
+  },
+  // Installs uv, then sets up the project-local .venv + pre-commit hooks
+  // (see CONTRIBUTING.md) so the container is ready to commit out of the box.
+  "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && curl -LsSf https://astral.sh/uv/install.sh | sh && $HOME/.local/bin/uv venv && $HOME/.local/bin/uv pip install --python .venv/bin/python pre-commit && .venv/bin/pre-commit install"
+}

@@ -1,0 +1,15 @@
+---
+# Shared config for markdownlint (used by the markdownlint-cli2 pre-commit
+# hook, and by MegaLinter's MARKDOWN_MARKDOWNLINT linter in CI).
+default: true
+
+# Prose in docs/overhaul/*.md and README.md is written as long lines with
+# semantic (not hard) line breaks - a common Markdown convention where the
+# renderer/editor handles wrapping. Enforcing a fixed column width would
+# fight normal prose editing rather than catch real issues.
+MD013: false
+
+# Templates and content files often intentionally start with front matter,
+# a comment, or a level-2 heading (e.g. .github/PULL_REQUEST_TEMPLATE.md's
+# "## Summary") rather than a top-level H1.
+MD041: false

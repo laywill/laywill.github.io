@@ -1,0 +1,44 @@
+---
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "github_actions"
+      - "chore"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Maintain npm dependencies. No package.json exists yet (Astro scaffolding
+  # is a later epic, E2 - see docs/overhaul/architecture.md), so this has
+  # nothing to update against until then; Dependabot no-ops silently on a
+  # missing manifest rather than erroring, and picks up automatically once
+  # one lands at the repo root.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "chore"
+    groups:
+      npm:
+        patterns:
+          - "*"
+
+  # Maintain devcontainer feature versions
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "chore"
+    groups:
+      devcontainer:
+        patterns:
+          - "*"
