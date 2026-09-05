@@ -64,9 +64,15 @@ JSON_JSONLINT_ARGUMENTS: "--comments --trailing-newline --trailing-commas"
 SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.cspell\.json|\.gitignore)
 
 # EditorConfig Checker Config
-# Exclude LICENSE: once issue #21 lands it will be the canonical license text
-# copied verbatim and shouldn't be reformatted to satisfy indent-size rules.
-EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (LICENSE)
+# - LICENSE is the canonical license text copied verbatim; shouldn't be
+#   reformatted to satisfy indent-size rules.
+# - *.md: editorconfig-checker's indent-size rule isn't Markdown-aware — it
+#   flags ordered-list continuation lines (3-space, aligning under "1. ") and
+#   intentionally-aligned ASCII diagrams inside fenced code blocks (see
+#   docs/overhaul/architecture.md, docs/overhaul/content-audit.md) as
+#   indentation errors. markdownlint (enabled above) already governs Markdown
+#   formatting, so Markdown is excluded here rather than mangling those.
+EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (LICENSE|\.md$)
 
 # Filter Configuration
 FILTER_REGEX_EXCLUDE: (\.git|\.venv|\.pytest_cache|\.vscode|node_modules|dist|\.astro)
