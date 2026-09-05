@@ -77,8 +77,8 @@
   --statusbar-blue: #007acc;
 
   /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
-     footer) — kept as a token rather than a literal so nothing outside this
-     file ever hard-codes a hex value. */
+  footer) — kept as a token rather than a literal so nothing outside this
+  file ever hard-codes a hex value. */
   --fg-inverse: #ffffff;
 
   /* Typography — font families */
