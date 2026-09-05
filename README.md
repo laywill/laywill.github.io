@@ -32,3 +32,10 @@ Design and architecture decisions live in [`docs/overhaul/`](docs/overhaul/):
 - Branches: `<type>/<issue-number>-<slug>` (e.g. `feat/42-landing-hero`), PRs into `main`
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/)
 - Every piece of work traces to an issue
+
+## License
+
+This repository uses a split licence:
+
+- **Code** (Astro components, TypeScript, configuration, build tooling, and all other source code) is licensed under the [MIT License](LICENSE).
+- **Site content** — written text, photographs, and other creative works published on the site — is © William Lay 2026, All Rights Reserved, and is not licensed for reuse.
