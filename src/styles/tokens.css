@@ -16,7 +16,7 @@
 /* Self-hosted font faces */
 
 @font-face {
-  font-family: "Raleway";
+  font-family: Raleway;
   src: url("/fonts/raleway-300.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
@@ -24,7 +24,7 @@
 }
 
 @font-face {
-  font-family: "Raleway";
+  font-family: Raleway;
   src: url("/fonts/raleway-700.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
@@ -32,7 +32,7 @@
 }
 
 @font-face {
-  font-family: "Lato";
+  font-family: Lato;
   src: url("/fonts/lato-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -40,7 +40,7 @@
 }
 
 @font-face {
-  font-family: "Lato";
+  font-family: Lato;
   src: url("/fonts/lato-700.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
@@ -79,16 +79,18 @@
   /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
   footer) — kept as a token rather than a literal so nothing outside this
   file ever hard-codes a hex value. */
-  --fg-inverse: #ffffff;
+  --fg-inverse: #fff;
 
   /* Typography — font families */
 
   /* Display / headings — matches CV header treatment */
   --font-display: "Raleway", "Segoe UI", sans-serif;
+
   /* Body copy */
   --font-body: "Lato", "Segoe UI", sans-serif;
+
   /* Code / IDE motifs (terminal, status bar, tags) */
-  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  --font-mono: "JetBrains Mono", "Cascadia Code", consolas, monospace;
 
   /* Typography — modular type scale (ratio 1.25, base 16px) */
 
@@ -99,7 +101,6 @@
   --font-size-xl: 1.953rem; /* 31px, h2 */
   --font-size-2xl: 2.441rem; /* 39px, h1 */
   --font-size-3xl: 3.052rem; /* 49px, display / hero name */
-
   --line-height-tight: 1.2; /* headings */
   --line-height-normal: 1.5; /* UI text */
   --line-height-relaxed: 1.7; /* prose */
