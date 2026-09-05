@@ -24,7 +24,7 @@ FILEIO_REPORTER: false
 
 # Only run linters for languages/tools actually used in this repo.
 ENABLE:
-  - ACTION       # GitHub Actions workflow linting (actionlint) - for when issue #23 lands workflows
+  - ACTION       # GitHub Actions workflow linting (actionlint)
   - CSS          # Plain CSS (no framework, per architecture.md)
   - EDITORCONFIG # Enforces .editorconfig rules
   - HTML         # Astro compiles to HTML; also covers .astro as best-effort HTML
@@ -75,4 +75,6 @@ SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.cspell\.json|\.gitignore)
 EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (LICENSE|\.md$)
 
 # Filter Configuration
-FILTER_REGEX_EXCLUDE: (\.git|\.venv|\.pytest_cache|\.vscode|node_modules|dist|\.astro)
+# Anchored on directory boundaries so `.git/` is excluded without also
+# matching `.github/` as a substring (see issue #48).
+FILTER_REGEX_EXCLUDE: (^|/)(\.git|\.venv|\.pytest_cache|\.vscode|node_modules|dist|\.astro)/
