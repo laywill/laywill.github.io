@@ -50,8 +50,14 @@ SPELL_LYCHEE_DISABLE_ERRORS: true
 
 # Exclude GitHub-relative links that only resolve correctly when rendered on
 # GitHub (e.g. SECURITY.md's "../../issues/new/choose" link), since Lychee
-# checks them against the local filesystem instead.
-SPELL_LYCHEE_ARGUMENTS: "--exclude 'issues/new/choose'"
+# checks them against the local filesystem instead. Walking "../../" up from
+# a repo-root file lands them at the filesystem root, so they reach Lychee as
+# file:///issues..., file:///releases... and file:///security... - matching on
+# that shape avoids excluding any genuine local path.
+# Absolute https:// URLs aren't a workable substitute here: the advisory form
+# at /security/advisories/new 404s for unauthenticated requests, which would
+# just swap a file error for an HTTP one.
+SPELL_LYCHEE_ARGUMENTS: "--exclude '^file:///(issues|releases|security)'"
 
 # JSON Configuration
 # --bom               Ignore the leading UTF-8 byte-order mark
