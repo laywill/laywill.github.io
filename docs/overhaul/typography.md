@@ -16,10 +16,12 @@ The CV is built from a customised Deedy-Resume class (`deedy-resume-openfont-wjl
 
 ## Loading rules
 
-- **Self-host** all fonts as WOFF2 in the repo (the old site's render-blocking Google Fonts `@import` is exactly what we're removing). Astro serves them from `public/fonts/` or via a fonts integration.
-- Subset to Latin; only load the weights actually used (target: ≤ 2 weights per family + italic where needed).
-- `font-display: swap` and real fallback stacks (`Raleway, "Segoe UI", sans-serif` etc.) so text renders instantly.
-- Preload the display face used above the fold.
+- **Self-host** all fonts as WOFF2 in the repo (the old site's render-blocking Google Fonts `@import` is exactly what we're removing).
+- Loading is owned by [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/), configured in `astro.config.mjs`, using the `local` provider against WOFF2 files vendored in `src/assets/fonts/`. Astro emits the `@font-face` rules, fingerprints each file into `/_astro/fonts/` (immutably cacheable) and exposes each family as a CSS variable. `src/styles/tokens.css` maps those onto the semantic `--font-display` / `--font-body` / `--font-mono` roles; components use the semantic names only.
+  - The `local` provider, not `google`/`fontsource`: builds stay hermetic (no build-time fetch from a font CDN) and the vendored files are auditable in-repo. Per-family SIL Open Font Licence texts ship at `public/fonts/LICENSE-*.txt`, since the built site redistributes the faces.
+- Subset to Latin; only load the weights actually used (target: ≤ 2 weights per family + italic where needed). Declare the subset's `unicodeRange` in the font config so the browser can skip downloads for out-of-range content.
+- `font-display: swap` (Astro's default) plus real fallback stacks. Ending each `fallbacks` array with a generic family lets Astro generate metric-adjusted fallback faces automatically, which is what actually removes the layout shift on swap.
+- Preload the body face on every page and the display face only on pages with a hero above the fold (`preloadDisplay` on `BaseLayout`).
 
 ## Scale
 

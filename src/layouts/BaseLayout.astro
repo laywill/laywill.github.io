@@ -1,20 +1,25 @@
 ---
+import { Font } from "astro:assets";
+
 import "../styles/tokens.css";
 
 interface Props {
   title: string;
   description?: string;
   /**
-   * Path (under public/fonts) of the above-the-fold display font this page
-   * actually renders, e.g. "raleway-700.woff2". Only pages with a hero that
-   * uses --font-display need this — leave unset to skip the preload rather
-   * than high-priority-fetching a face the page never uses.
+   * Whether this page renders a hero in the display face above the fold.
+   * Only such pages should preload it — a Notes page with no hero would
+   * otherwise high-priority-fetch a face it never paints. The body face is
+   * always preloaded, since every page renders body copy.
    */
-  preloadFont?: string;
+  preloadDisplay?: boolean;
 }
 
-const { title, description = "Personal site of William Lay.", preloadFont } =
-  Astro.props;
+const {
+  title,
+  description = "Personal site of William Lay.",
+  preloadDisplay = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -27,17 +32,15 @@ const { title, description = "Personal site of William Lay.", preloadFont } =
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
 
-    {
-      preloadFont && (
-        <link
-          rel="preload"
-          href={`/fonts/${preloadFont}`}
-          as="font"
-          type="font/woff2"
-          crossorigin
-        />
-      )
-    }
+    {/*
+      Each <Font> emits its family's @font-face rules and cssVariable; the
+      families are configured in astro.config.mjs. All three are declared on
+      every page so the variables always resolve, but only the faces the
+      page actually paints above the fold are preloaded.
+    */}
+    <Font cssVariable="--font-lato" preload />
+    <Font cssVariable="--font-raleway" preload={preloadDisplay} />
+    <Font cssVariable="--font-jetbrains-mono" />
   </head>
   <body>
     <slot />
