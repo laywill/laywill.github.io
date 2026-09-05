@@ -1,0 +1,117 @@
+/*
+ * Design tokens — the single source of truth for colour, typography and
+ * type-scale values across the site.
+ *
+ * Rules (see docs/overhaul/colour-scheme.md and docs/overhaul/typography.md):
+ *   - Every colour used anywhere on the site is a CSS custom property
+ *     defined here. No other file may hard-code a hex value.
+ *   - Every font stack used anywhere on the site is a CSS custom property
+ *     defined here. No other file may hard-code a font-family list.
+ *   - Fonts are self-hosted WOFF2 (Latin subset, font-display: swap) — no
+ *     Google Fonts (or any other) remote stylesheet/import.
+ *
+ * Palette source: VS Code Dark+ (default dark theme).
+ */
+
+/* ------------------------------------------------------------------ */
+/* Self-hosted font faces                                             */
+/* ------------------------------------------------------------------ */
+
+@font-face {
+  font-family: "Raleway";
+  src: url("/fonts/raleway-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Raleway";
+  src: url("/fonts/raleway-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/jetbrains-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* -------------------------------------------------------------- */
+  /* Colour — VS Code Dark+ palette                                  */
+  /* -------------------------------------------------------------- */
+
+  /* Base tokens */
+  --bg-editor: #1e1e1e;
+  --bg-sidebar: #252526;
+  --bg-highlight: #2a2d2e;
+  --border: #3c3c3c;
+  --fg: #d4d4d4;
+  --fg-muted: #858585;
+
+  /* Syntax accent tokens — use semantically, never decoratively */
+  --accent-blue: #569cd6;
+  --accent-lightblue: #9cdcfe;
+  --accent-teal: #4ec9b0;
+  --accent-yellow: #dcdcaa;
+  --accent-orange: #ce9178;
+  --accent-green: #6a9955;
+  --accent-purple: #c586c0;
+  --statusbar-blue: #007acc;
+
+  /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
+     footer) — kept as a token rather than a literal so nothing outside this
+     file ever hard-codes a hex value. */
+  --fg-inverse: #ffffff;
+
+  /* -------------------------------------------------------------- */
+  /* Typography — font families                                     */
+  /* -------------------------------------------------------------- */
+
+  /* Display / headings — matches CV header treatment */
+  --font-display: "Raleway", "Segoe UI", sans-serif;
+  /* Body copy */
+  --font-body: "Lato", "Segoe UI", sans-serif;
+  /* Code / IDE motifs (terminal, status bar, tags) */
+  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+
+  /* -------------------------------------------------------------- */
+  /* Typography — modular type scale (ratio 1.25, base 16px)        */
+  /* -------------------------------------------------------------- */
+
+  --font-size-sm: 0.8rem; /* 12.8px — captions, metadata */
+  --font-size-base: 1rem; /* 16px   — body minimum per typography.md */
+  --font-size-md: 1.25rem; /* 20px   — lead paragraphs */
+  --font-size-lg: 1.563rem; /* 25px   — h3 */
+  --font-size-xl: 1.953rem; /* 31px   — h2 */
+  --font-size-2xl: 2.441rem; /* 39px   — h1 */
+  --font-size-3xl: 3.052rem; /* 49px   — display / hero name */
+
+  --line-height-tight: 1.2; /* headings */
+  --line-height-normal: 1.5; /* UI text */
+  --line-height-relaxed: 1.7; /* prose */
+
+  /* Prose measure cap (Notes pages) */
+  --measure: 70ch;
+}

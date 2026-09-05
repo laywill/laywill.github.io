@@ -69,7 +69,12 @@
     "pexels",
     "dbaeumer",
     "esbenp",
-    "davidanson"
+    "davidanson",
+    "raleway",
+    "jetbrains",
+    "fontsource",
+    "lede",
+    "statusbar"
   ],
   "ignorePaths": [
     ".git",
@@ -79,6 +84,7 @@
     ".astro",
     ".venv",
     "megalinter-reports",
-    ".gitignore"
+    ".gitignore",
+    "public/fonts/LICENSE-*.txt"
   ]
 }

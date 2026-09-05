@@ -1,0 +1,23 @@
+{
+  "name": "williamlay.co.uk",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Personal website of William Lay — Astro v2 rebuild.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}
