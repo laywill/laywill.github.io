@@ -32,3 +32,7 @@ Design and architecture decisions live in [`docs/overhaul/`](docs/overhaul/):
 - Branches: `<type>/<issue-number>-<slug>` (e.g. `feat/42-landing-hero`), PRs into `main`
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/)
 - Every piece of work traces to an issue
+
+## License
+
+This repository uses a split licence, with details captured in [LICENSE](LICENSE).
