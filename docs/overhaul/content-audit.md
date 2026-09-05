@@ -4,21 +4,21 @@ Inventory date: 2026-09-04. The v1 site is preserved on `master` (tag `v1.0.0`).
 
 ## What dies
 
-| Item | Reason |
-| --- | --- |
-| `index-demo.html`, `assets/js/demo.js` | HTML5 UP template demo, accidentally deployed |
-| `under_construction.html` | Dead-end stub linked from three homepage cards |
-| `prod_tech.html` | Production Technician is no longer a professional identity; salvage a short "past life" mention + a few images for Interests |
-| `photographer.html` | Photography becomes an interest, not a profession; curated best shots move to Interests |
-| `engineer.html` | Content (firmware/DSP/microelectronics) describes a previous career phase; superseded by software/DevOps/leadership focus |
-| jQuery 1.11.3, skel.js, scrollex, scrolly, Font Awesome 4.6.3 + 900 KB webfonts | Dead 2015-era stack; Astro rebuild replaces wholesale |
-| `docs/CV_William_Lay.pdf` | Replaced by link to latest release: `https://github.com/laywill/CV/releases/latest/download/<asset>.pdf` (fallback: the [latest release page](https://github.com/laywill/CV/releases/latest)). Confirm the asset filename is stable across releases |
-| UA analytics `UA-106572147-1` | Dead since July 2023; replaced by GoatCounter |
-| `.htaccess` | Apache-only, inert on GitHub Pages |
-| ~1,000-char keyword-stuffed `<meta name="keywords">` | Ignored by search engines, reads as spam |
-| `terms-and-conditions.html` | Credits covered stock imagery being deleted; new stock (Pexels/Unsplash) gets a fresh, minimal credits note |
-| html5up.net attribution links (×8) | CC-BY obligation dies with the template code |
-| 213 MB image tree with fake thumbnails | Curated + optimised replacements only; originals stay out of git |
+| Item                                                                            | Reason                                                                                                                                                                                                                                              |
+|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `index-demo.html`, `assets/js/demo.js`                                          | HTML5 UP template demo, accidentally deployed                                                                                                                                                                                                       |
+| `under_construction.html`                                                       | Dead-end stub linked from three homepage cards                                                                                                                                                                                                      |
+| `prod_tech.html`                                                                | Production Technician is no longer a professional identity; salvage a short "past life" mention + a few images for Interests                                                                                                                        |
+| `photographer.html`                                                             | Photography becomes an interest, not a profession; curated best shots move to Interests                                                                                                                                                             |
+| `engineer.html`                                                                 | Content (firmware/DSP/microelectronics) describes a previous career phase; superseded by software/DevOps/leadership focus                                                                                                                           |
+| jQuery 1.11.3, skel.js, scrollex, scrolly, Font Awesome 4.6.3 + 900 KB webfonts | Dead 2015-era stack; Astro rebuild replaces wholesale                                                                                                                                                                                               |
+| `docs/CV_William_Lay.pdf`                                                       | Replaced by link to latest release: `https://github.com/laywill/CV/releases/latest/download/<asset>.pdf` (fallback: the [latest release page](https://github.com/laywill/CV/releases/latest)). Confirm the asset filename is stable across releases |
+| UA analytics `UA-106572147-1`                                                   | Dead since July 2023; replaced by GoatCounter                                                                                                                                                                                                       |
+| `.htaccess`                                                                     | Apache-only, inert on GitHub Pages                                                                                                                                                                                                                  |
+| ~1,000-char keyword-stuffed `<meta name="keywords">`                            | Ignored by search engines, reads as spam                                                                                                                                                                                                            |
+| `terms-and-conditions.html`                                                     | Credits covered stock imagery being deleted; new stock (Pexels/Unsplash) gets a fresh, minimal credits note                                                                                                                                         |
+| html5up.net attribution links (×8)                                              | CC-BY obligation dies with the template code                                                                                                                                                                                                        |
+| 213 MB image tree with fake thumbnails                                          | Curated + optimised replacements only; originals stay out of git                                                                                                                                                                                    |
 
 ## What migrates
 

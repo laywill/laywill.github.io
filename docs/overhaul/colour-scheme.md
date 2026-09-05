@@ -4,29 +4,29 @@ The site is dark-first, built from the VS Code Dark+ (default dark) theme. These
 
 ## Base tokens
 
-| Token | Hex | VS Code role |
-| --- | --- | --- |
-| `bg-editor` | `#1E1E1E` | Editor background — primary page background |
-| `bg-sidebar` | `#252526` | Sidebar background — alternate section / panel background |
-| `bg-highlight` | `#2A2D2E` | Line highlight — hover states, subtle emphasis |
-| `border` | `#3C3C3C` | Panel borders, dividers |
-| `fg` | `#D4D4D4` | Editor foreground — body text |
-| `fg-muted` | `#858585` | Line numbers — secondary text |
+| Token          | Hex       | VS Code role                                              |
+|----------------|-----------|-----------------------------------------------------------|
+| `bg-editor`    | `#1E1E1E` | Editor background — primary page background               |
+| `bg-sidebar`   | `#252526` | Sidebar background — alternate section / panel background |
+| `bg-highlight` | `#2A2D2E` | Line highlight — hover states, subtle emphasis            |
+| `border`       | `#3C3C3C` | Panel borders, dividers                                   |
+| `fg`           | `#D4D4D4` | Editor foreground — body text                             |
+| `fg-muted`     | `#858585` | Line numbers — secondary text                             |
 
 ## Syntax accent tokens
 
 Use **semantically** (consistent meaning per colour), never decoratively.
 
-| Token | Hex | VS Code role | Candidate site meaning |
-| --- | --- | --- | --- |
-| `accent-blue` | `#569CD6` | Keywords | Primary links / interactive |
-| `accent-lightblue` | `#9CDCFE` | Variables, attributes | Secondary links, metadata |
-| `accent-teal` | `#4EC9B0` | Types, classes | Skills / technology tags |
-| `accent-yellow` | `#DCDCAA` | Functions | Actions, highlights |
-| `accent-orange` | `#CE9178` | Strings | Quotes, human/narrative content |
-| `accent-green` | `#6A9955` | Comments | Asides, timestamps, de-emphasis |
-| `accent-purple` | `#C586C0` | Control keywords | Use sparingly — see anti-patterns (no purple *gradients*; flat token use is acceptable if the design study keeps it) |
-| `statusbar-blue` | `#007ACC` | Status bar | Footer / status-bar motif, primary CTA candidate |
+| Token              | Hex       | VS Code role          | Candidate site meaning                                                                                               |
+|--------------------|-----------|-----------------------|----------------------------------------------------------------------------------------------------------------------|
+| `accent-blue`      | `#569CD6` | Keywords              | Primary links / interactive                                                                                          |
+| `accent-lightblue` | `#9CDCFE` | Variables, attributes | Secondary links, metadata                                                                                            |
+| `accent-teal`      | `#4EC9B0` | Types, classes        | Skills / technology tags                                                                                             |
+| `accent-yellow`    | `#DCDCAA` | Functions             | Actions, highlights                                                                                                  |
+| `accent-orange`    | `#CE9178` | Strings               | Quotes, human/narrative content                                                                                      |
+| `accent-green`     | `#6A9955` | Comments              | Asides, timestamps, de-emphasis                                                                                      |
+| `accent-purple`    | `#C586C0` | Control keywords      | Use sparingly — see anti-patterns (no purple *gradients*; flat token use is acceptable if the design study keeps it) |
+| `statusbar-blue`   | `#007ACC` | Status bar            | Footer / status-bar motif, primary CTA candidate                                                                     |
 
 ## Contrast notes (against `#1E1E1E`, WCAG AA = 4.5:1 body, 3:1 large text)
 
