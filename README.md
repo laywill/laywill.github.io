@@ -38,4 +38,4 @@ Design and architecture decisions live in [`docs/overhaul/`](docs/overhaul/):
 This repository uses a split licence:
 
 - **Code** (Astro components, TypeScript, configuration, build tooling, and all other source code) is licensed under the [MIT License](LICENSE).
-- **Site content** — written text, photographs, and other creative works published on the site — is © William Lay 2026, All Rights Reserved, and is not licensed for reuse.
+- **Site content** (written text, photographs, and other creative works published on the site) is © William Lay 2026, All Rights Reserved, and is not licensed for reuse.
