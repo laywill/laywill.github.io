@@ -2,10 +2,11 @@ This repository uses a split licence. Unless a file or directory states
 otherwise, the MIT License below applies to all code (Astro components,
 TypeScript, configuration, build tooling, and other source code).
 
-Site content — written text, photographs, and other creative works — is NOT
-covered by the MIT License below. It is copyright William Lay and is not
-licensed for reuse. As content is added, the specific files/directories it
-lives in will be listed here:
+Site content (written text, photographs, and other creative works) is NOT
+covered by the MIT License below. It is copyright (c) William Lay 2026 and is not
+licensed for reuse. All rights, implied or otherwise, are reserved.
+
+As content is added, the specific files/directories it lives in will be listed here:
 
 <!-- TODO: list site content paths as they are added, e.g.:
 - src/content/ (Notes, Interests)
