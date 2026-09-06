@@ -40,15 +40,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # No JS/TS source exists yet (Astro scaffolding is issue #24) — CodeQL
-        # fails the build if a selected language has no matching files. Until
-        # #24 lands, `actions` (this repo's GitHub Actions workflows) is the
-        # only supported language with content to analyze. Switch/add
-        # javascript-typescript once the Astro project exists. See
-        # https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning#changing-the-languages-that-are-analyzed
-        # for the full list of supported identifiers.
         language:
           - actions
+          - javascript-typescript
 
     steps:
       - name: Checkout Code
