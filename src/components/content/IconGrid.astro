@@ -1,0 +1,121 @@
+---
+/*
+ * The lokkal-style "toolbox": one row per category, each row pairing a
+ * category label with the tools in it. Reconciling issue #27 (which calls
+ * this an "icon grid") with design-direction.md's split-pane spec (a
+ * category-label column plus wrapping tag pills): the tiles ARE tags, each
+ * carrying its own brand icon, not a separate icon+label control.
+ *
+ * Markup choice: <dl>. A category genuinely is a term whose tools are its
+ * description — "Cloud & infrastructure" describes the set {Docker,
+ * Kubernetes, Terraform, AWS} the way a glossary term describes its
+ * definition. That is a closer semantic fit than a <section>-per-category
+ * (which would need a heading level nobody has assigned — this is a data
+ * row, not a subsection of the page) or a <table> (there is one column, not
+ * a matrix). <dl> also gets the label/value pairing for free, which is
+ * exactly what "category is carried by text as well as colour" needs.
+ *
+ * The tag list itself is a real <ul> of <Tag as="li">, per the component
+ * library contract, so a screen reader announces "list, 4 items" rather
+ * than four unrelated inline elements.
+ */
+import { accentVar } from "../../lib/accents";
+import { TOOLBOX, type ToolboxCategory } from "../../data/toolbox";
+import Tag from "../ui/Tag.astro";
+
+interface Props {
+  categories?: readonly ToolboxCategory[];
+  class?: string;
+}
+
+const { categories = TOOLBOX, class: className } = Astro.props;
+---
+
+<dl class:list={["icon-grid", className]}>
+  {
+    categories.map((category: ToolboxCategory) => (
+      <div class="row">
+        {/*
+          The category accent is set as a local custom property (per
+          accents.ts's documented pattern) rather than branching in CSS, so
+          there is one rule for the label colour instead of one per accent.
+        */}
+        <dt class="label" style={`--row-accent: ${accentVar(category.accent)}`}>
+          {category.label}
+        </dt>
+        <dd class="tags">
+          <ul>
+            {category.items.map((item) => (
+              <Tag as="li" accent={category.accent} icon={item.icon} quoted={category.quoted}>
+                {item.label}
+              </Tag>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .icon-grid {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--row-accent);
+  }
+
+  .tags {
+    margin: 0;
+  }
+
+  .tags ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+
+  /*
+   * At `sm` (640px, per component-library.md's documented breakpoint table)
+   * the row gains its label column and the tags sit alongside it rather
+   * than beneath it. The label gets a fixed measure so every row's tag
+   * column starts at the same x-position; it does not use ch/rem tokens
+   * from the space scale because it is a text-measure width, not a
+   * spacing value — there is no token for that in tokens.css, so this is
+   * the "nearest existing one" compromise flagged in the report.
+   */
+  @media (min-width: 640px) {
+    .row {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .label {
+      flex: 0 0 12rem;
+      padding-top: var(--space-3xs);
+    }
+
+    .tags {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+</style>

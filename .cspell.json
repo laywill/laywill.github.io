@@ -83,7 +83,13 @@
     "wayfinding",
     "letterspaced",
     "letterspacing",
-    "namesection"
+    "namesection",
+    "amazonwebservices",
+    "githubactions",
+    "gnubash",
+    "circleci",
+    "argo",
+    "lightboxes"
   ],
   "ignorePaths": [
     ".git",

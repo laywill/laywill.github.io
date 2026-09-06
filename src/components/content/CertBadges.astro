@@ -1,0 +1,102 @@
+---
+/*
+ * A wrapping grid of certification badges on --bg-sidebar. These are TEXT
+ * badges — a short mono abbreviation over a caption — not artwork. Real
+ * badge artwork is issues #28 (copy) and #30 (artwork); this component only
+ * needs to survive that swap without a markup change.
+ *
+ * Accessibility choice for the abbr/name pairing: the mono "abbr" glyph
+ * (e.g. "PH1") is a purely visual mnemonic — it is not a real abbreviation
+ * that expands to the caption text via <abbr title>, and it carries no
+ * information the caption doesn't already state in full. Announcing it
+ * would give a screen-reader user something like "P H 1, Placeholder
+ * certification 1, Placeholder issuer" — a meaningless code read out before
+ * the actual name. So the glyph is `aria-hidden`, and the accessible name
+ * for each badge comes from the caption alone, once.
+ */
+import type { Certification } from "../../data/certifications";
+import { CERTIFICATIONS } from "../../data/certifications";
+
+interface Props {
+  items?: readonly Certification[];
+  class?: string;
+}
+
+const { items = CERTIFICATIONS, class: className } = Astro.props;
+---
+
+<ul class:list={["cert-badges", className]}>
+  {
+    items.map((cert: Certification) => (
+      <li class="badge">
+        <span class="abbr" aria-hidden="true">
+          {cert.abbr}
+        </span>
+        <span class="caption">
+          <span class="cert-name">{cert.name}</span>
+          <span class="issuer">
+            {cert.issuer}
+            {cert.year !== undefined && `, ${cert.year}`}
+          </span>
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .cert-badges {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    /* 2-up below `sm`, per component-library.md's breakpoint table. */
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+
+  @media (min-width: 640px) {
+    .cert-badges {
+      /* 3-up at `sm` and above. */
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .badge {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--space-2xs);
+    padding: var(--space-sm);
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--elevation-1);
+  }
+
+  .abbr {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    color: var(--fg);
+  }
+
+  .caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    /*
+     * Panel-surface caption text. --fg-muted manages only 4.15:1 on
+     * --bg-sidebar and fails AA there (see colour-scheme.md's contrast
+     * notes) — --fg-secondary clears 5.86:1, so it is the only de-emphasis
+     * token this component may use.
+     */
+    color: var(--fg-secondary);
+  }
+</style>
