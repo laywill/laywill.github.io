@@ -31,7 +31,6 @@
   sidebar, which also carries a --statusbar-blue marker so the state is
   never signalled by fill alone. */
   --bg-active: #37373d;
-
   --border: #3c3c3c;
 
   /* Quieter hairline for the breadcrumb bar, where a full --border
@@ -39,7 +38,6 @@
   they fall below WCAG 1.4.11, so neither may be the sole indicator of a
   control or of its state. */
   --border-subtle: #2a2a2a;
-
   --fg: #d4d4d4;
 
   /* Secondary text. Exists because --fg-muted manages only 4.15:1 on
