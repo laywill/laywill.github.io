@@ -1,0 +1,77 @@
+---
+name: Build
+
+# Reusable only: this workflow is never triggered directly. ci.yml calls it on
+# push/PR to main; release.yml calls it on a v* tag with pages: true so the
+# built output is uploaded in the shape actions/deploy-pages expects.
+on:
+  workflow_call:
+    inputs:
+      pages:
+        description: >-
+          Also upload dist/ as a GitHub Pages artifact (named "github-pages"),
+          which the caller's deploy job consumes. Off for ordinary CI runs so
+          PR runs don't leave a deployable artifact lying around.
+        type: boolean
+        default: false
+        required: false
+
+# Prefixed with a literal so the group can't collide with the other reusable
+# workflows called from the same release run - github.workflow resolves to the
+# *caller's* name inside a called workflow, so it is not a distinguisher here.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # --ignore-scripts: nothing in the dependency tree needs a lifecycle
+      # script to build this site, so don't run arbitrary install-time code.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # astro check is the strict-TypeScript gate (tsconfig extends
+      # astro/tsconfigs/strict); astro build is the real build.
+      - name: Type-check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      # Plain artifact for the link-check job, which runs in a separate
+      # workflow/job and therefore can't see this runner's filesystem.
+      - name: Upload build output
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
+
+      # Pages-shaped artifact (a single tar named "github-pages") for
+      # actions/deploy-pages. Only the built output is ever uploaded - v1
+      # shipped its whole 213 MB working tree, see docs/overhaul/architecture.md.
+      - name: Upload GitHub Pages artifact
+        if: ${{ inputs.pages }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: dist

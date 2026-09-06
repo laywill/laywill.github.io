@@ -1,0 +1,115 @@
+---
+name: Release
+
+# The only path to production. Deploys happen from v* tags and nowhere else -
+# no branch push, no manual dispatch, no schedule - and only after every check
+# job has passed on the tagged commit (see docs/overhaul/architecture.md).
+on:
+  push:
+    tags:
+      - "v*"
+
+# Releases are not cancelled by a newer one: two tags pushed close together
+# should both complete rather than leave a half-run pipeline behind.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Checks. Each is the same reusable workflow CI runs, so what gates a
+  # release is what ran on the PR - not a second, drifting copy of it.
+  # ---------------------------------------------------------------------
+  lint:
+    name: Lint
+    uses: ./.github/workflows/mega-linter.yml
+    # These mirror the permissions mega-linter.yml's own job declares: a
+    # called workflow's permissions can be reduced by the caller but never
+    # raised, so anything less here fails the run outright. The write scopes
+    # exist for MegaLinter's apply-fixes path, which is gated on
+    # APPLY_FIXES_EVENT: pull_request and so cannot fire on a tag push.
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    secrets:
+      # Optional. Absent, mega-linter.yml falls back to GITHUB_TOKEN.
+      PAT: ${{ secrets.PAT }}
+
+  sast:
+    name: SAST
+    uses: ./.github/workflows/codeql.yml
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      # Produces the "github-pages" artifact the deploy job consumes.
+      pages: true
+    permissions:
+      contents: read
+
+  link-check:
+    name: Link check
+    needs: build
+    uses: ./.github/workflows/link-check.yml
+    permissions:
+      contents: read
+
+  # ---------------------------------------------------------------------
+  # Deploy. needs: every check job above - that list is the enforcement.
+  # ---------------------------------------------------------------------
+  deploy:
+    name: Deploy to GitHub Pages
+    needs:
+      - lint
+      - sast
+      - build
+      - link-check
+
+    # Pre-release tags run the whole pipeline and stop here, which is what
+    # makes v2.0.0-rc.N a real dry run rather than a rehearsal of a different
+    # pipeline. SemVer puts a pre-release identifier after a hyphen
+    # (v2.0.0-rc.1, v2.0.0-beta.2), so the hyphen is the test; build metadata
+    # uses "+" and is not a pre-release.
+    if: ${{ !contains(github.ref_name, '-') }}
+
+    runs-on: ubuntu-latest
+
+    # The environment's own deployment branch/tag policy is a second gate,
+    # independent of this file and not visible anywhere in this repo, so it is
+    # recorded here. It allows exactly two refs:
+    #
+    #   master  (branch)  v1's legacy deploy path - static.yml on that branch
+    #   v*      (tag)     this workflow
+    #
+    # The tag entry is what lets this job deploy at all. Keeping it a *tag*
+    # policy means the tag-gate holds even if this workflow is edited.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    # Shared with master's static.yml (v1) so a v1 and v2 deploy queue behind
+    # each other instead of racing for the same Pages site. Never cancel: a
+    # half-applied deploy is worse than a slow one.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    steps:
+      # Deploys the "github-pages" artifact built above. No checkout: the
+      # repo tree is never what gets published.
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1

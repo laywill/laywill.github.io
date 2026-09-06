@@ -1,0 +1,61 @@
+---
+name: Link check
+
+# Reusable only. Checks links in the *built* output, which is the only place
+# they can be checked meaningfully: a page's href="/interests/" says nothing
+# about whether Astro actually emitted that route, and the .astro sources a
+# linter sees aren't the HTML a visitor gets.
+#
+# This is not the same check as MegaLinter's SPELL_LYCHEE. That one runs over
+# the source tree (Markdown/HTML in git), never sees dist/ - which doesn't
+# exist at lint time and is excluded by FILTER_REGEX_EXCLUDE anyway - and runs
+# with SPELL_LYCHEE_DISABLE_ERRORS: true, so it cannot fail a build. Same tool,
+# different target, and only this one gates a release.
+on:
+  workflow_call:
+
+# Literal prefix: github.workflow resolves to the caller's name inside a called
+# workflow, so it can't separate this group from the other called workflows'.
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  link-check:
+    name: Link check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # No checkout: the built site is the artifact from the build job, and
+      # the repo tree is irrelevant to this check.
+      - name: Download build output
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: dist
+          path: dist
+
+      # --offline restricts this to local files, so a flaky third-party host
+      # can never fail a release; external links are MegaLinter's lychee run's
+      # problem (non-blocking, by design).
+      #
+      # --root-dir is required, not optional: Astro emits root-absolute hrefs
+      # (href="/favicon.svg"), which lychee would otherwise resolve against the
+      # filesystem root rather than the site root. It needs an absolute path.
+      # lychee-action eval's this string, so $GITHUB_WORKSPACE expands here.
+      #
+      # failIfEmpty (on by default) guards the glob itself: if dist/ ever stops
+      # matching, the job fails rather than silently passing zero links.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
+        with:
+          args: >-
+            --offline
+            --verbose
+            --no-progress
+            --root-dir "$GITHUB_WORKSPACE/dist"
+            "dist/**/*.html"
+          fail: true
