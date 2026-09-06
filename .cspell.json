@@ -89,7 +89,12 @@
     "gnubash",
     "circleci",
     "argo",
-    "lightboxes"
+    "lightboxes",
+    "subresource",
+    "subresources",
+    "polyfill",
+    "polyfilling",
+    "deque"
   ],
   "ignorePaths": [
     ".git",

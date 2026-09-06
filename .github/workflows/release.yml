@@ -63,6 +63,13 @@ jobs:
     permissions:
       contents: read
 
+  a11y:
+    name: Accessibility
+    needs: build
+    uses: ./.github/workflows/a11y.yml
+    permissions:
+      contents: read
+
   # ---------------------------------------------------------------------
   # Deploy. needs: every check job above - that list is the enforcement.
   # ---------------------------------------------------------------------
@@ -73,6 +80,7 @@ jobs:
       - sast
       - build
       - link-check
+      - a11y
 
     # Pre-release tags run the whole pipeline and stop here, which is what
     # makes v2.0.0-rc.N a real dry run rather than a rehearsal of a different
