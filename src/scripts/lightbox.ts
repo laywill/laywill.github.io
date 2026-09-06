@@ -92,8 +92,12 @@ function initGallery(gallery: Element): void {
   function open(trigger: HTMLAnchorElement): void {
     const full = trigger.dataset.full;
     // No recorded full rendition: leave the click as a normal navigation
-    // rather than opening an empty dialog.
-    if (!full || !image) return;
+    // rather than opening an empty dialog. Written as explicit nullish and
+    // empty-string checks rather than a truthiness test, because a dataset
+    // read is `string | undefined` and ts-standard's
+    // strict-boolean-expressions rule (rightly) refuses to let the two
+    // cases collapse into one.
+    if (full === undefined || full === "" || image === null) return;
 
     invoker = trigger;
 
@@ -102,10 +106,12 @@ function initGallery(gallery: Element): void {
 
     image.src = full;
     image.alt = alt;
-    if (trigger.dataset.fullWidth) image.width = Number(trigger.dataset.fullWidth);
-    if (trigger.dataset.fullHeight) image.height = Number(trigger.dataset.fullHeight);
+    const fullWidth = trigger.dataset.fullWidth;
+    const fullHeight = trigger.dataset.fullHeight;
+    if (fullWidth !== undefined && fullWidth !== "") image.width = Number(fullWidth);
+    if (fullHeight !== undefined && fullHeight !== "") image.height = Number(fullHeight);
 
-    if (caption) {
+    if (caption !== null) {
       caption.textContent = captionText;
       caption.hidden = captionText.length === 0;
     }
@@ -115,7 +121,12 @@ function initGallery(gallery: Element): void {
     // independently of whether a caption exists — falling back to the
     // image's alt text — so the dialog is always named even when there is
     // no caption to fall back on.
-    dialog.setAttribute("aria-label", alt || captionText || "Image preview");
+    // First non-empty of alt, caption, or a generic fallback. Spelled out
+    // rather than chained with `||` so an empty string is handled as the
+    // deliberate "no text here" case it is, not as an accident.
+    const accessibleName =
+      alt !== "" ? alt : captionText !== "" ? captionText : "Image preview";
+    dialog.setAttribute("aria-label", accessibleName);
 
     dialog.showModal();
   }
@@ -132,7 +143,7 @@ function initGallery(gallery: Element): void {
       // open the dialog in its place (see the early return in open()) —
       // otherwise a visitor would click a thumbnail and see nothing happen.
       const full = trigger.dataset.full;
-      if (!full || !image) return;
+      if (full === undefined || full === "" || image === null) return;
       event.preventDefault();
       open(trigger);
     });
@@ -160,7 +171,7 @@ function initGallery(gallery: Element): void {
       // bitmaps for the lifetime of the page.
       image?.removeAttribute("src");
       if (image) image.alt = "";
-      if (caption) {
+      if (caption !== null) {
         caption.textContent = "";
         caption.hidden = true;
       }
