@@ -84,11 +84,14 @@ jobs:
     runs-on: ubuntu-latest
 
     # The environment's own deployment branch/tag policy is a second gate,
-    # independent of this file, and it currently allows the `master` branch
-    # only (that is v1's deploy path). A `v*` *tag* policy has to be added
-    # there before this job can deploy at all - see the cutover runbook in
-    # docs/overhaul/architecture.md. Keeping the policy to tags means the
-    # tag-gate holds even if this workflow is edited.
+    # independent of this file and not visible anywhere in this repo, so it is
+    # recorded here. It allows exactly two refs:
+    #
+    #   master  (branch)  v1's legacy deploy path - static.yml on that branch
+    #   v*      (tag)     this workflow
+    #
+    # The tag entry is what lets this job deploy at all. Keeping it a *tag*
+    # policy means the tag-gate holds even if this workflow is edited.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

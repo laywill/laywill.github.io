@@ -18,6 +18,12 @@
 
 APPLY_FIXES: yes
 DISABLE_ERRORS: false
+
+# MegaLinter classes any linter that can auto-fix as a "formatter" and
+# downgrades formatter errors to non-blocking by default. That quietly made
+# markdownlint advisory, including on the release lint gate, which is the one
+# place a lint failure has to mean something.
+FORMATTERS_DISABLE_ERRORS: false
 SHOW_ELAPSED_TIME: true
 PARALLEL: true
 FILEIO_REPORTER: false
@@ -87,6 +93,13 @@ SPELL_CSPELL_FILTER_REGEX_EXCLUDE: (\.cspell\.json|\.gitignore)
 #   indentation errors. markdownlint (enabled above) already governs Markdown
 #   formatting, so Markdown is excluded here rather than mangling those.
 EDITORCONFIG_EDITORCONFIG_CHECKER_FILTER_REGEX_EXCLUDE: (LICENSE|\.md$)
+
+# Markdownlint Config
+# MegaLinter looks for .markdownlint.json and silently falls back to its own
+# bundled config when it is absent - so CI was enforcing rules (MD013 at 400
+# columns) that .markdownlint.yaml disables, while the markdownlint-cli2
+# pre-commit hook read the .yaml and stayed clean. Point both at one file.
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yaml
 
 # Filter Configuration
 # Anchored on directory boundaries so `.git/` is excluded without also

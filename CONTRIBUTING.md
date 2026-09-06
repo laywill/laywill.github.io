@@ -65,9 +65,10 @@ automatically on container create.
 
 ## Releases and deploys
 
-The live site is published **only** by pushing a `v*` tag — there is no
-branch-push, manual-dispatch or scheduled path to a deploy. See
-[.github/workflows/release.yml](.github/workflows/release.yml).
+The v2 site is published **only** by pushing a `v*` tag — nothing on `main`
+offers a branch-push, manual-dispatch or scheduled path to a deploy. See
+[.github/workflows/release.yml](.github/workflows/release.yml). (The v1 site
+still deploys on push to `master`; that path retires with the branch.)
 
 A tag push runs lint (MegaLinter), SAST (CodeQL), build, and the internal
 link check over the built output. The deploy job `needs:` all four, so a
