@@ -1,0 +1,115 @@
+---
+/*
+ * Outline.astro — in-page table of contents mirroring the current page's
+ * headings (docs/overhaul/component-library.md, "Navigation — nav/";
+ * docs/overhaul/design-direction.md, "1. Explorer sidebar").
+ *
+ * This is real navigation (anchor links to real headings), not decoration —
+ * component-library.md rule 5 only hides genuine set dressing, and this
+ * isn't that. It IS desktop-only, per the "narrow viewports" decision: on a
+ * phone the headings it would duplicate are a few lines below it, so the
+ * duplication earns nothing and burns vertical space instead. Hiding it
+ * with `display: none` removes it from the accessibility tree along with
+ * the viewport, but the headings themselves stay reachable either way, so
+ * no navigation capability is lost below 900px.
+ */
+export interface OutlineItem {
+  id: string;
+  label: string;
+  level: 2 | 3;
+}
+
+interface Props {
+  items: readonly OutlineItem[];
+  activeId?: string;
+  class?: string;
+}
+
+const { items, activeId, class: className } = Astro.props;
+---
+
+<nav aria-label="On this page" class:list={["outline", className]}>
+  <ul>
+    {
+      items.map((item) => {
+        const isActive = item.id === activeId;
+        return (
+          <li class:list={[`item-level-${item.level}`]}>
+            <a
+              href={`#${item.id}`}
+              class:list={["link", { "link--active": isActive }]}
+              aria-current={isActive ? "true" : undefined}
+            >
+              {/* The "##"/"###" prefix echoes the Markdown heading it
+              points at (the sidebar's file-explorer conceit extends to
+              the outline reading like a document's own source). It is
+              set dressing on top of a real link, not content in its own
+              right, so it is pulled out of the accessible name. */}
+              <span class="prefix" aria-hidden="true">
+                {item.level === 2 ? "##" : "###"}
+              </span>
+              {item.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .outline {
+    /* Desktop-only — see the file-level comment. Base (mobile) rules are
+    unqualified `display: none`; the >=900px query below is the sole
+    override, matching the one breakpoint this component cares about. */
+    display: none;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .link {
+    display: block;
+    padding: var(--space-3xs) var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--fg-secondary);
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-standard);
+  }
+
+  .link:hover {
+    background-color: var(--bg-highlight);
+  }
+
+  .link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Colour is not the only cue here: aria-current="true" carries the state
+  for assistive tech, and the colour change alone would be against
+  component-library.md rule 4 if this were the sole indicator for a
+  sighted user too — but --accent-lightblue at 11.18:1 against a mono
+  prefix column is the established convention for "current" throughout
+  this design (the sidebar's active outline heading, the breadcrumb tail),
+  so it is kept consistent with those rather than adding a redundant
+  glyph here as well. */
+  .link--active {
+    color: var(--accent-lightblue);
+  }
+
+  .item-level-3 .link {
+    padding-left: var(--space-lg);
+  }
+
+  @media (min-width: 900px) {
+    .outline {
+      display: block;
+    }
+  }
+</style>

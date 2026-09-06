@@ -1,0 +1,76 @@
+---
+/*
+ * Breadcrumb.astro — the mono "william-lay › about.md › ## About" line
+ * (docs/overhaul/component-library.md, "Navigation — nav/";
+ * docs/overhaul/design-direction.md, "2. Breadcrumb bar").
+ *
+ * Entirely aria-hidden, at every viewport width it renders at: it restates
+ * sidebar/outline state rather than adding a navigation path of its own
+ * (there are no links here at all), which is exactly the case
+ * design-direction.md and component-library.md rule 5 say may be hidden
+ * from assistive tech. Hidden outright below 900px, alongside the sidebar
+ * it narrates — see the "narrow viewports" decision.
+ */
+interface Props {
+  segments: readonly string[];
+  class?: string;
+}
+
+const { segments, class: className } = Astro.props;
+const lastIndex = segments.length - 1;
+---
+
+<div aria-hidden="true" class:list={["breadcrumb", className]}>
+  {
+    segments.map((segment, index) => (
+      <>
+        {index > 0 && <span class="sep">›</span>}
+        <span
+          class:list={[
+            "segment",
+            {
+              "segment--current": index === lastIndex,
+              "segment--file": index === lastIndex - 1,
+            },
+          ]}
+        >
+          {segment}
+        </span>
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .breadcrumb {
+    display: none;
+    align-items: baseline;
+    gap: var(--space-3xs);
+    padding: var(--space-2xs) var(--space-sm);
+    font-family: var(--font-mono);
+
+    /* --fg-muted is legal here (4.52:1 on --bg-editor, the breadcrumb's
+    surface) but only above its 14px floor — this is body-copy size, not
+    the mockup's rejected 11.5px mono, per the design doc's accessibility
+    corrections. */
+    font-size: var(--font-size-base);
+    color: var(--fg-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    overflow-x: hidden;
+    white-space: nowrap;
+  }
+
+  .segment--file {
+    color: var(--fg);
+  }
+
+  .segment--current {
+    color: var(--accent-lightblue);
+  }
+
+  @media (min-width: 900px) {
+    .breadcrumb {
+      display: flex;
+    }
+  }
+</style>
