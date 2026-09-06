@@ -35,30 +35,52 @@ export default defineConfig({
    * names only, so swapping a face is a change here plus one alias there.
    */
   fonts: [
+    // Display / the hero name. Chosen by the design study (issue #26); see
+    // docs/overhaul/typography.md.
+    {
+      provider: fontProviders.google(),
+      name: "Public Sans",
+      cssVariable: "--font-public-sans",
+      fallbacks: ["Segoe UI", "sans-serif"],
+      weights: [700],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    // Body. 700 carries the role titles in the career timeline.
+    {
+      provider: fontProviders.google(),
+      name: "Lato",
+      cssVariable: "--font-lato",
+      fallbacks: ["Segoe UI", "sans-serif"],
+      weights: [400, 700],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    // Code / IDE motifs. 500 carries the callout labels.
+    {
+      provider: fontProviders.google(),
+      name: "JetBrains Mono",
+      cssVariable: "--font-jetbrains-mono",
+      fallbacks: ["Cascadia Code", "Consolas", "monospace"],
+      weights: [400, 500],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    /*
+     * Retained deliberately, and currently unused: the design study replaced
+     * Raleway with Public Sans for the name, but Raleway is the CV's heading
+     * face, so it stays a live candidate for headings as the design iterates
+     * past MVP. Nothing in tokens.css aliases it, so no CSS rule references
+     * it and no visitor downloads it — it costs a build-time fetch and a few
+     * bytes of @font-face declaration. Drop this entry if a post-MVP pass
+     * settles on something else.
+     */
     {
       provider: fontProviders.google(),
       name: "Raleway",
       cssVariable: "--font-raleway",
       fallbacks: ["Segoe UI", "sans-serif"],
       weights: [700],
-      styles: ["normal"],
-      subsets: ["latin"],
-    },
-    {
-      provider: fontProviders.google(),
-      name: "Lato",
-      cssVariable: "--font-lato",
-      fallbacks: ["Segoe UI", "sans-serif"],
-      weights: [400],
-      styles: ["normal"],
-      subsets: ["latin"],
-    },
-    {
-      provider: fontProviders.google(),
-      name: "JetBrains Mono",
-      cssVariable: "--font-jetbrains-mono",
-      fallbacks: ["Cascadia Code", "Consolas", "monospace"],
-      weights: [400],
       styles: ["normal"],
       subsets: ["latin"],
     },
