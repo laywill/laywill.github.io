@@ -75,7 +75,9 @@
     "lede",
     "statusbar",
     "zizmor",
-    "artipacked"
+    "artipacked",
+    "gstatic",
+    "vendoring"
   ],
   "ignorePaths": [
     ".git",

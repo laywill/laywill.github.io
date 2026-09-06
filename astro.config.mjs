@@ -1,35 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
 
-/*
- * The Latin subset range shared by all three families below. The WOFF2 files
- * in src/assets/fonts/ are Latin-subset builds, so declaring the range lets
- * the browser skip the download entirely for a page whose glyphs all fall
- * outside it, and keeps per-glyph fallback correct rather than rendering
- * tofu for a character the file never contained.
- */
-const LATIN_SUBSET = /** @type {[string, ...string[]]} */ ([
-  "U+0000-00FF",
-  "U+0131",
-  "U+0152-0153",
-  "U+02BB-02BC",
-  "U+02C6",
-  "U+02DA",
-  "U+02DC",
-  "U+0304",
-  "U+0308",
-  "U+0329",
-  "U+2000-206F",
-  "U+20AC",
-  "U+2122",
-  "U+2191",
-  "U+2193",
-  "U+2212",
-  "U+2215",
-  "U+FEFF",
-  "U+FFFD",
-]);
-
 // https://astro.build/config
 export default defineConfig({
   site: "https://williamlay.co.uk",
@@ -42,12 +13,22 @@ export default defineConfig({
    * fallback faces (optimizedFallbacks, on by default) to cut layout shift
    * while the real face loads. font-display defaults to swap.
    *
-   * The `local` provider keeps the WOFF2 binaries vendored in the repo
-   * (src/assets/fonts/), so builds stay hermetic — no build-time fetch from
-   * Google/Fontsource, and no runtime request to a third-party font host.
-   * Per-family licences ship at public/fonts/LICENSE-*.txt: the built site
-   * redistributes these faces, and the SIL Open Font Licence requires the
-   * licence to travel with them.
+   * The faces are still self-hosted: the `google` provider resolves and
+   * downloads the WOFF2 files at *build* time, then emits them fingerprinted
+   * into /_astro/fonts/ and serves them from our own origin. The shipped
+   * pages contain no fonts.googleapis.com/fonts.gstatic.com reference, so a
+   * visitor never talks to a third-party font host — which is the part the
+   * old site's render-blocking @import got wrong. The binaries deliberately
+   * are not vendored in git: the provider fetches exactly the weights and
+   * subsets requested below, and Astro caches them between builds.
+   *
+   * Per-family licences ship at public/fonts/LICENSE-*.txt. Not vendoring
+   * the binaries doesn't end that obligation — the built site redistributes
+   * these faces, and the SIL Open Font Licence requires the licence to
+   * travel with them.
+   *
+   * `subsets: ["latin"]` makes the provider emit the Latin unicode-range for
+   * us, so a page whose glyphs fall outside it skips the download entirely.
    *
    * Semantic tokens (--font-display / --font-body / --font-mono) alias these
    * variables in src/styles/tokens.css; components reference the semantic
@@ -55,52 +36,31 @@ export default defineConfig({
    */
   fonts: [
     {
-      provider: fontProviders.local(),
+      provider: fontProviders.google(),
       name: "Raleway",
       cssVariable: "--font-raleway",
       fallbacks: ["Segoe UI", "sans-serif"],
-      unicodeRange: LATIN_SUBSET,
-      options: {
-        variants: [
-          {
-            src: ["./src/assets/fonts/raleway-700.woff2"],
-            weight: 700,
-            style: "normal",
-          },
-        ],
-      },
+      weights: [700],
+      styles: ["normal"],
+      subsets: ["latin"],
     },
     {
-      provider: fontProviders.local(),
+      provider: fontProviders.google(),
       name: "Lato",
       cssVariable: "--font-lato",
       fallbacks: ["Segoe UI", "sans-serif"],
-      unicodeRange: LATIN_SUBSET,
-      options: {
-        variants: [
-          {
-            src: ["./src/assets/fonts/lato-400.woff2"],
-            weight: 400,
-            style: "normal",
-          },
-        ],
-      },
+      weights: [400],
+      styles: ["normal"],
+      subsets: ["latin"],
     },
     {
-      provider: fontProviders.local(),
+      provider: fontProviders.google(),
       name: "JetBrains Mono",
       cssVariable: "--font-jetbrains-mono",
       fallbacks: ["Cascadia Code", "Consolas", "monospace"],
-      unicodeRange: LATIN_SUBSET,
-      options: {
-        variants: [
-          {
-            src: ["./src/assets/fonts/jetbrains-mono-400.woff2"],
-            weight: 400,
-            style: "normal",
-          },
-        ],
-      },
+      weights: [400],
+      styles: ["normal"],
+      subsets: ["latin"],
     },
   ],
 });
