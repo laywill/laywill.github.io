@@ -1,0 +1,132 @@
+---
+/*
+ * StatusBar.astro — the --statusbar-blue footer band
+ * (docs/overhaul/component-library.md, "Chrome — chrome/";
+ * docs/overhaul/design-direction.md, "6. Status-bar footer").
+ *
+ * Everything here is either a real link (williamlay.co.uk, back to "/") or
+ * pure set dressing borrowed from a code editor's status bar. Per
+ * component-library.md rule 5, the set dressing takes aria-hidden="true"
+ * individually rather than the whole <footer> being hidden, because the
+ * real link must stay in the accessibility tree.
+ *
+ * Text colour is #FFFFFF (--fg-on-accent) on #007ACC (--statusbar-blue):
+ * 4.51:1 per colour-scheme.md, clearing WCAG AA (4.5:1) by 0.01. That
+ * margin only holds at --font-size-base or larger — colour-scheme.md is
+ * explicit that this pairing must not be shrunk, and re-measured if either
+ * colour ever changes. There is deliberately no smaller-text rule anywhere
+ * in this file, including inside the @media block below.
+ */
+interface Problems {
+  errors: number;
+  warnings: number;
+}
+
+interface Props {
+  /** Decorative — set dressing for the editor motif, not a real git state. */
+  branch?: string;
+  problems?: Problems;
+  language?: string;
+  class?: string;
+}
+
+const {
+  branch = "main",
+  problems = { errors: 0, warnings: 0 },
+  language = "Markdown",
+  class: className,
+} = Astro.props;
+---
+
+<footer class:list={["statusbar", className]}>
+  <div class="group group--left" aria-hidden="true">
+    <span class="item">
+      <span class="glyph">⎇</span>
+      {branch}
+    </span>
+    <span class="item glyph" title="Synced">⟲</span>
+    <span class="item problems">
+      <span class="glyph">✕</span>
+      {problems.errors}
+      <span class="glyph">⚠</span>
+      {problems.warnings}
+    </span>
+  </div>
+
+  <div class="group group--right">
+    <span class="item" aria-hidden="true">Ln 1, Col 1</span>
+    <span class="item" aria-hidden="true">UTF-8</span>
+    <span class="item" aria-hidden="true">{language}</span>
+    <a class="item item--link" href="/">williamlay.co.uk</a>
+    <span class="item glyph" aria-hidden="true" title="Theme">◐</span>
+  </div>
+</footer>
+
+<style>
+  .statusbar {
+    /* Full width including under the sidebar: AppShell.astro gives this
+    component's grid-area a `grid-column: 1 / -1` equivalent by placing it
+    in its own full-span row, so no width rule is needed here. */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    /* Wraps rather than dropping items at the 360px floor. A media query
+    that hides "the most decorative" items was the other option the
+    component-library brief offered, but every item here is already either
+    aria-hidden or a real link — there is nothing left to cull that
+    wouldn't also delete information a sighted user relies on. Wrapping
+    keeps all of it token-driven with no bespoke breakpoint to maintain. */
+    flex-wrap: wrap;
+    row-gap: var(--space-3xs);
+    column-gap: var(--space-md);
+
+    padding: var(--space-2xs) var(--space-md);
+    background-color: var(--statusbar-blue);
+    color: var(--fg-on-accent);
+    font-family: var(--font-mono);
+
+    /* Fixed at --font-size-base — see the file-level comment on contrast. */
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+  }
+
+  .group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    white-space: nowrap;
+  }
+
+  .problems {
+    gap: var(--space-2xs);
+  }
+
+  .glyph {
+    /* Decorative glyphs sit inside an aria-hidden ancestor (the left group)
+    or carry their own aria-hidden (the theme glyph) — never a meaning
+    carried by colour alone, since there is only one colour here anyway. */
+    line-height: 1;
+  }
+
+  .item--link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .item--link:hover {
+    text-decoration: underline;
+  }
+
+  .item--link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+</style>

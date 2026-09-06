@@ -1,0 +1,175 @@
+---
+/*
+ * AppShell.astro — the page frame (docs/overhaul/component-library.md,
+ * "Layout — layout/"; docs/overhaul/design-direction.md, page structure
+ * §§1, 2, 6 and "Glossy and scrollable, not an IDE emulator").
+ *
+ * Composes the navigation (Nav.astro, rendered once and reshaped by CSS
+ * between an editor-tab bar and an explorer sidebar — see Nav.astro's own
+ * header comment), the breadcrumb, the in-page Outline, a <main> content
+ * column and the status-bar footer, in one CSS Grid.
+ *
+ * "Motif, not emulator" (design-direction.md) is the load-bearing
+ * constraint on the grid below: the sidebar rail is `position: sticky` so
+ * it stays in view while scrolling, but it must never become an
+ * independently-scrolling pane with its own scrollbar. Nav.astro sets
+ * `height: 100%; overflow-y: auto` on itself at >=900px — an ordinary
+ * "fill the available box" pattern from Nav's point of view — which only
+ * turns into a real scrolling pane if an ancestor gives that box a
+ * *definite* height. `.rail` is therefore kept at `align-self: start`
+ * (opting out of Grid's default row-stretch) and nothing in this file sets
+ * an explicit height anywhere in the ancestor chain, so Nav's `100%`
+ * resolves against `auto` and never creates a second scrollbar. The page
+ * scrolls as one normal document, as the design doc requires.
+ *
+ * Composing Nav (a <nav> landmark), <main> and StatusBar's <footer> also
+ * satisfies the StatusBar requirement that the footer not be the page's
+ * only landmark content.
+ */
+import type { OutlineItem } from "../nav/Outline.astro";
+import Nav from "../nav/Nav.astro";
+import Outline from "../nav/Outline.astro";
+import Breadcrumb from "../nav/Breadcrumb.astro";
+import StatusBar from "../chrome/StatusBar.astro";
+
+interface Props {
+  activeNavId: string;
+  breadcrumb?: readonly string[];
+  outline?: readonly OutlineItem[];
+  activeOutlineId?: string;
+  class?: string;
+}
+
+const {
+  activeNavId,
+  breadcrumb,
+  outline,
+  activeOutlineId,
+  class: className,
+} = Astro.props;
+
+// Narrowed to `undefined` rather than tested with a separate boolean flag +
+// non-null assertion at the call site — TypeScript can then confirm the
+// prop is present wherever it's read below.
+const breadcrumbSegments =
+  breadcrumb && breadcrumb.length > 0 ? breadcrumb : undefined;
+const outlineItems = outline && outline.length > 0 ? outline : undefined;
+---
+
+{/*
+  The skip link is the first focusable element on the page, ahead of Nav's
+  own links, so a keyboard/screen-reader user can bypass the whole sidebar
+  or tab bar in one press. It is visually hidden (translated off-canvas)
+  until it receives focus.
+*/}
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class:list={["shell", className]}>
+  <div class="rail">
+    <Nav activeId={activeNavId} />
+    {
+      outlineItems && (
+        <Outline items={outlineItems} activeId={activeOutlineId} />
+      )
+    }
+  </div>
+
+  <div class="content-col">
+    {breadcrumbSegments && <Breadcrumb segments={breadcrumbSegments} />}
+    <main id="main">
+      <slot />
+    </main>
+  </div>
+
+  <div class="statusbar-row">
+    <StatusBar />
+  </div>
+</div>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
+
+    /* Clears the sticky rail and the status bar both: a skip link the user
+    cannot see is worse than no skip link, because it still takes the first
+    Tab. */
+    z-index: var(--z-skip-link);
+
+    padding: var(--space-2xs) var(--space-sm);
+    background-color: var(--bg-active);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-md) 0;
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  /* Plain :focus (not :focus-visible) drives visibility: a skip link that
+  only appears for keyboard users but stays invisible to a mouse click is a
+  worse outcome than showing it either way. The ring below is layered on
+  top for the keyboard case specifically, per rule 6. */
+  .skip-link:focus {
+    transform: translateY(0%);
+  }
+
+  .skip-link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "rail"
+      "content"
+      "statusbar";
+  }
+
+  .rail {
+    grid-area: rail;
+    /* Opts out of Grid's default stretch — see the file-level comment on
+    why this matters for Nav's internal height:100%/overflow-y:auto. */
+    align-self: start;
+  }
+
+  .content-col {
+    grid-area: content;
+    /* Stops long unbroken mono content (hashes, refs, filenames) from
+    forcing the track wider than the viewport at the 360px floor. */
+    min-width: 0;
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--space-sm);
+  }
+
+  .statusbar-row {
+    grid-area: statusbar;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      /* The `md` breakpoint (component-library.md): tab bar becomes the
+      sidebar rail, status bar spans both tracks. */
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      grid-template-areas:
+        "rail content"
+        "statusbar statusbar";
+    }
+
+    .rail {
+      position: sticky;
+      top: 0;
+    }
+
+    .content-col {
+      padding-inline: var(--space-lg);
+    }
+  }
+</style>

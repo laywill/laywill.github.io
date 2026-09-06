@@ -1,0 +1,125 @@
+---
+/*
+ * Pane.astro — a bordered panel under a --bg-sidebar tab header
+ * (docs/overhaul/component-library.md, "Layout — layout/" and "Decision:
+ * the gloss vocabulary").
+ *
+ * Depth is bought with --elevation-1 (a hairline drop shadow) plus --sheen
+ * (a 1px inset top highlight) at rest, per the gloss-vocabulary decision —
+ * never a gradient, never a glow. Panes are static containers, not
+ * interactive controls, so there is no hover-raise here: component-library
+ * .md reserves the elevation-2 hover state for *interactive* surfaces.
+ *
+ * `headingLevel` decides whether the tab header is content or chrome:
+ *   - given  -> the filename is a real heading; the header participates in
+ *               the accessibility tree normally (e.g. the career/toolbox
+ *               panes, which anchor a page section).
+ *   - omitted -> the whole header is decorative set dressing and takes
+ *               aria-hidden="true" (component-library.md rule 5).
+ */
+import type { Accent } from "../../lib/accents";
+import { accentVar } from "../../lib/accents";
+
+interface Props {
+  /** Filename shown in the tab header, e.g. "experience.ts". */
+  file: string;
+  /** Right-aligned status note in the header, e.g. "git log --graph". */
+  status?: string;
+  /** Accent for the filename glyph/text. Defaults to "lightblue". */
+  accent?: Accent;
+  /** Heading level if the pane's filename should act as a heading. Omit for a purely decorative header. */
+  headingLevel?: 2 | 3;
+  class?: string;
+}
+
+const {
+  file,
+  status,
+  accent = "lightblue",
+  headingLevel,
+  class: className,
+} = Astro.props;
+
+const isDecorative = headingLevel === undefined;
+const HeadingTag = headingLevel === 3 ? "h3" : "h2";
+---
+
+<div class:list={["pane", className]}>
+  <div
+    class="pane-header"
+    style={`--pane-accent: ${accentVar(accent)}`}
+    aria-hidden={isDecorative ? "true" : undefined}
+  >
+    {
+      headingLevel ? (
+        <HeadingTag class="pane-file">{file}</HeadingTag>
+      ) : (
+        <span class="pane-file">{file}</span>
+      )
+    }
+    {status && <span class="pane-status">{status}</span>}
+  </div>
+  <div class="pane-body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .pane {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-editor);
+    /* Depth vocabulary settled by component-library.md: a hairline shadow
+    plus a lit top edge, combined as two shadow layers rather than a fill —
+    neither breaches the flat-colour rule. */
+    box-shadow:
+      var(--elevation-1),
+      var(--sheen);
+    overflow: hidden;
+  }
+
+  .pane-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    background-color: var(--bg-sidebar);
+    font-family: var(--font-mono);
+
+    /*
+     * --font-size-base, not --font-size-sm, and deliberately not
+     * conditional on `isDecorative`. --font-size-sm (12.8px) sits below
+     * both legibility floors design-direction.md's accessibility
+     * corrections set (the 14px floor colour-scheme.md gives muted text,
+     * and the 16px body floor in typography.md); that size is only
+     * permitted for content reliably hidden from assistive tech. This
+     * header is aria-hidden only when headingLevel is omitted, so sizing
+     * it per-state would make legibility depend on a prop a caller might
+     * flip either way — fixing it at the base size keeps it legible
+     * regardless.
+     */
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+  }
+
+  .pane-file {
+    margin: 0;
+    font-weight: normal;
+    font-family: var(--font-mono);
+    font-size: inherit;
+    color: var(--pane-accent);
+  }
+
+  .pane-status {
+    flex: none;
+    color: var(--fg-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pane-body {
+    padding: var(--space-md);
+  }
+</style>
