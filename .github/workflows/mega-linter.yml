@@ -52,6 +52,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
+          # Credentials must persist here so the "Commit and push applied
+          # linter fixes" step below (stefanzweifel/git-auto-commit-action)
+          # can push - it has no token input of its own and relies on the
+          # credential helper this checkout configures.
+          # zizmor: ignore[artipacked] persisted credentials required for the auto-commit push step below
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
           # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to
@@ -163,9 +168,12 @@ jobs:
 
       - name: Create PR output
         if: env.APPLY_FIXES_IF_PR == 'true'
+        env:
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
         run: |
-          echo "PR Number - ${{ steps.cpr.outputs.pull-request-number }}"
-          echo "PR URL - ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "PR Number - ${PR_NUMBER}"
+          echo "PR URL - ${PR_URL}"
 
       # Push new commit if applicable
       # (for now works only on PR from same repository, not from forks)
