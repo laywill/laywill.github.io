@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="William Lay"
+  description="Software engineer, DevOps practitioner and agile coach."
+  preloadDisplay
+>
+  <main class="hero">
+    <h1>William Lay</h1>
+    <p class="lede">
+      Software engineer working across DevOps, agile coaching and
+      engineering leadership. This page is a scaffold — the full site is
+      under active rebuild.
+    </p>
+    <p class="tag">software engineer</p>
+  </main>
+
+  <footer class="statusbar">
+    <span>◆ v2 scaffold — Astro + strict TypeScript</span>
+  </footer>
+</BaseLayout>
+
+<style>
+  .hero {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-tight);
+    color: var(--fg-display);
+    margin: 0 0 1rem;
+  }
+
+  .lede {
+    font-family: var(--font-body);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-relaxed);
+    color: var(--fg);
+    margin: 0 0 1.5rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--accent-teal);
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.6rem;
+    margin: 0;
+  }
+
+  .statusbar {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    color: var(--fg-on-accent);
+    background-color: var(--statusbar-blue);
+    padding: 0.4rem 1.5rem;
+  }
+</style>

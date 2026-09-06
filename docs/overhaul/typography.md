@@ -16,10 +16,14 @@ The CV is built from a customised Deedy-Resume class (`deedy-resume-openfont-wjl
 
 ## Loading rules
 
-- **Self-host** all fonts as WOFF2 in the repo (the old site's render-blocking Google Fonts `@import` is exactly what we're removing). Astro serves them from `public/fonts/` or via a fonts integration.
-- Subset to Latin; only load the weights actually used (target: ≤ 2 weights per family + italic where needed).
-- `font-display: swap` and real fallback stacks (`Raleway, "Segoe UI", sans-serif` etc.) so text renders instantly.
-- Preload the display face used above the fold.
+- **Self-host** all fonts as WOFF2 (the old site's render-blocking Google Fonts `@import` is exactly what we're removing). Self-hosting is about what the *visitor's browser* fetches, not about what git tracks — the shipped pages must contain no `fonts.googleapis.com` / `fonts.gstatic.com` reference.
+- Loading is owned by [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/), configured in `astro.config.mjs`. Astro emits the `@font-face` rules, fingerprints each file into `/_astro/fonts/` (immutably cacheable) and exposes each family as a CSS variable. `src/styles/tokens.css` maps those onto the semantic `--font-display` / `--font-body` / `--font-mono` roles; components use the semantic names only.
+  - The `google` provider, resolved at **build** time: Astro downloads the requested weights/subsets during `astro build` and emits them into our own origin. The binaries are deliberately **not** vendored in git — tracking them buys nothing the provider doesn't already give, costs ~67 kB of repo weight, and has to be re-subset by hand whenever a weight changes. The provider's Latin subsets are also smaller than hand-rolled ones.
+  - The build therefore needs network access, which it already does for `npm ci`. A font host outage fails the build loudly rather than degrading the site.
+  - Per-family SIL Open Font Licence texts still ship at `public/fonts/LICENSE-*.txt`. Not vendoring the binaries doesn't end that obligation: the built site redistributes the faces, and the OFL requires the licence to travel with them.
+- Subset to Latin; only load the weights actually used (target: ≤ 2 weights per family + italic where needed). `subsets: ["latin"]` makes the provider emit the matching `unicodeRange` automatically, so the browser can skip downloads for out-of-range content — don't hand-maintain that range.
+- `font-display: swap` (Astro's default) plus real fallback stacks. Ending each `fallbacks` array with a generic family lets Astro generate metric-adjusted fallback faces automatically, which is what actually removes the layout shift on swap.
+- Preload the body face on every page and the display face only on pages with a hero above the fold (`preloadDisplay` on `BaseLayout`).
 
 ## Scale
 

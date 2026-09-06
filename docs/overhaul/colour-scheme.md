@@ -4,14 +4,16 @@ The site is dark-first, built from the VS Code Dark+ (default dark) theme. These
 
 ## Base tokens
 
-| Token          | Hex       | VS Code role                                              |
-|----------------|-----------|-----------------------------------------------------------|
-| `bg-editor`    | `#1E1E1E` | Editor background — primary page background               |
-| `bg-sidebar`   | `#252526` | Sidebar background — alternate section / panel background |
-| `bg-highlight` | `#2A2D2E` | Line highlight — hover states, subtle emphasis            |
-| `border`       | `#3C3C3C` | Panel borders, dividers                                   |
-| `fg`           | `#D4D4D4` | Editor foreground — body text                             |
-| `fg-muted`     | `#858585` | Line numbers — secondary text                             |
+| Token          | Hex       | VS Code role                                                                                                                                                            |
+|----------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `bg-editor`    | `#1E1E1E` | Editor background — primary page background                                                                                                                             |
+| `bg-sidebar`   | `#252526` | Sidebar background — alternate section / panel background                                                                                                               |
+| `bg-highlight` | `#2A2D2E` | Line highlight — hover states, subtle emphasis                                                                                                                          |
+| `border`       | `#3C3C3C` | Panel borders, dividers                                                                                                                                                 |
+| `fg`           | `#D4D4D4` | Editor foreground — body text                                                                                                                                           |
+| `fg-muted`     | `#858585` | Line numbers — secondary text                                                                                                                                           |
+| `fg-on-accent` | `#FFFFFF` | N/A (not a VS Code role) — text on accent-coloured surfaces, e.g. the status-bar footer                                                                                 |
+| `fg-display`   | `#569CD6` | N/A (not a VS Code role) — decorative hero/display-name colour; deliberately separate from `accent-blue` so "blue means clickable" stays true for the interactive token |
 
 ## Syntax accent tokens
 
@@ -34,7 +36,7 @@ Use **semantically** (consistent meaning per colour), never decoratively.
 - `#858585` ≈ 4.6:1 — passes body AA, but only just; don't shrink it below 14px.
 - `#569CD6` ≈ 5.8:1, `#9CDCFE` ≈ 9.9:1, `#4EC9B0` ≈ 8.6:1, `#DCDCAA` ≈ 10.5:1, `#CE9178` ≈ 6.4:1 — all pass for text.
 - `#6A9955` ≈ 4.5:1 — borderline; treat as large-text/decoration only, or lighten when used for small text.
-- White text on `#007ACC` ≈ 4.6:1 — passes AA for normal text; verify per component.
+- White text on `#007ACC` measured at **4.51:1** — clears AA's 4.5:1 normal-text threshold by 0.01, i.e. it is borderline. Treat as fixed at `--font-size-base` (16px) or larger, matching the 14px floor this doc already sets for `#858585`; do not shrink it further, and re-measure before nudging either colour.
 
 Ratios above are approximate — re-verify programmatically in the design-tokens issue before locking components.
 

@@ -20,21 +20,11 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+# (Trimmed from the upstream Python template: this repo never builds a
+# Python package, only uses .venv for pre-commit tooling, so the unanchored
+# build/, lib/, var/, share/, parts/ entries here would otherwise silently
+# swallow same-named Node/Astro paths, e.g. src/lib/.)
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
 .installed.cfg
 *.egg
 MANIFEST

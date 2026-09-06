@@ -70,8 +70,14 @@
     "dbaeumer",
     "esbenp",
     "davidanson",
+    "raleway",
+    "jetbrains",
+    "lede",
+    "statusbar",
     "zizmor",
-    "artipacked"
+    "artipacked",
+    "gstatic",
+    "vendoring"
   ],
   "ignorePaths": [
     ".git",
@@ -81,6 +87,7 @@
     ".astro",
     ".venv",
     "megalinter-reports",
-    ".gitignore"
+    ".gitignore",
+    "public/fonts/LICENSE-*.txt"
   ]
 }

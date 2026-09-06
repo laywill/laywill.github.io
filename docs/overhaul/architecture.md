@@ -40,9 +40,9 @@ tag push v* ──► lint ─┐
 ## Hosting and domains
 
 - GitHub Pages, deployed via `actions/deploy-pages`.
-- **Canonical host: `https://www.williamlay.co.uk`** — `public/CNAME` contains `www.williamlay.co.uk`.
-- DNS: `www` CNAME record → `laywill.github.io`; apex `williamlay.co.uk` A/AAAA (or ALIAS) records to GitHub Pages IPs so GitHub serves the apex → www redirect. Verify/add at the registrar (`needs-william`).
-- All canonical URLs, sitemap entries and OG tags use the www host.
+- **Canonical host: `https://williamlay.co.uk`** (apex) — matches the live `CNAME` on `master`, so cutover requires no domain change. `astro.config.mjs`'s `site` and `public/CNAME` (added at cutover, per E6 below) both use the apex.
+- DNS: apex `williamlay.co.uk` A/AAAA (or ALIAS) records → GitHub Pages IPs; `www` CNAME record → `laywill.github.io` so GitHub serves the www → apex redirect. Verify/add at the registrar (`needs-william`).
+- All canonical URLs, sitemap entries and OG tags use the apex host.
 
 ## SEO / discovery
 
@@ -65,11 +65,11 @@ GoatCounter: free personal tier, privacy-friendly (no cookies, no consent banner
 ## Cutover runbook (E6)
 
 1. Pre-flight: `v2.0.0-rc.N` tag green end-to-end (lint, SAST, build, link check; deploy step skipped).
-2. Confirm DNS: `www` CNAME + apex records in place; `public/CNAME` = `www.williamlay.co.uk`.
+2. Confirm DNS: apex + `www` CNAME records in place; `public/CNAME` = `williamlay.co.uk`.
 3. Flip repo default branch `master` → `main`.
 4. Disable `master`'s `static.yml` workflow (delete on a tiny final master commit, or disable via Actions UI).
 5. Push tag `v2.0.0` → pipeline deploys the new site.
-6. Verify: `https://www.williamlay.co.uk` serves v2; apex redirects to www; HTTPS cert valid for both; old-URL redirect stubs work.
+6. Verify: `https://williamlay.co.uk` serves v2; www redirects to apex; HTTPS cert valid for both; old-URL redirect stubs work.
 7. Re-verify Google Search Console; submit sitemap.
 8. Lighthouse audit — Performance / Accessibility / SEO ≥ 95.
 9. Delete stale remote branches (`graphic_redesign`, `development`, old dependabot branches).

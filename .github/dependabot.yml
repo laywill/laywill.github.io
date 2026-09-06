@@ -14,11 +14,8 @@ updates:
         patterns:
           - "*"
 
-  # Maintain npm dependencies. No package.json exists yet (Astro scaffolding
-  # is a later epic, E2 - see docs/overhaul/architecture.md), so this has
-  # nothing to update against until then; Dependabot no-ops silently on a
-  # missing manifest rather than erroring, and picks up automatically once
-  # one lands at the repo root.
+  # Maintain npm dependencies (package.json at the repo root, added by the
+  # Astro scaffold — see docs/overhaul/architecture.md).
   - package-ecosystem: "npm"
     directory: "/"
     schedule:

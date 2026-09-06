@@ -1,0 +1,61 @@
+---
+import { Font } from "astro:assets";
+
+import "../styles/tokens.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  /**
+   * Whether this page renders a hero in the display face above the fold.
+   * Only such pages should preload it — a Notes page with no hero would
+   * otherwise high-priority-fetch a face it never paints. The body face is
+   * always preloaded, since every page renders body copy.
+   */
+  preloadDisplay?: boolean;
+}
+
+const {
+  title,
+  description = "Personal site of William Lay.",
+  preloadDisplay = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title}</title>
+
+    {/*
+      Each <Font> emits its family's @font-face rules and cssVariable; the
+      families are configured in astro.config.mjs. All three are declared on
+      every page so the variables always resolve, but only the faces the
+      page actually paints above the fold are preloaded.
+    */}
+    <Font cssVariable="--font-lato" preload />
+    <Font cssVariable="--font-raleway" preload={preloadDisplay} />
+    <Font cssVariable="--font-jetbrains-mono" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-editor);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+  }
+</style>
