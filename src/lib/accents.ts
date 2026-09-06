@@ -17,15 +17,15 @@
  *   green      asides: git refs, date ranges, terminal `~`
  */
 export const ACCENTS = [
-  "blue",
-  "lightblue",
-  "teal",
-  "yellow",
-  "orange",
-  "green",
-] as const;
+  'blue',
+  'lightblue',
+  'teal',
+  'yellow',
+  'orange',
+  'green'
+] as const
 
-export type Accent = (typeof ACCENTS)[number];
+export type Accent = (typeof ACCENTS)[number]
 
 /**
  * The CSS custom property for an accent, for use in an inline `style`
@@ -38,6 +38,6 @@ export type Accent = (typeof ACCENTS)[number];
  * This is not a hard-coded colour: it resolves to a token defined in
  * src/styles/tokens.css, which stays the single source of truth.
  */
-export function accentVar(accent: Accent): string {
-  return `var(--accent-${accent})`;
+export function accentVar (accent: Accent): string {
+  return `var(--accent-${accent})`
 }

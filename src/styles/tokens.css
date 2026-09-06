@@ -151,19 +151,19 @@
 
   --shadow-color: 0 0 0;
   --elevation-0: none;
-  --elevation-1: 0 1px 2px rgb(var(--shadow-color) / 0.35); /* panes at rest */
-  --elevation-2: 0 2px 8px rgb(var(--shadow-color) / 0.45); /* hovered/raised */
-  --elevation-3: 0 8px 24px rgb(var(--shadow-color) / 0.55); /* lightbox */
+  --elevation-1: 0 1px 2px rgb(var(--shadow-color) / 35%); /* panes at rest */
+  --elevation-2: 0 2px 8px rgb(var(--shadow-color) / 45%); /* hovered/raised */
+  --elevation-3: 0 8px 24px rgb(var(--shadow-color) / 55%); /* lightbox */
 
   /* Modal scrim, for a <dialog>'s ::backdrop. Distinct from the elevation
   steps: those describe how far a surface sits above the page, this one dims
   everything behind a surface that has taken over the viewport. */
-  --scrim: rgb(var(--shadow-color) / 0.7);
+  --scrim: rgb(var(--shadow-color) / 70%);
 
   /* A 1px inner top highlight. Not a gradient and not a fill: it reads as
   a lit top edge on a raised surface, which is the whole of the "glossier
   than the artboard" ask that flat colour cannot supply. */
-  --sheen: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --sheen: inset 0 1px 0 rgb(255 255 255 / 4%);
 
   /* --------------------------------------------------------------------
    * Motion. Every transition uses a duration token, so the reduced-motion

@@ -10,37 +10,37 @@
 
 export interface Certification {
   /** Short mono abbreviation shown on the badge face. */
-  abbr: string;
+  abbr: string
   /** Full name, the badge caption. */
-  name: string;
-  issuer: string;
-  year?: number;
+  name: string
+  issuer: string
+  year?: number
 }
 
 export const CERTIFICATIONS: readonly Certification[] = [
   {
-    abbr: "PH1",
-    name: "Placeholder certification 1",
-    issuer: "Placeholder issuer",
+    abbr: 'PH1',
+    name: 'Placeholder certification 1',
+    issuer: 'Placeholder issuer'
   },
   {
-    abbr: "PH2",
-    name: "Placeholder certification 2",
-    issuer: "Placeholder issuer",
+    abbr: 'PH2',
+    name: 'Placeholder certification 2',
+    issuer: 'Placeholder issuer'
   },
   {
-    abbr: "PH3",
-    name: "Placeholder certification 3",
-    issuer: "Placeholder issuer",
+    abbr: 'PH3',
+    name: 'Placeholder certification 3',
+    issuer: 'Placeholder issuer'
   },
   {
-    abbr: "PH4",
-    name: "Placeholder certification 4",
-    issuer: "Placeholder issuer",
+    abbr: 'PH4',
+    name: 'Placeholder certification 4',
+    issuer: 'Placeholder issuer'
   },
   {
-    abbr: "PH5",
-    name: "Placeholder certification 5",
-    issuer: "Placeholder issuer",
-  },
-] as const;
+    abbr: 'PH5',
+    name: 'Placeholder certification 5',
+    issuer: 'Placeholder issuer'
+  }
+] as const

@@ -42,18 +42,18 @@
 
 // Every attribute this module reads or writes, named once so a markup
 // change in Gallery.astro and a lookup here can't silently drift apart.
-const GALLERY_SELECTOR = "[data-lightbox-gallery]";
-const TRIGGER_SELECTOR = "[data-lightbox-trigger]";
-const DIALOG_SELECTOR = "[data-lightbox-dialog]";
-const CLOSE_SELECTOR = "[data-lightbox-close]";
-const IMAGE_SELECTOR = "[data-lightbox-image]";
-const CAPTION_SELECTOR = "[data-lightbox-caption]";
+const GALLERY_SELECTOR = '[data-lightbox-gallery]'
+const TRIGGER_SELECTOR = '[data-lightbox-trigger]'
+const DIALOG_SELECTOR = '[data-lightbox-dialog]'
+const CLOSE_SELECTOR = '[data-lightbox-close]'
+const IMAGE_SELECTOR = '[data-lightbox-image]'
+const CAPTION_SELECTOR = '[data-lightbox-caption]'
 
 // See "Idempotency" above. Shared across every gallery root the module
 // wires up, not one per gallery, since a WeakSet costs nothing extra to
 // share and there is no case where an element needs re-wiring within a
 // single page load.
-const wired = new WeakSet<Element>();
+const wired = new WeakSet<Element>()
 
 /**
  * Wires up a single `[data-lightbox-gallery]` root: finds its one dialog
@@ -66,9 +66,9 @@ const wired = new WeakSet<Element>();
  * type guarantee once the DOM is involved, and a malformed gallery
  * shouldn't be able to take the rest of the page's lightboxes down with it.
  */
-function initGallery(gallery: Element): void {
-  const dialogOrNull = gallery.querySelector<HTMLDialogElement>(DIALOG_SELECTOR);
-  if (!dialogOrNull) return;
+function initGallery (gallery: Element): void {
+  const dialogOrNull = gallery.querySelector<HTMLDialogElement>(DIALOG_SELECTOR)
+  if (dialogOrNull == null) return
 
   // TypeScript's control-flow narrowing above doesn't survive into the
   // closures below (open/close are ordinary nested functions, not
@@ -77,43 +77,43 @@ function initGallery(gallery: Element): void {
   // already run. Rebinding to a second, never-reassigned `const` gives the
   // closures a variable TypeScript can see is never null, without an
   // unchecked `!` assertion.
-  const dialog: HTMLDialogElement = dialogOrNull;
+  const dialog: HTMLDialogElement = dialogOrNull
 
-  const image = dialog.querySelector<HTMLImageElement>(IMAGE_SELECTOR);
-  const caption = dialog.querySelector<HTMLElement>(CAPTION_SELECTOR);
-  const closeButton = dialog.querySelector<HTMLButtonElement>(CLOSE_SELECTOR);
+  const image = dialog.querySelector<HTMLImageElement>(IMAGE_SELECTOR)
+  const caption = dialog.querySelector<HTMLElement>(CAPTION_SELECTOR)
+  const closeButton = dialog.querySelector<HTMLButtonElement>(CLOSE_SELECTOR)
 
   // The trigger that opened the dialog, so focus can be returned to it on
   // close (the acceptance criterion native <dialog> does not give you for
   // free — showModal() moves focus INTO the dialog, but close() doesn't
   // move it back anywhere in particular).
-  let invoker: HTMLElement | null = null;
+  let invoker: HTMLElement | null = null
 
-  function open(trigger: HTMLAnchorElement): void {
-    const full = trigger.dataset.full;
+  function open (trigger: HTMLAnchorElement): void {
+    const full = trigger.dataset.full
     // No recorded full rendition: leave the click as a normal navigation
     // rather than opening an empty dialog. Written as explicit nullish and
     // empty-string checks rather than a truthiness test, because a dataset
     // read is `string | undefined` and ts-standard's
     // strict-boolean-expressions rule (rightly) refuses to let the two
     // cases collapse into one.
-    if (full === undefined || full === "" || image === null) return;
+    if (full === undefined || full === '' || image === null) return
 
-    invoker = trigger;
+    invoker = trigger
 
-    const alt = trigger.dataset.alt ?? "";
-    const captionText = trigger.dataset.caption ?? "";
+    const alt = trigger.dataset.alt ?? ''
+    const captionText = trigger.dataset.caption ?? ''
 
-    image.src = full;
-    image.alt = alt;
-    const fullWidth = trigger.dataset.fullWidth;
-    const fullHeight = trigger.dataset.fullHeight;
-    if (fullWidth !== undefined && fullWidth !== "") image.width = Number(fullWidth);
-    if (fullHeight !== undefined && fullHeight !== "") image.height = Number(fullHeight);
+    image.src = full
+    image.alt = alt
+    const fullWidth = trigger.dataset.fullWidth
+    const fullHeight = trigger.dataset.fullHeight
+    if (fullWidth !== undefined && fullWidth !== '') image.width = Number(fullWidth)
+    if (fullHeight !== undefined && fullHeight !== '') image.height = Number(fullHeight)
 
     if (caption !== null) {
-      caption.textContent = captionText;
-      caption.hidden = captionText.length === 0;
+      caption.textContent = captionText
+      caption.hidden = captionText.length === 0
     }
 
     // The dialog's accessible name. A visible caption already gives a
@@ -125,42 +125,42 @@ function initGallery(gallery: Element): void {
     // rather than chained with `||` so an empty string is handled as the
     // deliberate "no text here" case it is, not as an accident.
     const accessibleName =
-      alt !== "" ? alt : captionText !== "" ? captionText : "Image preview";
-    dialog.setAttribute("aria-label", accessibleName);
+      alt !== '' ? alt : captionText !== '' ? captionText : 'Image preview'
+    dialog.setAttribute('aria-label', accessibleName)
 
-    dialog.showModal();
+    dialog.showModal()
   }
 
-  function close(): void {
-    dialog.close();
+  function close (): void {
+    dialog.close()
   }
 
   gallery.querySelectorAll<HTMLAnchorElement>(TRIGGER_SELECTOR).forEach((trigger) => {
-    if (wired.has(trigger)) return;
-    wired.add(trigger);
-    trigger.addEventListener("click", (event) => {
+    if (wired.has(trigger)) return
+    wired.add(trigger)
+    trigger.addEventListener('click', (event) => {
       // Prevent the default navigation only once we know we can actually
       // open the dialog in its place (see the early return in open()) —
       // otherwise a visitor would click a thumbnail and see nothing happen.
-      const full = trigger.dataset.full;
-      if (full === undefined || full === "" || image === null) return;
-      event.preventDefault();
-      open(trigger);
-    });
-  });
+      const full = trigger.dataset.full
+      if (full === undefined || full === '' || image === null) return
+      event.preventDefault()
+      open(trigger)
+    })
+  })
 
-  if (closeButton && !wired.has(closeButton)) {
-    wired.add(closeButton);
-    closeButton.addEventListener("click", close);
+  if ((closeButton != null) && !wired.has(closeButton)) {
+    wired.add(closeButton)
+    closeButton.addEventListener('click', close)
   }
 
   if (!wired.has(dialog)) {
-    wired.add(dialog);
+    wired.add(dialog)
 
     // Fires for every close path: the close button, Esc (native <dialog>
     // behaviour), and a future affordance that isn't part of this
     // component today. One handler covers all of them.
-    dialog.addEventListener("close", () => {
+    dialog.addEventListener('close', () => {
       // Clearing `src` rather than leaving the last-opened rendition
       // loaded: a visitor who opens several full-resolution images in one
       // session shouldn't keep every one of them decoded in memory behind
@@ -169,18 +169,18 @@ function initGallery(gallery: Element): void {
       // HTTP cache, not the network — a decode cost, not a fetch cost —
       // which is a reasonable trade against holding N large decoded
       // bitmaps for the lifetime of the page.
-      image?.removeAttribute("src");
-      if (image) image.alt = "";
+      image?.removeAttribute('src')
+      if (image != null) image.alt = ''
       if (caption !== null) {
-        caption.textContent = "";
-        caption.hidden = true;
+        caption.textContent = ''
+        caption.hidden = true
       }
-      dialog.removeAttribute("aria-label");
+      dialog.removeAttribute('aria-label')
 
-      invoker?.focus();
-      invoker = null;
-    });
+      invoker?.focus()
+      invoker = null
+    })
   }
 }
 
-document.querySelectorAll(GALLERY_SELECTOR).forEach(initGallery);
+document.querySelectorAll(GALLERY_SELECTOR).forEach(initGallery)

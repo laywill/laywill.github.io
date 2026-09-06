@@ -49,7 +49,7 @@ colour, anywhere.
 Gloss is bought with three things instead, all of them tokenised:
 
 | Lever      | Tokens                                    | Where it is spent                                                                                         |
-| ---------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+|------------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | **Depth**  | `--elevation-1/2/3`, `--sheen`            | Panes and the terminal card sit at elevation 1; hover raises interactive surfaces to 2; the lightbox is 3 |
 | **State**  | `--bg-highlight`, `--bg-active`           | Hover and active states are a background change, not a glow                                               |
 | **Motion** | `--duration-fast/base`, `--ease-standard` | Colour and background changes at 120ms; transform, opacity and elevation at 180ms                         |
@@ -102,7 +102,7 @@ literal `px` values written at each call site. They are documented here once and
 must not be varied component by component.
 
 | Name    | Min-width | What changes                                                               |
-| ------- | --------- | -------------------------------------------------------------------------- |
+|---------|-----------|----------------------------------------------------------------------------|
 | *floor* | `360px`   | The narrowest supported viewport. No horizontal scroll, ever               |
 | `sm`    | `640px`   | Tag rows gain their category-label column; certification badges go to 3-up |
 | `md`    | `900px`   | Tab bar becomes the sidebar rail; breadcrumb appears; hero goes two-column |
@@ -118,7 +118,7 @@ Paths are under `src/components/`.
 ### Navigation — `nav/`
 
 | Component          | Purpose                                                                                      |
-| ------------------ | -------------------------------------------------------------------------------------------- |
+|--------------------|----------------------------------------------------------------------------------------------|
 | `Nav.astro`        | The single site navigation. Renders as an explorer sidebar at `md`+, an editor-tab bar below |
 | `Outline.astro`    | In-page table of contents mirroring the current page's headings. Desktop only                |
 | `Breadcrumb.astro` | The mono `william-lay › about.md › ## About` line. Decorative, `aria-hidden`                 |
@@ -131,7 +131,7 @@ plain text, not a link: `design-direction.md` requires that `writing/` and
 ### Chrome — `chrome/`
 
 | Component         | Purpose                                                                    |
-| ----------------- | -------------------------------------------------------------------------- |
+|-------------------|----------------------------------------------------------------------------|
 | `StatusBar.astro` | The `--statusbar-blue` footer band, full width including under the sidebar |
 
 Real links and real status are content; `Ln 1, Col 1`, `UTF-8` and the problem
@@ -142,7 +142,7 @@ must not be shrunk.
 ### Layout — `layout/`
 
 | Component          | Purpose                                                                         |
-| ------------------ | ------------------------------------------------------------------------------- |
+|--------------------|---------------------------------------------------------------------------------|
 | `AppShell.astro`   | The page frame: nav rail/tab bar, breadcrumb, content column, status bar        |
 | `Section.astro`    | A titled content band with consistent vertical rhythm and a real heading level  |
 | `Pane.astro`       | A bordered panel under a `--bg-sidebar` tab header carrying a filename + status |
@@ -151,7 +151,7 @@ must not be shrunk.
 ### UI primitives — `ui/`
 
 | Component        | Purpose                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------ |
+|------------------|--------------------------------------------------------------------------------------|
 | `Button.astro`   | CTA pair. `variant="primary"` is a `--statusbar-blue` fill; `"secondary"` an outline |
 | `Tag.astro`      | Mono tag pill, coloured by domain, with the domain also named by its row label       |
 | `Callout.astro`  | Obsidian-flavoured callout: 3px accent left border over an 8% tint of that accent    |
@@ -172,7 +172,7 @@ first and a component change second, so it is not made here.
 ### Content components — `content/`
 
 | Component           | Purpose                                                                          |
-| ------------------- | -------------------------------------------------------------------------------- |
+|---------------------|----------------------------------------------------------------------------------|
 | `IconGrid.astro`    | The lokkal-style "toolbox": category rows of icon + label tiles, from typed data |
 | `CertBadges.astro`  | Wrapping grid of certification badges on `--bg-sidebar`                          |
 | `CareerGraph.astro` | The `git log --graph` career timeline: node gutter, commit line, role, employer  |
@@ -185,7 +185,7 @@ sources the real thing from the CV.
 ### Media — `media/`
 
 | Component               | Purpose                                                                      |
-| ----------------------- | ---------------------------------------------------------------------------- |
+|-------------------------|------------------------------------------------------------------------------|
 | `ResponsiveImage.astro` | `astro:assets` wrapper: enforced dimensions, required `alt`, `srcset`, lazy  |
 | `Gallery.astro`         | Grid of thumbnails; opens a high-resolution rendition in a lightbox on click |
 
