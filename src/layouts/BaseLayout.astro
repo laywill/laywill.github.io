@@ -13,12 +13,20 @@ interface Props {
    * always preloaded, since every page renders body copy.
    */
   preloadDisplay?: boolean;
+  /**
+   * Keep the page out of search indexes. Used by the component preview
+   * harness, which is a development artefact rather than site content: it
+   * should build, link-check and pass the accessibility run like everything
+   * else, but it should never be a search result for William's name.
+   */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "Personal site of William Lay.",
   preloadDisplay = false,
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -29,6 +37,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
 
