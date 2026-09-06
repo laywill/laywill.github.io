@@ -13,8 +13,16 @@ on:
   schedule:
     - cron: "17 3 * * 1"
 
+  # Also callable as the SAST gate of the release pipeline (release.yml), so a
+  # tagged release is analysed by this exact configuration rather than a copy
+  # of it that can drift.
+  workflow_call:
+
+# The literal prefix matters: github.workflow resolves to the *caller's*
+# workflow name when this runs as a called workflow, so without it every
+# workflow release.yml calls would share one group and cancel its siblings.
 concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }}
+  group: codeql-${{ github.ref }}
   cancel-in-progress: true
 
 permissions: {}

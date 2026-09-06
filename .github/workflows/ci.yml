@@ -1,0 +1,36 @@
+---
+name: CI
+
+# Build and link-check every push/PR to main. These were deferred from the
+# original CI issue (#23) until the Astro scaffold (#24) existed - it does now,
+# so the same reusable workflows the release pipeline gates on also run here,
+# where a break is cheap to fix rather than at tag time.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build
+    # No pages artifact on CI runs: nothing here can deploy, so don't produce
+    # a deployable artifact.
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+
+  link-check:
+    name: Link check
+    needs: build
+    uses: ./.github/workflows/link-check.yml
+    permissions:
+      contents: read

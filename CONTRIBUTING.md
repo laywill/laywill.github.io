@@ -57,10 +57,40 @@ automatically on container create.
    locally, faster than waiting for CI.
 3. Open a pull request against `main` using the provided
    [PR template](.github/PULL_REQUEST_TEMPLATE.md).
-4. [MegaLinter](https://megalinter.io/) runs in CI on every PR (once issue
-   #23 lands); fix any reported issues (or apply its suggested auto-fixes).
+4. CI runs on every PR: [MegaLinter](https://megalinter.io/), CodeQL,
+   `astro check` + `astro build`, and an internal link check over the built
+   output. Fix any reported issues (or apply MegaLinter's auto-fixes).
 5. A reviewer will be automatically requested per
    [CODEOWNERS](.github/CODEOWNERS).
+
+## Releases and deploys
+
+The live site is published **only** by pushing a `v*` tag — there is no
+branch-push, manual-dispatch or scheduled path to a deploy. See
+[.github/workflows/release.yml](.github/workflows/release.yml).
+
+A tag push runs lint (MegaLinter), SAST (CodeQL), build, and the internal
+link check over the built output. The deploy job `needs:` all four, so a
+failure in any of them means no deploy. Only the built `dist/` is published,
+never the repo tree.
+
+Tags carrying a SemVer pre-release suffix (anything after a hyphen, e.g.
+`v2.0.0-rc.1`) run the entire pipeline and skip **only** the deploy job — so
+a release candidate is a genuine dry run of the release, not a rehearsal of
+some other pipeline:
+
+```sh
+git tag v2.0.0-rc.1
+git push origin v2.0.0-rc.1   # full pipeline, deploy skipped
+
+git tag v2.0.0
+git push origin v2.0.0        # full pipeline, then deploys
+```
+
+The build and link-check workflows the release gates on are the same
+reusable workflows that run on every PR
+([.github/workflows/ci.yml](.github/workflows/ci.yml)), so tag time should
+hold no surprises.
 
 ## Code of Conduct
 
