@@ -30,6 +30,12 @@ navigation.
    `:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }`.
    Never `outline: none` without a replacement of at least equal contrast.
 7. **No horizontal scroll at 360px.** Non-negotiable, from the brief.
+8. **14px is the floor for any text a visitor reads.** `--font-size-sm` is
+   pinned at `0.875rem` rather than the `0.8rem` the 1.25 ratio would give,
+   precisely so the smallest token in the scale is still legal. Accessibility
+   correction 2 in [design-direction.md](design-direction.md) allows anything
+   smaller only if it is hidden from assistive tech, and no component should
+   have to reason about that to pick a size. Body copy remains ≥ 16px.
 
 ## Decision: the gloss vocabulary
 
@@ -155,6 +161,14 @@ The callout tint is derived, not tokenised:
 `color-mix(in srgb, var(--accent-teal) 8%, transparent)` — one recipe per
 colour-scheme.md, so the tint stays correct if an accent value moves.
 
+`Callout` accepts only `info` (teal) and `tip` (yellow) — the two types the
+semantic colour map actually assigns. **Open question for
+[#33](https://github.com/laywill/laywill.github.io/issues/33) (Notes):** the
+obvious further types have no accent. `warning` in particular has nowhere to
+go — orange means "strings and human content", and `--accent-purple` is
+deliberately held unassigned. Widening the union is a colour-map decision
+first and a component change second, so it is not made here.
+
 ### Content components — `content/`
 
 | Component           | Purpose                                                                          |
@@ -190,14 +204,16 @@ TypeScript, type-checked by `astro check` like everything else.
 
 Requirements it meets:
 
-- The grid item is a real `<button>`, so it is keyboard-reachable without help.
+- The grid item is a real `<a href>` pointing at the full rendition, not a
+  `<button>`. A button that does nothing without JavaScript is a dead control;
+  a link degrades to a working navigation. The script upgrades those links into
+  lightbox openers, so the lightbox is an enhancement rather than the mechanism.
 - The dialog is a native `<dialog>` opened with `showModal()`, which gives focus
   trapping, `Esc` to close and inertness of the rest of the page for free.
-- Focus returns to the invoking button on close.
+- Focus returns to the invoking link on close.
 - The full-resolution `src` is assigned on open, so nothing large is fetched
-  until a visitor asks for it.
-- With JavaScript unavailable the grid still renders and each thumbnail still
-  links to its full rendition — the lightbox is an enhancement.
+  until a visitor asks for it. Until then the URL exists only in `href` and a
+  `data-` attribute — never in an `<img src>`, a preload, or a hidden image.
 
 ## Accessibility checking
 
