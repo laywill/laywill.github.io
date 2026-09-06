@@ -34,12 +34,17 @@ const {
 
     {/*
       Each <Font> emits its family's @font-face rules and cssVariable; the
-      families are configured in astro.config.mjs. All three are declared on
-      every page so the variables always resolve, but only the faces the
-      page actually paints above the fold are preloaded.
+      families are configured in astro.config.mjs. All three in use are
+      declared on every page so the variables always resolve, but only the
+      faces the page actually paints above the fold are preloaded.
+
+      Raleway is configured but deliberately has no <Font> here: nothing
+      aliases --font-raleway in tokens.css, so emitting it would define a
+      variable no rule reads. It is held for a possible post-MVP headings
+      role — see docs/overhaul/typography.md.
     */}
     <Font cssVariable="--font-lato" preload />
-    <Font cssVariable="--font-raleway" preload={preloadDisplay} />
+    <Font cssVariable="--font-public-sans" preload={preloadDisplay} />
     <Font cssVariable="--font-jetbrains-mono" />
   </head>
   <body>

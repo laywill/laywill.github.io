@@ -77,7 +77,13 @@
     "zizmor",
     "artipacked",
     "gstatic",
-    "vendoring"
+    "vendoring",
+    "mockup",
+    "artboard",
+    "wayfinding",
+    "letterspaced",
+    "letterspacing",
+    "namesection"
   ],
   "ignorePaths": [
     ".git",

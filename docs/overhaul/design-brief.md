@@ -20,13 +20,17 @@ williamlay.co.uk is a **landing page**, not a portfolio archive. The typical vis
 
 Dark-first design built from the VS Code Dark+ palette (see [colour-scheme.md](colour-scheme.md)), with IDE-inspired motifs used **semantically, sparingly, and authentically** — the lokkal.space lesson: form follows function, and the aesthetic must genuinely reflect who William is, not be decoration.
 
-Candidate motifs (design study to select):
+**The design study is settled: option `2a`. The chosen layout, motifs and semantic colour map are recorded in [design-direction.md](design-direction.md), which is the reference for the component library and the landing-page build.** In summary, the candidate motifs resolved as:
 
-- Status-bar style footer (VS Code blue `#007ACC`)
-- Tab / breadcrumb styling for navigation
-- Syntax-highlight colours applied semantically (e.g. types teal, functions yellow) rather than randomly
-- Obsidian-flavoured elements in Notes: callout blocks, `[[wikilink]]` styling, tag pills; graph-view visual as a stretch goal
-- Terminal/prompt touches where they carry meaning
+- Status-bar style footer (VS Code blue `#007ACC`) — **in**
+- Explorer sidebar and breadcrumb as the actual navigation — **in** (editor tabs lost to the sidebar, but remain the likely narrow-viewport form)
+- Syntax-highlight colours applied semantically (types teal, functions yellow, and so on) — **in**, with meanings now fixed in [colour-scheme.md](colour-scheme.md)
+- Terminal/prompt touches where they carry meaning — **in**, as the hero's second column
+- Obsidian callout blocks — **in** on the landing page, and shared with Notes
+- Obsidian `[[wikilink]]` styling and the graph-view visual — deferred to Notes, not on the landing page
+- A git-graph career timeline — **in**, added by the study
+
+One constraint the study added: the IDE chrome is a *motif, not an emulator*. The page scrolls as an ordinary document, and nothing may depend on the visitor knowing VS Code.
 
 ## Gestalt / diagram-first principle
 

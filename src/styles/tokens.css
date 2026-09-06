@@ -26,8 +26,27 @@
   --bg-editor: #1e1e1e;
   --bg-sidebar: #252526;
   --bg-highlight: #2a2d2e;
+
+  /* List active-selection background — the current row in the explorer
+  sidebar, which also carries a --statusbar-blue marker so the state is
+  never signalled by fill alone. */
+  --bg-active: #37373d;
   --border: #3c3c3c;
+
+  /* Quieter hairline for the breadcrumb bar, where a full --border
+  over-divides. Both borders are decorative: at 1.51:1 against --bg-editor
+  they fall below WCAG 1.4.11, so neither may be the sole indicator of a
+  control or of its state. */
+  --border-subtle: #2a2a2a;
   --fg: #d4d4d4;
+
+  /* Secondary text. Exists because --fg-muted manages only 4.15:1 on
+  --bg-sidebar and so fails AA there; this clears it at 5.86:1. Use it for
+  de-emphasised text on any panel surface. */
+  --fg-secondary: #a0a0a0;
+
+  /* De-emphasised text on --bg-editor only (4.52:1, 14px floor). See
+  docs/overhaul/colour-scheme.md before using it anywhere else. */
   --fg-muted: #858585;
 
   /* Syntax accent tokens — use semantically, never decoratively */
@@ -45,17 +64,23 @@
   file ever hard-codes a hex value. */
   --fg-on-accent: #fff;
 
-  /* Decorative display colour for the hero name treatment — deliberately
-  its own token rather than reusing --accent-blue, which is scoped to
-  interactive/link use per colour-scheme.md. */
-  --fg-display: #569cd6;
+  /* Display colour for the hero name treatment. The chosen direction sets
+  the name in plain foreground rather than blue — it isn't a link, so it
+  doesn't take link blue. Kept as its own token, rather than folded into
+  --fg, so a future iteration that does colour the name has one seam to
+  change. */
+  --fg-display: #d4d4d4;
 
   /* Typography — semantic font roles.
   Each aliases a family declared in astro.config.mjs; Astro substitutes the
   full stack (face + metric-adjusted fallback + generic) at build time. */
 
-  /* Display / headings — matches CV header treatment */
-  --font-display: var(--font-raleway);
+  /* Display / headings. Public Sans per the design study; a deliberate
+  divergence from the CV's Lato Black name treatment, recorded in
+  docs/overhaul/typography.md. Raleway is still declared in
+  astro.config.mjs but intentionally aliased to nothing — it is held for a
+  possible post-MVP headings role. */
+  --font-display: var(--font-public-sans);
 
   /* Body copy */
   --font-body: var(--font-lato);
