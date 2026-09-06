@@ -1,0 +1,246 @@
+---
+/*
+ * Terminal.astro — the hero's terminal card (docs/overhaul/component-
+ * library.md, "UI primitives"; docs/overhaul/design-direction.md,
+ * "3. Hero"). Restates the positioning statement in a second register; it
+ * must never be the *only* place a fact appears (design-direction.md §3),
+ * which is a constraint on the CALLER's content, not on this component.
+ *
+ * Gloss vocabulary applied here (component-library.md, "the gloss
+ * vocabulary"): the card sits at elevation 1 with --sheen for the lit-top-
+ * edge highlight — depth, not a gradient.
+ */
+import type { Accent } from "../../lib/accents";
+import { accentVar } from "../../lib/accents";
+
+export interface TerminalSpan {
+  text: string;
+  accent?: Accent;
+}
+
+export interface TerminalLine {
+  kind: "command" | "output" | "blank";
+  /** Plain text for a simple line. */
+  text?: string;
+  /** Coloured runs, for output lines that carry the semantic colour map. */
+  spans?: readonly TerminalSpan[];
+}
+
+interface Props {
+  /** Title-bar text. Default "bash — ~/william". */
+  title?: string;
+  lines: readonly TerminalLine[];
+  /** Render a trailing block cursor. Default true. */
+  cursor?: boolean;
+  class?: string;
+}
+
+const {
+  title = "bash — ~/william",
+  lines,
+  cursor = true,
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={["terminal", className]}>
+  {
+    /*
+    Title bar: three NEUTRAL dots, deliberately not the macOS traffic-
+    light red/amber/green — design-direction.md is explicit that this is a
+    conscious departure ("deliberately *not* traffic-light colours"), not
+    an oversight to "fix" back toward the familiar convention. The whole
+    bar is chrome, not content or navigation, so it and the filename text
+    are hidden from assistive tech per component-library.md rule 5; the
+    real content lives in the body below.
+    */
+  }
+  <div class="titlebar" aria-hidden="true">
+    <span class="dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </span>
+    <span class="title">{title}</span>
+  </div>
+
+  <div class="body">
+    {
+      lines.map((line) => {
+        if (line.kind === "blank") {
+          /* A blank line is pure vertical rhythm between commands, not
+          content — hidden so a screen reader doesn't announce an empty
+          row for every gap in the transcript. */
+          return (
+            <p class="line" aria-hidden="true">
+              &nbsp;
+            </p>
+          );
+        }
+
+        if (line.kind === "command") {
+          return (
+            <p class="line">
+              {
+                /* "~ $ " is shell-prompt decoration around the real
+                content (the command itself) — it tells a sighted user
+                "this is input", but conveys nothing a screen-reader user
+                needs that the command text doesn't already carry, so it's
+                hidden and the command text is left exposed normally. */
+              }
+              <span class="prompt" aria-hidden="true">
+                <span class="prompt-user">~</span>{" "}
+                <span class="prompt-dollar">$</span>{" "}
+              </span>
+              {line.text}
+            </p>
+          );
+        }
+
+        // "output": either coloured spans carrying the semantic colour
+        // map, or a plain text line. Both are real transcript content and
+        // stay fully exposed to assistive tech.
+        return (
+          <p class="line">
+            {line.spans
+              ? line.spans.map((span) => (
+                  <span
+                    style={
+                      span.accent
+                        ? `color: ${accentVar(span.accent)}`
+                        : undefined
+                    }
+                  >
+                    {span.text}
+                  </span>
+                ))
+              : line.text}
+          </p>
+        );
+      })
+    }
+    {
+      cursor && (
+        /* The trailing cursor simulates an empty prompt awaiting input —
+        there is no command here yet, so the entire row (prompt included)
+        is decorative and hidden from assistive tech, unlike the real
+        command/output rows above. */
+        <p class="line" aria-hidden="true">
+          <span class="prompt">
+            <span class="prompt-user">~</span>{" "}
+            <span class="prompt-dollar">$</span>{" "}
+          </span>
+          <span class="cursor"></span>
+        </p>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .terminal {
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    /* Depth (elevation-1) and gloss (--sheen, the lit-top-edge inset
+    highlight) composed as two shadow layers on one property — see the
+    gloss vocabulary in component-library.md. */
+    box-shadow:
+      var(--elevation-1),
+      var(--sheen);
+    overflow: hidden;
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dots {
+    display: flex;
+    gap: var(--space-3xs);
+    flex: none;
+  }
+
+  .dot {
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background-color: var(--border);
+  }
+
+  .title {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--fg-secondary);
+  }
+
+  .body {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--fg);
+    padding: var(--space-md);
+    margin: 0;
+
+    /*
+    Floor requirement: no horizontal page scroll at 360px
+    (component-library.md rule 7), but terminal transcript lines
+    ("engineer → devops → coach → "leader"") are naturally wide. Of the
+    two options the brief allows — wrap, or make the card body its own
+    scroll region — wrapping is chosen: an inner horizontally-scrolling
+    box would need its own tabindex/keyboard handling to stay reachable
+    (a scrollable region with no interactive descendant is not otherwise
+    keyboard-operable) and would clip content from sighted users too.
+    Wrapping costs the line-per-command alignment at very narrow widths,
+    which is a purely cosmetic loss.
+    */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .line {
+    margin: 0;
+  }
+
+  .prompt-user {
+    color: var(--accent-green);
+  }
+
+  .prompt-dollar {
+    color: var(--accent-blue);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    vertical-align: text-bottom;
+    background-color: var(--fg);
+  }
+
+  /*
+  Static by default (design-direction.md correction 4: "the terminal
+  cursor must not blink unless the animation is disabled under
+  prefers-reduced-motion"). The blink keyframes therefore live entirely
+  inside the no-preference branch: a reduced-motion visitor gets a solid,
+  unanimated block, never a version that starts blinking and then stops.
+  This is a *separate* guard from the token-level reduced-motion override
+  in tokens.css, which only collapses transition durations to 1ms and has
+  no effect on a looping @keyframes animation.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    .cursor {
+      animation: terminal-cursor-blink 1s step-end infinite;
+    }
+  }
+
+  @keyframes terminal-cursor-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>
