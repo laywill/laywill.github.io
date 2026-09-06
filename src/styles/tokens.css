@@ -88,9 +88,18 @@
   /* Code / IDE motifs (terminal, status bar, tags) */
   --font-mono: var(--font-jetbrains-mono);
 
-  /* Typography — modular type scale (ratio 1.25, base 16px) */
+  /* Typography — modular type scale (ratio 1.25, base 16px), with one
+  documented exception at the smallest step; see --font-size-sm. */
 
-  --font-size-sm: 0.8rem; /* 12.8px, captions/metadata */
+  /* 14px, captions/metadata. Deliberately NOT the 0.8rem (12.8px) that the
+  1.25 ratio would give: accessibility correction 2 in
+  docs/overhaul/design-direction.md requires anything below the floors to be
+  either scaled up or confined to content hidden from assistive tech, and a
+  token used for real captions cannot rely on the latter. 14px is also the
+  floor colour-scheme.md attaches to --fg-muted, so pinning the smallest step
+  here means no component can breach it by picking the smallest token. The
+  ratio therefore breaks at this one end, on purpose. */
+  --font-size-sm: 0.875rem;
   --font-size-base: 1rem; /* 16px, body minimum per typography.md */
   --font-size-md: 1.25rem; /* 20px, lead paragraphs */
   --font-size-lg: 1.563rem; /* 25px, h3 */
@@ -146,6 +155,11 @@
   --elevation-2: 0 2px 8px rgb(var(--shadow-color) / 0.45); /* hovered/raised */
   --elevation-3: 0 8px 24px rgb(var(--shadow-color) / 0.55); /* lightbox */
 
+  /* Modal scrim, for a <dialog>'s ::backdrop. Distinct from the elevation
+  steps: those describe how far a surface sits above the page, this one dims
+  everything behind a surface that has taken over the viewport. */
+  --scrim: rgb(var(--shadow-color) / 0.7);
+
   /* A 1px inner top highlight. Not a gradient and not a fill: it reads as
   a lit top edge on a raised surface, which is the whole of the "glossier
   than the artboard" ask that flat colour cannot supply. */
@@ -186,6 +200,11 @@
   --z-base: 0;
   --z-sticky: 10;
   --z-statusbar: 20;
+
+  /* The skip link is only ever painted while focused, but when it is it must
+  clear the sticky nav rail and the status bar both — otherwise the first
+  thing a keyboard user reaches is a control they cannot see. */
+  --z-skip-link: 30;
   --z-lightbox: 100;
 }
 
