@@ -20,22 +20,34 @@
     "words": [
         // People and projects credited in the site or its tooling
         "ajlkn",
+        "Bakshi",
+        "communistopoly",
         "devcontainer",
         "devcontainers",
+        "Duplicati",
+        "gimmie",
         "Giraudel",
         "laywill",
+        "Nikhomkhai",
+        "Panumas",
         "Peng",
+        "QinetiQ",
         "Redd",
+        "Roke",
         "stefanzweifel",
+        "Unraid",
         // Kit, venues and qualifications named in the copy.
         "Andorra",
+        "ARCD",
         "Audiotechnik",
         "IPAF",
+        "ISTAR",
         "Milos",
         "Quatro",
         "Resolume",
         "Selex",
         "Sennheiser",
+        "tlnp",
         // The 2017 stack: skel breakpoint names, jQuery plugins, Sass
         "jquery",
         "MSIE",
@@ -59,7 +71,9 @@
         "linters",
         "lychee",
         "megalinter",
+        "ossf",
         "oxsecurity",
+        "sarif",
         "secretlint",
         "stylelint",
         "trufflehog",
@@ -75,7 +89,9 @@
         "Pexels",
         "Skye",
         "Spiske",
-        "tiddled"
+        "tiddled",
+        // Workflow copy
+        "fulls"
     ],
     "ignoreWords": [
         "laywill.github.io",
