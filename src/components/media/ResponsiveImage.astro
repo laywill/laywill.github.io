@@ -72,3 +72,29 @@ const {
   fetchpriority={fetchpriority}
   class={className}
 />
+
+<style>
+  /*
+   * The component is called ResponsiveImage, so it has to actually be one.
+   * astro:assets emits real intrinsic width/height attributes - which is what
+   * removes layout shift - but those are also what make an unstyled <img>
+   * paint at its full natural size. A 2000px source in a 328px column then
+   * pushes the document's scroll width to 2000px, which is precisely the
+   * "no horizontal scroll at 360px" floor the brief calls non-negotiable.
+   *
+   * Caught by driving a real browser at 360px, not by astro check or by the
+   * axe run: jsdom has no layout, so nothing automated in this repo could
+   * have seen it.
+   *
+   * height: auto is the other half - without it, capping the width while the
+   * height attribute still applies squashes the aspect ratio.
+   *
+   * :global because the element is emitted by <Picture>, so Astro's scoping
+   * attribute lands on the <picture> wrapper rather than on the <img> inside
+   * it.
+   */
+  picture :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+</style>

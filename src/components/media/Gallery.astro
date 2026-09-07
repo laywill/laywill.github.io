@@ -92,9 +92,12 @@ const resolved = await Promise.all(
 ---
 
 <div class:list={["gallery", className]} data-lightbox-gallery>
-  {/* role="list" defends against Safari/VoiceOver dropping list semantics
-  from a <ul> once `list-style: none` is applied — a known engine quirk,
-  not a WAI-ARIA requirement on unstyled lists. */}
+  {/* House rule, applied to every unstyled list in this library, not just
+  this one: role="list" defends against Safari/VoiceOver dropping list
+  semantics from a <ul>/<ol> the moment `list-style: none` is applied — a
+  known engine quirk, not a WAI-ARIA requirement on unstyled lists in
+  general. Restoring the role costs one attribute and keeps the semantics
+  regardless of engine. */}
   <ul class="grid" role="list">
     {
       resolved.map(({ item, full }) => (
@@ -260,6 +263,25 @@ const resolved = await Promise.all(
     border-radius: var(--radius-lg);
     box-shadow: var(--elevation-3);
     color: var(--fg);
+    z-index: var(--z-lightbox);
+
+    /*
+     * Column flex, rather than the image being sized against a hand-tuned
+     * `calc(85vh - 2 * var(--space-md))`: that subtraction only ever
+     * accounted for the dialog's own padding, not the caption that roughly
+     * half the demo gallery items render below the image. The caption's
+     * margin-top plus its own line box pushed straight through the fixed
+     * cap on every item with a caption, and `max-height` on `.lightbox`
+     * combined with no `overflow` set meant that overflow was simply
+     * invisible rather than scrollable. Flex-column instead lets the
+     * caption claim whatever space its content needs first, so the image
+     * (below, `flex: 0 1 auto` with `min-height: 0`) only ever gets what's
+     * left inside the 85vh cap — correct with a caption, without a caption,
+     * and at any caption length, with no subtraction to keep in sync by
+     * hand.
+     */
+    display: flex;
+    flex-direction: column;
 
     /*
      * Entry/exit transition is CSS-only via @starting-style + allow-discrete
@@ -319,12 +341,22 @@ const resolved = await Promise.all(
   .lightbox-image {
     display: block;
     max-width: 100%;
-    max-height: calc(85vh - 2 * var(--space-md));
+    /* No max-height here — the flex-column parent above is what constrains
+    this now. `flex: 0 1 auto` lets the image take its natural size up to
+    whatever height the column has left after the caption (min-height: 0
+    overrides the flex default of `min-height: auto`, which would otherwise
+    refuse to shrink the image below its intrinsic size and defeat the
+    whole arrangement). */
+    flex: 0 1 auto;
+    min-height: 0;
     margin: 0 auto;
     border-radius: var(--radius-md);
   }
 
   .lightbox-caption {
+    /* flex: none — the caption always renders at its natural height; it is
+    the image that yields space to it, never the other way round. */
+    flex: none;
     margin: var(--space-sm) 0 0;
     color: var(--fg-secondary);
     font-family: var(--font-body);
