@@ -65,7 +65,7 @@
   step is what actually reads as hover. It also improves the white-text
   ratio it has to carry, from 4.51:1 to 4.79:1, so the hover state is never
   the weaker of the two. */
-  --statusbar-blue-hover: #1177bb;
+  --statusbar-blue-hover: #17b;
 
   /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
   footer) — kept as a token rather than a literal so nothing outside this
