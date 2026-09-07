@@ -1,0 +1,144 @@
+---
+/*
+ * Outline.astro — in-page table of contents mirroring the current page's
+ * headings (docs/overhaul/component-library.md, "Navigation — nav/";
+ * docs/overhaul/design-direction.md, "1. Explorer sidebar").
+ *
+ * This is real navigation (anchor links to real headings), not decoration —
+ * component-library.md rule 5 only hides genuine set dressing, and this
+ * isn't that. It IS desktop-only, per the "narrow viewports" decision: on a
+ * phone the headings it would duplicate are a few lines below it, so the
+ * duplication earns nothing and burns vertical space instead. Hiding it
+ * with `display: none` removes it from the accessibility tree along with
+ * the viewport, but the headings themselves stay reachable either way, so
+ * no navigation capability is lost below 900px.
+ */
+export interface OutlineItem {
+  id: string;
+  label: string;
+  level: 2 | 3;
+}
+
+interface Props {
+  items: readonly OutlineItem[];
+  activeId?: string;
+  class?: string;
+}
+
+const { items, activeId, class: className } = Astro.props;
+---
+
+<nav aria-label="On this page" class:list={["outline", className]}>
+  <ul>
+    {
+      items.map((item) => {
+        const isActive = item.id === activeId;
+        return (
+          <li class:list={[`item-level-${item.level}`]}>
+            {/* "location" rather than "page" or the bare "true": the spec
+            defines "location" as "the current item within a container or
+            set of related elements" — precisely a table of contents, where
+            every candidate is a fragment of the one page rather than a
+            distinct page or step. */}
+            <a
+              href={`#${item.id}`}
+              class:list={["link", { "link--active": isActive }]}
+              aria-current={isActive ? "location" : undefined}
+            >
+              {/* The "##"/"###" prefix echoes the Markdown heading it
+              points at (the sidebar's file-explorer conceit extends to
+              the outline reading like a document's own source). It is
+              set dressing on top of a real link, not content in its own
+              right, so it is pulled out of the accessible name. */}
+              <span class="prefix" aria-hidden="true">
+                {item.level === 2 ? "##" : "###"}
+              </span>
+              {item.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .outline {
+    /* Desktop-only — see the file-level comment. Base (mobile) rules are
+    unqualified `display: none`; the >=900px query below is the sole
+    override, matching the one breakpoint this component cares about. */
+    display: none;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .link {
+    display: block;
+    padding: var(--space-3xs) var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--fg-secondary);
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-standard);
+
+    /* Transparent until active — reserves the marker's width at rest so
+    becoming active never shifts the text, matching the technique
+    Nav.astro uses for its own active-row marker. */
+    border-left: var(--focus-ring-width) solid transparent;
+  }
+
+  /* The prefix and the heading text are adjacent inline boxes with no
+  whitespace between them in the markup - JSX drops it - so without this the
+  row renders as "##Buttons". Declared rather than added as a text space
+  because the prefix is aria-hidden set dressing, and padding it apart keeps
+  the accessible name free of a stray leading space. */
+  .prefix {
+    margin-inline-end: var(--space-3xs);
+  }
+
+  .link:hover {
+    background-color: var(--bg-highlight);
+  }
+
+  .link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Two cues, not one — the same requirement the sidebar's own active row
+  is held to (component-library.md rule 4), not an exception from it.
+  aria-current="location" reaches assistive tech only; --accent-lightblue
+  reaches sighted users only. Neither audience gets both without the
+  --statusbar-blue left marker below, borrowed from Nav.astro's
+  row--active so "current" reads as one visual language across the rail. */
+  .link--active {
+    color: var(--accent-lightblue);
+    border-left-color: var(--statusbar-blue);
+  }
+
+  .item-level-3 .link {
+    padding-left: var(--space-lg);
+  }
+
+  @media (min-width: 900px) {
+    .outline {
+      display: block;
+
+      /* Nav.astro paints --bg-sidebar on itself, not on the shared .rail
+      ancestor (AppShell.astro), so without its own background the outline
+      would show the rail's default surface instead and produce a visible
+      seam where the two components meet. The border-top is the "below a
+      divider" divider design-direction.md §1 calls for and that neither
+      component previously rendered. Setting the background on .rail
+      itself would be the tidier fix if AppShell.astro's owner would rather
+      do it there — this is the workaround available from this file alone. */
+      background-color: var(--bg-sidebar);
+      border-top: 1px solid var(--border);
+    }
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+/*
+ * Callout.astro — the Obsidian-flavoured callout block
+ * (docs/overhaul/component-library.md, "UI primitives"; design-direction.md
+ * "5. Callout row"). This is the ONE definition of the callout vocabulary:
+ * the Notes pages (issue #33) reuse this component rather than re-deriving
+ * the [!type] syntax, the border-plus-tint treatment or the type→accent map.
+ *
+ * The 8% tint is derived with color-mix against a locally-scoped custom
+ * property, per colour-scheme.md's explicit instruction not to add a tint
+ * token per accent: "one recipe, and the tint stays correct if an accent
+ * value ever moves." Because the accent varies per `type`, the recipe has
+ * to run against a variable rather than being written once per colour.
+ */
+import { Icon } from "astro-icon/components";
+import { accentVar, type Accent } from "../../lib/accents";
+
+interface Props {
+  /**
+   * Obsidian callout type. Drives the accent and the icon.
+   *
+   * Deliberately only the two types the semantic colour map actually
+   * assigns. Widening this union is a colour decision, not a component
+   * change — see the comment on ACCENT_BY_TYPE.
+   */
+  type: "info" | "tip";
+  /** The callout's title, e.g. "Currently". */
+  title: string;
+  class?: string;
+}
+
+const { type, title, class: className } = Astro.props;
+
+/*
+ * Type -> accent, fixed by the semantic colour map in design-direction.md:
+ * info is a type/category (teal), tip is an action (yellow).
+ *
+ * The map assigns no others, and colour-scheme.md is explicit that an accent
+ * must not be pressed into service ad hoc — so the obvious further types
+ * ("note", "warning") are NOT defined here. There is no accent reserved for
+ * alerts in 2a at all: orange means "strings and human content", which is
+ * the wrong meaning for a warning, and --accent-purple is retained precisely
+ * as an unassigned token. Picking either would be inventing a semantic in a
+ * component file, which is the wrong place for that decision.
+ *
+ * Notes (issue #33) is where the callout vocabulary grows. Widening this map
+ * belongs to that issue, alongside an update to the colour map — see the
+ * open question in docs/overhaul/component-library.md.
+ */
+const ACCENT_BY_TYPE: Record<Props["type"], Accent> = {
+  info: "teal",
+  tip: "yellow",
+};
+
+/*
+ * lucide glyph per type, from one icon family so the callout row reads as
+ * one visual language rather than a pile of borrowed marks.
+ */
+const ICON_BY_TYPE: Record<Props["type"], string> = {
+  info: "lucide:info",
+  tip: "lucide:lightbulb",
+};
+
+const accent = ACCENT_BY_TYPE[type];
+const iconName = ICON_BY_TYPE[type];
+---
+
+<div
+  class:list={["callout", className]}
+  style={`--callout-accent: ${accentVar(accent)}`}
+>
+  <p class="label">
+    {
+      /* The icon repeats the [!type] marker's meaning redundantly for
+      sighted users; screen-reader users get that meaning from the visible
+      "info"/"tip" text below instead, so the glyph is decorative here and
+      hidden rather than announced twice. */
+    }
+    <Icon name={iconName} aria-hidden="true" class="glyph" />
+    {
+      /* [!info] is Obsidian's own callout syntax, not prose — it exists to
+      be recognised visually by anyone who already reads Obsidian vaults,
+      the way a diff's leading "+" is recognised without narration. It adds
+      no information a screen-reader user needs beyond the title that
+      follows, so it is hidden from the accessibility tree; the *title*
+      ("Currently") is real content and stays exposed. */
+    }
+    <span aria-hidden="true">[!{type}]</span>{" "}{title}
+  </p>
+  <div class="body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    border-left: 3px solid var(--callout-accent);
+    background-color: color-mix(in srgb, var(--callout-accent) 8%, transparent);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--callout-accent);
+    margin: 0 0 var(--space-2xs);
+  }
+
+  .glyph {
+    width: 1em;
+    height: 1em;
+    flex: none;
+  }
+
+  .body {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--fg);
+  }
+
+  .body :global(:last-child) {
+    margin-bottom: 0;
+  }
+</style>

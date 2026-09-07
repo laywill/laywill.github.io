@@ -1,0 +1,250 @@
+---
+/*
+ * AppShell.astro — the page frame (docs/overhaul/component-library.md,
+ * "Layout — layout/"; docs/overhaul/design-direction.md, page structure
+ * §§1, 2, 6 and "Glossy and scrollable, not an IDE emulator").
+ *
+ * Composes the navigation (Nav.astro, rendered once and reshaped by CSS
+ * between an editor-tab bar and an explorer sidebar — see Nav.astro's own
+ * header comment), the breadcrumb, the in-page Outline, a <main> content
+ * column and the status-bar footer, in one CSS Grid.
+ *
+ * "Motif, not emulator" (design-direction.md) is the load-bearing
+ * constraint on the grid below: the sidebar rail is `position: sticky` so
+ * it stays in view while scrolling, but it must never become an
+ * independently-scrolling pane with its own scrollbar. Nav.astro sets
+ * `height: 100%; overflow-y: auto` on itself at >=900px — an ordinary
+ * "fill the available box" pattern from Nav's point of view — which only
+ * turns into a real scrolling pane if an ancestor gives that box a
+ * *definite* height. `.rail` is therefore kept at `align-self: start`
+ * (opting out of Grid's default row-stretch), and this file gives `.rail`
+ * a `max-height` at >=900px (see that rule for why) but never a `height` —
+ * `max-height` alone doesn't make a box's height definite, so Nav's `100%`
+ * still resolves against `auto` and Nav itself never gains a second,
+ * independent scrollbar. `.rail` can scroll on its own past that
+ * `max-height`, which is a deliberate, narrow exception to "one scrolling
+ * document" — see the rule for the failure it's trading against. The page
+ * is otherwise one normal scrolling document, as the design doc requires.
+ *
+ * Composing Nav (a <nav> landmark), <main> and StatusBar's <footer> also
+ * satisfies the StatusBar requirement that the footer not be the page's
+ * only landmark content.
+ */
+import type { OutlineItem } from "../nav/Outline.astro";
+import Nav from "../nav/Nav.astro";
+import Outline from "../nav/Outline.astro";
+import Breadcrumb from "../nav/Breadcrumb.astro";
+import StatusBar from "../chrome/StatusBar.astro";
+
+interface Props {
+  activeNavId: string;
+  breadcrumb?: readonly string[];
+  outline?: readonly OutlineItem[];
+  activeOutlineId?: string;
+  class?: string;
+}
+
+const {
+  activeNavId,
+  breadcrumb,
+  outline,
+  activeOutlineId,
+  class: className,
+} = Astro.props;
+
+// Narrowed to `undefined` rather than tested with a separate boolean flag +
+// non-null assertion at the call site — TypeScript can then confirm the
+// prop is present wherever it's read below.
+const breadcrumbSegments =
+  breadcrumb && breadcrumb.length > 0 ? breadcrumb : undefined;
+const outlineItems = outline && outline.length > 0 ? outline : undefined;
+---
+
+{/*
+  The skip link is the first focusable element on the page, ahead of Nav's
+  own links, so a keyboard/screen-reader user can bypass the whole sidebar
+  or tab bar in one press. It is visually hidden (translated off-canvas)
+  until it receives focus.
+*/}
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class:list={["shell", className]}>
+  <div class="rail">
+    <Nav activeId={activeNavId} />
+    {
+      outlineItems && (
+        <Outline items={outlineItems} activeId={activeOutlineId} />
+      )
+    }
+  </div>
+
+  <div class="content-col">
+    {breadcrumbSegments && <Breadcrumb segments={breadcrumbSegments} />}
+    {/*
+      tabindex="-1" makes #main programmatically focusable without adding
+      it to the Tab order (a positive/zero tabindex would do the latter,
+      which is not wanted — it's a skip-link target, not a stop on the
+      normal tab path). Modern engines move the sequential-focus starting
+      point to the target of a same-page hash navigation even when it
+      isn't focusable, so this looks redundant with the skip link above.
+      It isn't: several screen-reader/browser pairings only move the
+      virtual cursor to a target that is actually focusable. This is the
+      standard belt-and-braces for skip links — do not remove it as dead
+      weight just because it appears to do nothing in one browser.
+    */}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+  </div>
+
+  <div class="statusbar-row">
+    <StatusBar />
+  </div>
+</div>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
+
+    /* Clears the sticky rail and the status bar both: a skip link the user
+    cannot see is worse than no skip link, because it still takes the first
+    Tab. */
+    z-index: var(--z-skip-link);
+
+    padding: var(--space-2xs) var(--space-sm);
+    background-color: var(--bg-active);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-md) 0;
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  /* Plain :focus (not :focus-visible) drives visibility: a skip link that
+  only appears for keyboard users but stays invisible to a mouse click is a
+  worse outcome than showing it either way. The ring below is layered on
+  top for the keyboard case specifically, per rule 6. */
+  .skip-link:focus {
+    transform: translateY(0%);
+  }
+
+  .skip-link:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "rail"
+      "content"
+      "statusbar";
+  }
+
+  .rail {
+    grid-area: rail;
+    /* Opts out of Grid's default stretch — see the file-level comment on
+    why this matters for Nav's internal height:100%/overflow-y:auto. */
+    align-self: start;
+
+    /* Pinned to the top at every width, not just >=900px. Below `md` this
+    is what actually makes the editor-tab bar "pinned to the top of the
+    page", which component-library.md already claims of it — the sticky
+    rule used to be nested inside the >=900px query only, so below that
+    the tab bar simply scrolled away with the document like any other
+    content, and the doc's claim didn't match the code. `top: 0` and
+    `position: sticky` are therefore unconditional; only the >=900px query
+    below adds anything further (the height cap, because only the
+    full sidebar's content is ever tall enough to need one). --z-sticky
+    is the token that exists for exactly this and was previously
+    unreferenced. It sits below --z-skip-link (tokens.css's "stacking
+    order, in one place" table), so the skip link still renders above the
+    pinned rail when it receives focus, matching the skip-link comment
+    above. */
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+  }
+
+  .content-col {
+    grid-area: content;
+    /* Stops long unbroken mono content (hashes, refs, filenames) from
+    forcing the track wider than the viewport at the 360px floor. */
+    min-width: 0;
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--space-sm);
+  }
+
+  .statusbar-row {
+    grid-area: statusbar;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      /* The `md` breakpoint (component-library.md): tab bar becomes the
+      sidebar rail, status bar spans both tracks. */
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      grid-template-areas:
+        "rail content"
+        "statusbar statusbar";
+    }
+
+    .rail {
+      /* position/top are already set unconditionally above; this query
+      only adds the height cap, which only matters once the full sidebar
+      (Nav plus the Outline) is in play.
+
+      Uncapped, a sticky element with no height limit of its own just
+      keeps growing with its content — sticky only pins the *position*,
+      not the size. Rail content (site label, root row, six-odd nav rows,
+      the Outline group) runs to roughly 615px on the preview page. On a
+      viewport 900-1200px wide but under about 640px tall — a 1366x768
+      laptop with browser chrome, a 1024x600 Chromebook — that's taller
+      than the viewport itself, and the bottom of the rail (the Outline's
+      last entries) sticks off-screen with no way to scroll it into view:
+      the rail is pinned, the page's own scroll only moves .content-col
+      past it, and nothing ever brings the rail's lower half on-screen.
+      That's worse than not being sticky at all — a static rail would at
+      least let the page scroll reach it.
+
+      This is in tension with design-direction.md's "no fake panes with
+      independent scroll" — the whole point of that rule is not to emulate
+      an IDE's independently-scrolling panels. But that rule is aimed at
+      *gratuitous* IDE emulation (resizable splitters, tab management,
+      chrome nobody outside VS Code would know how to use); it is not a
+      mandate to make navigation unreachable. A scrollbar that appears
+      only when the rail's own content genuinely exceeds the viewport it's
+      pinned against is a scroll-affordance for content that has nowhere
+      else to go, not an emulated pane — and stranding the outline links
+      for the entire scroll is the clearly worse failure of the two.
+
+      This also must not reintroduce the second-scrollbar problem the
+      file-level comment above works to avoid: Nav.astro sets `height:
+      100%; overflow-y: auto` on itself at this width, which only becomes
+      a *second* independent scroll box if some ancestor gives it a
+      definite height to resolve that percentage against. `max-height`
+      does not do that — per the CSS box model, a percentage height on a
+      child resolves against the *auto* case (i.e. is itself ignored)
+      whenever the containing block's own height is not an explicit
+      length, and `max-height` without `height` leaves .rail's computed
+      height as `auto` even though its rendered size is now clamped. So
+      Nav's `height: 100%` still resolves as it did before this change —
+      effectively inert — and only .rail itself gains a scrollbar, and
+      only when it overflows. One scrollbar, not two. */
+      max-height: 100dvh;
+      overflow-y: auto;
+    }
+
+    .content-col {
+      padding-inline: var(--space-lg);
+    }
+  }
+</style>

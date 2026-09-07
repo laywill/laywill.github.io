@@ -1,0 +1,61 @@
+---
+name: Accessibility
+
+# Reusable only. Runs axe-core over the *built* HTML, which is the only place
+# it can run meaningfully: an .astro source is not the markup a visitor gets,
+# and the ARIA a component emits is frequently decided by a prop.
+#
+# What this does NOT check is as important as what it does, and is stated in
+# docs/overhaul/component-library.md rather than only here: jsdom performs no
+# layout, so the colour-contrast rule cannot run and is disabled explicitly by
+# scripts/a11y.mjs. Contrast is governed instead by the computed ratios in
+# docs/overhaul/colour-scheme.md. Nor does this cover responsive behaviour or
+# keyboard operation. It is a regression guard on structure, naming and ARIA -
+# not a claim that the site is accessible.
+on:
+  workflow_call:
+
+# Literal prefix: github.workflow resolves to the caller's name inside a called
+# workflow, so it cannot separate this group from the other called workflows'.
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  a11y:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Unlike link-check.yml this does need the repo: the checker itself
+      # (scripts/a11y.mjs) and its dependencies live there. Only dist/ is
+      # inspected; the source tree is never the subject of the check.
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # The same artifact the link check consumes - the build job's output,
+      # not a rebuild. Checking a second build would be checking something
+      # other than what ships.
+      - name: Download build output
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: dist
+          path: dist
+
+      - name: Run axe-core
+        run: npm run a11y

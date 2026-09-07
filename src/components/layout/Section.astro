@@ -1,0 +1,117 @@
+---
+/*
+ * Section.astro — a titled content band with consistent vertical rhythm
+ * (docs/overhaul/component-library.md, "Layout — layout/").
+ *
+ * When `title` is given this renders a real <section> with a real heading
+ * and an `aria-labelledby` pointing at it — a landmark with a name.
+ *
+ * When `title` is omitted there is nothing to name the landmark with. A
+ * `<section>` (or any element with an ARIA `region`-implying role) that
+ * has no accessible name is exposed to assistive tech as an unlabelled
+ * generic region — noise in the landmark list, not information. Rather
+ * than ship that, the untitled case renders a plain `<div>`: identical
+ * visual rhythm, no phantom landmark. Callers that want a landmark must
+ * supply a title.
+ */
+interface Props {
+  /**
+   * Explicit id for the heading/landmark. Required — not merely
+   * recommended — whenever `title` may repeat across a page: the fallback
+   * below derives a slug from `title`, so two sections sharing a title
+   * collide on
+   * the same id. That produces a duplicate `id` (an axe `duplicate-id-aria`
+   * violation, since both feed `aria-labelledby`) and, at runtime, an
+   * `aria-labelledby` on the second section that resolves back to the
+   * *first* section's heading. Nothing here detects a repeated title and
+   * warns — callers are responsible for passing a distinct `id` themselves
+   * when that's possible.
+   */
+  id?: string;
+  title?: string;
+  /**
+   * Heading level for `title`. Default 2.
+   *
+   * Level 1 is offered because a page needs exactly one `<h1>` and a Section
+   * is often the natural place for it — a page whose first band carries the
+   * page title should not have to render a bare heading outside the layout
+   * just to satisfy that. It is the caller's job to use it exactly once.
+   */
+  level?: 1 | 2 | 3;
+  class?: string;
+}
+
+const { id, title, level = 2, class: className } = Astro.props;
+
+// Kebab-cases a title into a stable id when the caller supplies a title
+// but no explicit `id` — aria-labelledby always needs a target, and this
+// is deliberately the same id an in-page anchor (Outline.astro) would want
+// to point a "## Title" entry at, so a caller can pass `id` once and have
+// it serve both jobs.
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const headingId = title ? (id ?? slugify(title)) : undefined;
+const Heading = level === 1 ? "h1" : level === 3 ? "h3" : "h2";
+---
+
+{
+  title ? (
+    <section
+      class:list={["section", className]}
+      aria-labelledby={headingId}
+    >
+      <Heading id={headingId} class="section-title" data-level={level}>
+        {title}
+      </Heading>
+      <slot />
+    </section>
+  ) : (
+    <div id={id} class:list={["section", className]}>
+      <slot />
+    </div>
+  )
+}
+
+<style>
+  .section {
+    /* Vertical rhythm from the space scale — component-library.md asks for
+    "consistent vertical rhythm from the space tokens", not a bespoke value
+    per band. Mobile-first: --space-xl is documented in tokens.css as "band
+    padding, narrow" and was previously never referenced — every band paid
+    --space-2xl (64px top *and* bottom = 128px between adjacent sections)
+    even at the 360px floor, on exactly the viewport design-direction.md
+    flags for its above-the-fold budget. --space-xl applies below `md`
+    (900px, component-library.md's breakpoint table); --space-2xl takes
+    over at `md` and above, where the extra vertical room is affordable. */
+    padding-block: var(--space-xl);
+  }
+
+  @media (min-width: 900px) {
+    .section {
+      padding-block: var(--space-2xl);
+    }
+  }
+
+  .section-title {
+    margin: 0 0 var(--space-lg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: var(--line-height-tight);
+    color: var(--fg);
+    font-size: var(--font-size-xl); /* level 2 default */
+  }
+
+  .section-title[data-level="1"] {
+    font-size: var(--font-size-2xl);
+  }
+
+  .section-title[data-level="3"] {
+    font-size: var(--font-size-lg);
+  }
+</style>

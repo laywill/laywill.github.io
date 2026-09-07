@@ -58,8 +58,12 @@ automatically on container create.
 3. Open a pull request against `main` using the provided
    [PR template](.github/PULL_REQUEST_TEMPLATE.md).
 4. CI runs on every PR: [MegaLinter](https://megalinter.io/), CodeQL,
-   `astro check` + `astro build`, and an internal link check over the built
-   output. Fix any reported issues (or apply MegaLinter's auto-fixes).
+   `astro check` + `astro build`, an internal link check over the built
+   output, and an axe-core accessibility check over the same built output
+   (`npm run a11y` — it checks structure, naming and ARIA, not contrast or
+   responsive behaviour; see
+   [docs/overhaul/component-library.md](docs/overhaul/component-library.md)).
+   Fix any reported issues (or apply MegaLinter's auto-fixes).
 5. A reviewer will be automatically requested per
    [CODEOWNERS](.github/CODEOWNERS).
 
@@ -70,9 +74,9 @@ offers a branch-push, manual-dispatch or scheduled path to a deploy. See
 [.github/workflows/release.yml](.github/workflows/release.yml). (The v1 site
 still deploys on push to `master`; that path retires with the branch.)
 
-A tag push runs lint (MegaLinter), SAST (CodeQL), build, and the internal
-link check over the built output. The deploy job `needs:` all four, so a
-failure in any of them means no deploy. Only the built `dist/` is published,
+A tag push runs lint (MegaLinter), SAST (CodeQL), build, the internal link
+check over the built output, and the accessibility check. The deploy job
+`needs:` all five, so a failure in any of them means no deploy. Only the built `dist/` is published,
 never the repo tree.
 
 Tags carrying a SemVer pre-release suffix (anything after a hyphen, e.g.
