@@ -25,45 +25,106 @@ interface Props {
 const { items = CERTIFICATIONS, class: className } = Astro.props;
 ---
 
-<ul class:list={["cert-badges", className]}>
-  {
-    items.map((cert: Certification) => (
-      <li class="badge">
-        <span class="abbr" aria-hidden="true">
-          {cert.abbr}
-        </span>
-        <span class="caption">
-          <span class="cert-name">{cert.name}</span>
-          <span class="issuer">
-            {cert.issuer}
-            {cert.year !== undefined && `, ${cert.year}`}
+{/*
+  The frame exists solely to establish CSS containment for the grid below
+  (see the `.cert-badges-frame` rule) — it carries no styling of its own.
+  This component renders inside the certs.json pane of the split-panes
+  layout (design-direction.md §4), sharing the right-hand column with the
+  toolbox pane. At a 1200px viewport that column is only ~352px wide (see
+  IconGrid.astro's `.icon-grid` comment for the full arithmetic), so
+  sizing the grid off the viewport rather than its own box is wrong here
+  for the same reason it was wrong there — and here it is worse than
+  cosmetic: a `min-width` media query for the 3-up step fires at 640px of
+  VIEWPORT while the pane may still be nowhere near 640px wide, so the
+  grid asks for three columns' worth of content in a container that
+  cannot give it, and the columns overflow the pane rather than shrinking
+  to fit it.
+*/}
+<div class="cert-badges-frame">
+  {/*
+    House rule (see also Gallery.astro, IconGrid.astro, CareerGraph.astro):
+    role="list" restores list semantics that this markup otherwise loses
+    twice over — `list-style: none` drops it in Safari/VoiceOver
+    specifically, and `.badge` below sets `display: flex` on every <li>,
+    which removes the implicit listitem role in every engine (HTML-AAM
+    keys the role mapping to computed display, not the element). One
+    attribute, applied consistently, is cheaper than relying on either
+    behaving.
+  */}
+  <ul class:list={["cert-badges", className]} role="list">
+    {
+      items.map((cert: Certification) => (
+        <li class="badge">
+          <span class="abbr" aria-hidden="true">
+            {cert.abbr}
           </span>
-        </span>
-      </li>
-    ))
-  }
-</ul>
+          <span class="caption">
+            <span class="cert-name">{cert.name}</span>
+            <span class="issuer">
+              {cert.issuer}
+              {cert.year !== undefined && `, ${cert.year}`}
+            </span>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
 
 <style>
+  .cert-badges-frame {
+    /*
+     * `container-type: inline-size` needs a box whose own size comes from
+     * something other than the content query is about to resize — the
+     * grid itself can't be its own container, hence this otherwise-inert
+     * wrapper. Named (rather than left anonymous) purely for readability
+     * at the `@container` call sites below.
+     */
+    container: cert-badges / inline-size;
+  }
+
   .cert-badges {
     margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
-    /* 2-up below `sm`, per component-library.md's breakpoint table. */
-    grid-template-columns: repeat(2, 1fr);
+    /*
+     * 2-up is the floor state, valid at any container width down to the
+     * 360px page floor. `minmax(0, 1fr)`, not a bare `1fr` — the same fix
+     * CareerGraph.astro's grid already documents: a bare `1fr` track's
+     * min-width defaults to `auto` (content-based), so a badge whose
+     * content wants more room than an equal split allows would widen the
+     * track instead of shrinking, pushing the grid past the pane's edge.
+     * That is precisely the overflow measured at a 1200px viewport before
+     * this fix (badges extending ~200px past the pane, invisible only
+     * because the pane's own `overflow: hidden` was silently clipping
+     * them) — `minmax(0, 1fr)` makes the track shrink to fit instead.
+     */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-sm);
   }
 
-  @media (min-width: 640px) {
+  /*
+   * 3-up once the container has room for it. 34rem is derived, not
+   * guessed — see `.badge`'s min-height comment for where 9.875rem (the
+   * content's real minimum) comes from:
+   *
+   *   3 columns x 9.875rem + 2 gaps x var(--space-sm) (1rem)
+   *   = 29.625rem + 2rem = 31.625rem, rounded up to 34rem
+   *
+   * The 2.375rem of headroom above the bare minimum keeps 3-up from
+   * reintroducing the squeeze at the first container width it's legal in;
+   * it does not need to be exact, only comfortably past the point where
+   * text would start wrapping inside a badge instead of the grid flowing
+   * around it.
+   */
+  @container cert-badges (min-width: 34rem) {
     .cert-badges {
-      /* 3-up at `sm` and above. */
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
   .badge {
-    aspect-ratio: 1 / 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,11 +136,69 @@ const { items = CERTIFICATIONS, class: className } = Astro.props;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: var(--elevation-1);
+    /*
+     * Squareness (below) is suspended until the container is wide enough
+     * to hold the content without it; until then, min-height is the sum
+     * of what the content actually needs, computed from the same tokens
+     * the content is set in rather than a hard-coded figure that would go
+     * stale the moment a type-scale or space-scale value moved:
+     *
+     *   abbr, 1 line             : --font-size-md * --line-height-normal
+     *                               = 1.25rem * 1.5   = 1.875rem
+     *   cert-name + issuer,
+     *   2 lines each (worst case): --font-size-sm * --line-height-normal * 4
+     *                               = 0.875rem * 1.5 * 4 = 5.25rem
+     *   caption's internal gap    : --space-3xs           = 0.25rem
+     *   badge's own gap           : --space-2xs           = 0.5rem
+     *   padding, top + bottom     : --space-sm * 2         = 2rem
+     *   ------------------------------------------------------------
+     *   total                     = 9.875rem (158px)
+     *
+     * A 1:1 ratio at the 360px floor's narrowest 2-up column (~131px, well
+     * below the 22rem container query's threshold below) would ask for
+     * 131px of height
+     * against that 158px requirement, so the badge would either clip its
+     * own text or silently grow taller than its ratio — the defect this
+     * whole rule exists to avoid.
+     */
+    min-height: calc(
+      (var(--font-size-md) * var(--line-height-normal)) +
+        (var(--font-size-sm) * var(--line-height-normal) * 4) + var(--space-3xs) + var(--space-2xs) +
+        (var(--space-sm) * 2)
+    );
+  }
+
+  /*
+   * Squareness resumes once a column is wide enough to hold the content
+   * above without the min-height rescue: 2 columns x 9.875rem + 1 gap x
+   * var(--space-sm) (1rem) = 20.75rem, rounded up to 22rem for the same
+   * kind of headroom the 3-up threshold above takes.
+   */
+  @container cert-badges (min-width: 22rem) {
+    .badge {
+      aspect-ratio: 1 / 1;
+      /* Without this, the min-height above would persist alongside the
+      ratio and could in principle still force a badge taller than
+      square — resetting it makes aspect-ratio the sole authority on
+      height once there is room to honour it, rather than the two rules
+      silently agreeing in practice. */
+      min-height: 0;
+    }
   }
 
   .abbr {
     font-family: var(--font-mono);
-    font-weight: 700;
+    /*
+     * 500, not 700: astro.config.mjs loads JetBrains Mono at 400 and 500
+     * only (typography.md caps a family at two weights), so a 700 request
+     * here was never rendering — the browser was synthesising a fake bold
+     * from the 500 face. 500 is the heaviest weight actually shipped, and
+     * reads as the intended "glyph, not caption" emphasis without asking
+     * for a weight that doesn't exist. If the badge genuinely needs true
+     * bold, that is a call for whoever owns astro.config.mjs to add a
+     * third weight — not made here.
+     */
+    font-weight: 500;
     font-size: var(--font-size-md);
     color: var(--fg);
   }

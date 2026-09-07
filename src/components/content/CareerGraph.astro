@@ -41,7 +41,19 @@ const { entries = CAREER, headingLevel = 3, class: className } = Astro.props;
 const RoleHeading = `h${headingLevel}` as "h3" | "h4";
 ---
 
-<ol class:list={["career-graph", className]}>
+{/*
+  House rule (see also Gallery.astro, IconGrid.astro, CertBadges.astro):
+  role="list" restores list semantics an engine or the cascade otherwise
+  drops. Two separate causes, both present here: `list-style: none` on the
+  list itself is a known Safari/VoiceOver-only defect; `.entry` below sets
+  `display: grid` on each <li>, which in EVERY engine removes the implicit
+  listitem role per HTML-AAM, since the role mapping is keyed to the
+  computed display value, not the element. `role="list"` is correct on an
+  <ol> as much as a <ul>: WAI-ARIA has one list role, with no separate
+  ordered variant — the sequence itself is still conveyed by DOM/reading
+  order, which role="list" does not disturb.
+*/}
+<ol class:list={["career-graph", className]} role="list">
   {
     entries.map((entry: CareerEntry) => (
       <li class="entry">

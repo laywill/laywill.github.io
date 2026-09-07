@@ -44,7 +44,19 @@ const { categories = TOOLBOX, class: className } = Astro.props;
           {category.label}
         </dt>
         <dd class="tags">
-          <ul>
+          {/*
+            role="list" — house rule (see also Gallery.astro, CertBadges.astro,
+            CareerGraph.astro): Safari/VoiceOver drops list semantics from a
+            <ul>/<ol> once `list-style: none` is applied, and separately —
+            this is the case that bites hardest here — EVERY engine drops the
+            implicit list/listitem role once an item's `display` is changed
+            away from `list-item` at all (HTML-AAM), which is exactly what
+            Tag.astro's `display: inline-flex` does to each <li> below. Both
+            defects are engine/spec quirks around unstyled lists, not a
+            WAI-ARIA requirement on this markup — restoring the role
+            explicitly is cheaper than relying on either behaving.
+          */}
+          <ul role="list">
             {category.items.map((item) => (
               <Tag as="li" accent={category.accent} icon={item.icon} quoted={category.quoted}>
                 {item.label}
@@ -63,6 +75,22 @@ const { categories = TOOLBOX, class: className } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+    /*
+     * Establishes containment for the `.row` container query below. This
+     * component renders inside the toolbox pane of the split-panes layout
+     * (design-direction.md §4), which at a 1200px viewport is only ~352px
+     * wide — the `lg` split-panes breakpoint fires on the VIEWPORT, but the
+     * space this component actually has is the pane's, not the page's. A
+     * `min-width` media query on the row therefore switches to the
+     * two-column form using the wrong measurement; a container query
+     * switches on the box that's actually available, which is what the
+     * row layout decision should have been keyed to from the start. This
+     * is a query on the component's own real estate, not a competing
+     * breakpoint — component-library.md's "must not be varied component by
+     * component" rule governs viewport breakpoints, and a container query
+     * is deliberately not one.
+     */
+    container: icon-grid / inline-size;
   }
 
   .row {
@@ -93,15 +121,28 @@ const { categories = TOOLBOX, class: className } = Astro.props;
   }
 
   /*
-   * At `sm` (640px, per component-library.md's documented breakpoint table)
-   * the row gains its label column and the tags sit alongside it rather
-   * than beneath it. The label gets a fixed measure so every row's tag
-   * column starts at the same x-position; it does not use ch/rem tokens
-   * from the space scale because it is a text-measure width, not a
-   * spacing value — there is no token for that in tokens.css, so this is
-   * the "nearest existing one" compromise flagged in the report.
+   * Row layout is keyed to the CONTAINER's inline size, not the viewport
+   * (see the `.icon-grid` comment above for why). 24rem is not copied from
+   * component-library.md's `sm` breakpoint — it's derived from the row's
+   * own tokens, because the thing being measured is different (the pane's
+   * width, not the page's):
+   *
+   *   12rem   label column (--space-md worth of headroom either side of
+   *           the longest current label, "Cloud & infrastructure")
+   * + 1.5rem  --space-md row gap between label and tags
+   * + 10.5rem minimum tag column judged wide enough that a single pill
+   *           (e.g. "trunk-based development") wraps onto a second line
+   *           rather than breaking mid-word
+   * = 24rem
+   *
+   * Below 24rem of available width the row stays stacked (label above
+   * tags, both full width) rather than forcing the row form into less
+   * space than that — which is exactly the ~352px (22rem) a 1200px-wide
+   * vertical monitor gives this component, per finding 10. Stacked at that
+   * width is correct: it holds without squeezing, which a forced row would
+   * not.
    */
-  @media (min-width: 640px) {
+  @container icon-grid (min-width: 24rem) {
     .row {
       flex-direction: row;
       align-items: flex-start;
@@ -109,7 +150,14 @@ const { categories = TOOLBOX, class: className } = Astro.props;
     }
 
     .label {
-      flex: 0 0 12rem;
+      /* `0 1 12rem`, not `0 0 12rem`: shrinkable as a second line of
+      defence. The container query above is sized so 12rem should always
+      fit once it has fired, but a shrinkable basis means a label is never
+      the thing that forces the row wider than its container if that
+      arithmetic is ever wrong at some content length not accounted for
+      above (e.g. a future category label longer than "Cloud &
+      infrastructure"). */
+      flex: 0 1 12rem;
       padding-top: var(--space-3xs);
     }
 
