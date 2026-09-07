@@ -66,7 +66,16 @@
         "vendored",
         "vendorized",
         "vendorizes",
-        "zizmor"
+        "zizmor",
+        // Cars, coffee and travel hobby pages
+        "Hoffmann",
+        "Inverness",
+        "Lopes",
+        "Nurburgring",
+        "Pexels",
+        "Skye",
+        "Spiske",
+        "tiddled"
     ],
     "ignoreWords": [
         "laywill.github.io",
