@@ -231,10 +231,18 @@ const {
   This is a *separate* guard from the token-level reduced-motion override
   in tokens.css, which only collapses transition durations to 1ms and has
   no effect on a looping @keyframes animation.
+
+  The period comes from its own token, --duration-cursor-blink, rather
+  than --duration-fast/--duration-base: those two are exactly the pair
+  tokens.css collapses to 1ms under prefers-reduced-motion, which would
+  turn a 1ms "blink" into a strobe rather than a stop. This animation is
+  suppressed wholesale by the media query above instead, so its duration
+  token is deliberately left outside that collapsing pair.
   */
   @media (prefers-reduced-motion: no-preference) {
     .cursor {
-      animation: terminal-cursor-blink 1s step-end infinite;
+      animation: terminal-cursor-blink var(--duration-cursor-blink) step-end
+        infinite;
     }
   }
 

@@ -107,10 +107,12 @@ const {
   }
 
   /* Primary: solid fill, per the design doc "--statusbar-blue fill with
-  --fg-on-accent text". Hover darkens toward the fill itself is not
-  available as a token, so hover is carried by the elevation raise above
-  plus a highlight background swap, matching the "State" row of the gloss
-  table (--bg-highlight / --bg-active are background changes, not glows). */
+  --fg-on-accent text". Hover stays a fill-versus-outline button, not a
+  fill-versus-neutral one: --statusbar-blue-hover is VS Code's own
+  button.hoverBackground, a darker shade of the same blue rather than an
+  unrelated neutral, so the primary CTA reads as "hovered", not "disabled".
+  It also happens to clear 4.79:1 against --fg-on-accent, better contrast
+  than the resting fill, so hover never reads as visually weaker either. */
   .button.primary {
     background-color: var(--statusbar-blue);
     color: var(--fg-on-accent);
@@ -118,8 +120,8 @@ const {
   }
 
   .button.primary:hover {
-    background-color: var(--bg-active);
-    border-color: var(--bg-active);
+    background-color: var(--statusbar-blue-hover);
+    border-color: var(--statusbar-blue-hover);
   }
 
   /* Secondary: outline only, no fill — the OUTLINE half of the fill/outline

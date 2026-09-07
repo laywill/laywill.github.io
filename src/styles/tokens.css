@@ -59,6 +59,14 @@
   --accent-purple: #c586c0;
   --statusbar-blue: #007acc;
 
+  /* Hover state for a --statusbar-blue fill. VS Code's own
+  button.hoverBackground, so it is the palette's answer rather than an
+  invented one, and it lifts rather than darkens - on a dark UI a lighter
+  step is what actually reads as hover. It also improves the white-text
+  ratio it has to carry, from 4.51:1 to 4.79:1, so the hover state is never
+  the weaker of the two. */
+  --statusbar-blue-hover: #1177bb;
+
   /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
   footer) — kept as a token rather than a literal so nothing outside this
   file ever hard-codes a hex value. */
@@ -150,7 +158,6 @@
    * ------------------------------------------------------------------ */
 
   --shadow-color: 0 0 0;
-  --elevation-0: none;
   --elevation-1: 0 1px 2px rgb(var(--shadow-color) / 35%); /* panes at rest */
   --elevation-2: 0 2px 8px rgb(var(--shadow-color) / 45%); /* hovered/raised */
   --elevation-3: 0 8px 24px rgb(var(--shadow-color) / 55%); /* lightbox */
@@ -173,6 +180,12 @@
   --duration-fast: 120ms; /* colour/background state changes */
   --duration-base: 180ms; /* transform, opacity, elevation */
   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Terminal cursor blink period. Deliberately outside the pair above: the
+  reduced-motion block collapses those to 1ms, which would turn a blink into
+  a strobe. The cursor animation is instead suppressed wholesale by its own
+  prefers-reduced-motion guard, so its period must not be collapsed. */
+  --duration-cursor-blink: 1s;
 
   /* --------------------------------------------------------------------
    * Focus. A visible focus indicator is required on every interactive
