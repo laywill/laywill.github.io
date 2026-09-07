@@ -175,10 +175,18 @@ const galleryItems: readonly GalleryItem[] = [
           exercised. A same-origin download would not also set
           target="_blank" in real use — pairing it with `external` here too
           would exercise both attributes on one link but misrepresent how
-          the prop is actually meant to be used, so this is `download` alone. */
+          the prop is actually meant to be used, so this is `download` alone.
+
+          It points at the favicon rather than a plausible-looking
+          placeholder-cv.pdf for two reasons: the file has to actually exist
+          or the internal link check fails on it, and `download` is ignored
+          entirely on a cross-origin URL - so a link to the real CV release
+          asset would demonstrate the prop doing nothing. The real CV link
+          lives on the landing page (#28) and is cross-origin, which is worth
+          remembering when that button is built. */
         }
-        <Button href="/placeholder-cv.pdf" variant="secondary" icon="lucide:download" download>
-          Download variant (download attribute)
+        <Button href="/favicon.svg" variant="secondary" icon="lucide:download" download>
+          Download variant (demo)
         </Button>
       </div>
     </Section>

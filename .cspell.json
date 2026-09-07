@@ -90,6 +90,7 @@
     "circleci",
     "argo",
     "lightboxes",
+    "teardown",
     "subresource",
     "subresources",
     "polyfill",
