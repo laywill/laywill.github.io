@@ -9,10 +9,10 @@
 	form {
 		$gutter: _size(element-margin) * 0.75;
 
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 
 		.field {
-			margin: 0 0 ($gutter * 1) 0;
+			margin: 0 0 ($gutter * 1);
 			clear: both;
 
 			&.half {
@@ -40,12 +40,12 @@
 
 		> .actions {
 			clear: both;
-			margin: ($gutter * 1.25) 0 0 0 !important;
+			margin: ($gutter * 1.25) 0 0 !important;
 		}
 
 		@include breakpoint(small) {
 			.field {
-				margin: 0 0 ($gutter * 0.75) 0;
+				margin: 0 0 ($gutter * 0.75);
 
 				&.half {
 					padding: 0 0 0 ($gutter * 0.75 * 0.5);
@@ -57,7 +57,7 @@
 			}
 
 			> .actions {
-				margin: ($gutter * 1) 0 0 0 !important;
+				margin: ($gutter * 1) 0 0 !important;
 			}
 		}
 
@@ -90,7 +90,7 @@
 		display: block;
 		font-size: 0.9rem;
 		font-weight: _font(weight-bold);
-		margin: 0 0 (_size(element-margin) * 0.5) 0;
+		margin: 0 0 (_size(element-margin) * 0.5);
 	}
 
 	input[type="text"],
@@ -102,6 +102,7 @@
 	select,
 	textarea {
 		@include vendor('appearance', 'none');
+
 		background-color: transparent;
 		border-radius: _size(border-radius);
 		border: none;
@@ -120,10 +121,11 @@
 
 	.select-wrapper {
 		@include icon;
+
 		display: block;
 		position: relative;
 
-		&:before {
+		&::before {
 			content: '\f078';
 			display: block;
 			height: _size(element-height);
@@ -158,6 +160,7 @@
 	input[type="checkbox"],
 	input[type="radio"], {
 		@include vendor('appearance', 'none');
+
 		display: block;
 		float: left;
 		margin-right: -2rem;
@@ -168,6 +171,7 @@
 		& + label {
 			@include icon;
 			@include vendor('user-select', 'none');
+
 			cursor: pointer;
 			display: inline-block;
 			font-size: 1rem;
@@ -177,7 +181,7 @@
 			position: relative;
 			margin-bottom: 0;
 
-			&:before {
+			&::before {
 				border-radius: _size(border-radius);
 				border: solid _size(border-width);
 				content: '';
@@ -193,7 +197,7 @@
 		}
 
 		&:checked + label {
-			&:before {
+			&::before {
 				content: '\f00c';
 			}
 		}
@@ -201,7 +205,7 @@
 
 	input[type="checkbox"] {
 		& + label {
-			&:before {
+			&::before {
 				border-radius: _size(border-radius);
 			}
 		}
@@ -209,7 +213,7 @@
 
 	input[type="radio"] {
 		& + label {
-			&:before {
+			&::before {
 				border-radius: 100%;
 			}
 		}
@@ -257,7 +261,7 @@
 		}
 
 		.select-wrapper {
-			&:before {
+			&::before {
 				color: _palette($p, border);
 			}
 		}
@@ -267,13 +271,13 @@
 			& + label {
 				color: _palette($p, fg);
 
-				&:before {
+				&::before {
 					border-color: _palette($p, border);
 				}
 			}
 
 			&:checked + label {
-				&:before {
+				&::before {
 					background-color: _palette($p, fg-bold);
 					border-color: _palette($p, fg-bold);
 					color: _palette($p, bg);
@@ -281,7 +285,7 @@
 			}
 
 			&:focus + label {
-				&:before {
+				&::before {
 					border-color: _palette($p, accent);
 					box-shadow: 0 0 0 _size(border-width) _palette($p, accent);
 				}

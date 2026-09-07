@@ -40,6 +40,7 @@
 
 	a {
 		@include vendor('transition', 'color #{_duration(transition)} ease-in-out');
+
 		text-decoration: underline;
 
 		&:hover {
@@ -56,7 +57,7 @@
 	}
 
 	p {
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 
 		&.major {
 			font-size: 1.25rem;
@@ -67,7 +68,7 @@
 		font-weight: _font(weight);
 		line-height: 1.375;
 		letter-spacing: _font(kerning);
-		margin: 0 0 (_size(element-margin) * 0.5) 0;
+		margin: 0 0 (_size(element-margin) * 0.5);
 
 		a {
 			color: inherit;
@@ -115,7 +116,7 @@
 	blockquote {
 		border-left: solid (_size(border-width) * 4);
 		font-style: italic;
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 		padding: (_size(element-margin) / 4) 0 (_size(element-margin) / 4) _size(element-margin);
 	}
 
@@ -131,7 +132,7 @@
 		-webkit-overflow-scrolling: touch;
 		font-family: _font(family-fixed);
 		font-size: 0.9em;
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 
 		code {
 			display: block;
@@ -188,7 +189,6 @@
 	}
 
 	@mixin color-typography($p: null) {
-
 		@if $p != null {
 			background-color: _palette($p, bg);
 			color: _palette($p, fg);

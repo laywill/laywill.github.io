@@ -19,7 +19,6 @@
 		xsmall: '(max-width: 480px)',
 		xxsmall: '(max-width: 360px)'
 	));
-
 	@include skel-layout((
 		reset: 'full',
 		boxModel: 'border',
@@ -45,19 +44,21 @@
 	@mixin phone($image-width) {
 		@include vendor('flex-grow', '0');
 		@include vendor('flex-shrink', '0');
+
 		border-radius: 0;
 		border: solid _size(border-width);
 
 		img {
 			@include vendor('object-fit', 'cover');
 			@include vendor('object-position', 'center');
+
 			display: block;
 			width: 100%;
 			height: 100%;
 			border-radius: 0;
 		}
 
-		&:before {
+		&::before {
 			content: '';
 			display: block;
 			background-position: center;
@@ -66,7 +67,7 @@
 			border-bottom: 0;
 		}
 
-		&:after {
+		&::after {
 			content: '';
 			display: block;
 			background-position: center;
@@ -88,14 +89,14 @@
 		margin-top: ($image-pad-top * $image-factor);
 		margin-bottom: (_size(element-margin) + ($image-pad-bottom * $image-factor));
 
-		&:before {
+		&::before {
 			height: ($image-pad-top * $image-factor);
 			background-size: (64px * $image-factor) (32px * $image-factor);
 			margin-top: (($image-pad-top * $image-factor) * -1);
 			border-radius: (1rem * $image-factor) (1rem * $image-factor) 0 0;
 		}
 
-		&:after {
+		&::after {
 			height: ($image-pad-bottom * $image-factor);
 			background-size: (64px * $image-factor) (32px * $image-factor);
 			margin-bottom: (($image-pad-bottom * $image-factor) * -1);
@@ -110,31 +111,34 @@
 		@if ($p != 'invert') {
 			border-width: 0;
 		}
+
 		@else {
 			border-width: _size(border-width);
 		}
 
-		&:before {
-			background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable"><style>rect {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }</style><rect rx="4" ry="4" x="11" y="12" width="42" height="8" vector-effect="non-scaling-stroke" /></svg>');
+		&::before {
+			background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable">\3c style>rect {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }\3c /style><rect rx="4" ry="4" x="11" y="12" width="42" height="8" vector-effect="non-scaling-stroke" /></svg>');
 			border-color: _palette($p, border);
 
 			@if ($p == 'invert') {
 				width: calc(100% + #{_size(border-width) * 2});
 				margin-left: (_size(border-width) * -1);
 			}
+
 			@else {
 				width: 100%;
 			}
 		}
 
-		&:after {
-			background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable"><style>circle {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }</style><circle cx="32" cy="16" r="14" vector-effect="non-scaling-stroke" /></svg>');
+		&::after {
+			background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable">\3c style>circle {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }\3c /style><circle cx="32" cy="16" r="14" vector-effect="non-scaling-stroke" /></svg>');
 			border-color: _palette($p, border);
 
 			@if ($p == 'invert') {
 				width: calc(100% + #{_size(border-width) * 2});
 				margin-left: (_size(border-width) * -1);
 			}
+
 			@else {
 				width: 100%;
 			}
@@ -143,10 +147,11 @@
 
 	@mixin color-phone-variant($v, $p) {
 		@if ($v == 'android') {
-			&:after {
-				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable"><style>rect {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }</style><rect rx="4" ry="4" x="6" y="4" width="52" height="24" vector-effect="non-scaling-stroke" /></svg>');
+			&::after {
+				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="32px" viewBox="0 0 64 32" zoomAndPan="disable">\3c style>rect {fill: transparent; stroke: #{_palette($p, border)}; stroke-width: #{_size(border-width)}; }\3c /style><rect rx="4" ry="4" x="6" y="4" width="52" height="24" vector-effect="non-scaling-stroke" /></svg>');
 			}
 		}
+
 		@else if ($p == 'iphone') {
 			// ...
 		}

@@ -8,7 +8,7 @@
 
 	ol {
 		list-style: decimal;
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 		padding-left: 1.25rem;
 
 		li {
@@ -18,7 +18,7 @@
 
 	ul {
 		list-style: disc;
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 		padding-left: 1rem;
 
 		li {
@@ -79,7 +79,7 @@
 			&.vertical {
 				li {
 					display: block;
-					padding: (_size(element-margin) * 0.5) 0 0 0;
+					padding: (_size(element-margin) * 0.5) 0 0;
 
 					&:first-child {
 						padding-top: 0;
@@ -92,7 +92,7 @@
 
 				&.small {
 					li {
-						padding: (_size(element-margin) * 0.25) 0 0 0;
+						padding: (_size(element-margin) * 0.25) 0 0;
 
 						&:first-child {
 							padding-top: 0;
@@ -128,10 +128,10 @@
 			}
 
 			@include breakpoint(xsmall) {
-				margin: 0 0 _size(element-margin) 0;
+				margin: 0 0 _size(element-margin);
 
 				li {
-					padding: (_size(element-margin) * 0.5) 0 0 0;
+					padding: (_size(element-margin) * 0.5) 0 0;
 					display: block;
 					text-align: center;
 					width: 100%;
@@ -145,7 +145,7 @@
 						margin: 0 !important;
 
 						&.icon {
-							&:before {
+							&::before {
 								margin-left: -2rem;
 							}
 						}
@@ -154,7 +154,7 @@
 
 				&.small {
 					li {
-						padding: (_size(element-margin) * 0.25) 0 0 0;
+						padding: (_size(element-margin) * 0.25) 0 0;
 
 						&:first-child {
 							padding-top: 0;
@@ -166,12 +166,12 @@
 	}
 
 	dl {
-		margin: 0 0 _size(element-margin) 0;
+		margin: 0 0 _size(element-margin);
 
 		dt {
 			display: block;
 			font-weight: _font(weight-bold);
-			margin: 0 0 (_size(element-margin) * 0.5) 0;
+			margin: 0 0 (_size(element-margin) * 0.5);
 		}
 
 		dd {
@@ -189,7 +189,7 @@
 				float: left;
 			}
 
-			&:after {
+			&::after {
 				content: '';
 				display: block;
 				clear: both;

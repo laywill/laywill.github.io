@@ -17,6 +17,7 @@
 					$x: 'body.is-loading &';
 					$y: _duration(on-load);
 				}
+
 				@else if ($event == 'scroll') {
 					$x: '&.is-inactive';
 					$y: _duration(on-scroll);
@@ -71,6 +72,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-wrap', 'wrap');
 		@include vendor('justify-content', 'center');
+
 		position: relative;
 		width: 100%;
 		background-color: transparent;
@@ -93,6 +95,7 @@
 
 			.image {
 				@include vendor('transition', 'opacity #{_duration(transition)} ease-in-out');
+
 				display: block;
 				width: 100%;
 				border-radius: 0;
@@ -111,6 +114,7 @@
 				@include vendor('justify-content', 'center');
 				@include vendor('pointer-events', 'none');
 				@include vendor('transition', 'opacity #{_duration(transition)} ease-in-out');
+
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -273,6 +277,7 @@
 		@include color-typography(invert);
 		@include color-button(invert);
 		@include vendor('display', 'flex');
+
 		-webkit-overflow-scrolling: touch;
 		position: relative;
 		background-color: transparent;
@@ -280,6 +285,7 @@
 		> .forward, >.backward {
 			@include icon;
 			@include vendor('transition', 'opacity #{_duration(transition)} ease-in-out');
+
 			position: absolute;
 			top: 0;
 			width: 5rem;
@@ -288,7 +294,7 @@
 			opacity: 0;
 			z-index: 2;
 
-			&:before {
+			&::before {
 				display: block;
 				top: calc(50% - 1.5rem);
 				width: 4rem;
@@ -310,7 +316,7 @@
 			right: 0;
 			background-image: linear-gradient(to left, rgba(0,0,0,0.25) 15%, rgba(0,0,0,0));
 
-			&:before {
+			&::before {
 				content: '\f105';
 				right: 0;
 			}
@@ -320,7 +326,7 @@
 			left: 0;
 			background-image: linear-gradient(to right, rgba(0,0,0,0.25) 15%, rgba(0,0,0,0));
 
-			&:before {
+			&::before {
 				content: '\f104';
 				left: 0;
 			}
@@ -328,8 +334,8 @@
 
 		> .inner {
 			@include vendor('display', 'inherit');
-			overflow-x: auto;
-			overflow-y: hidden;
+
+			overflow: auto hidden;
 			position: relative;
 			width: 100%;
 		}
@@ -337,6 +343,7 @@
 		article {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			display: block;
 			position: relative;
 			overflow: hidden;
@@ -362,6 +369,7 @@
 				@include vendor('justify-content', 'center');
 				@include vendor('pointer-events', 'none');
 				@include vendor('transition', 'opacity #{_duration(transition)} ease-in-out');
+
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -500,6 +508,7 @@
 				'visibility #{_duration(gallery-lightbox)}',
 				'z-index #{_duration(gallery-lightbox)}'
 			));
+
 			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 			position: fixed;
 			top: 0;
@@ -512,10 +521,11 @@
 			opacity: 0;
 			z-index: 0;
 
-			&:before {
+			&::before {
 				@include vendor('animation', 'gallery-modal-spinner 1s infinite linear');
 				@include vendor('transition', 'opacity #{_duration(gallery-lightbox) * 0.5} ease');
 				@include vendor('transition-delay', '#{_duration(gallery-lightbox)}');
+
 				content: '';
 				display: block;
 				position: absolute;
@@ -524,14 +534,14 @@
 				width: 4rem;
 				height: 4rem;
 				margin: -2rem 0 0 -2rem;
-				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96px" height="96px" viewBox="0 0 96 96" zoomAndPan="disable"><style>circle {fill: transparent; stroke: #{_palette(invert, fg-bold)}; stroke-width: 1.5px; }</style><defs><clipPath id="corner"><polygon points="0,0 48,0 48,48 96,48 96,96 0,96" /></clipPath></defs><g clip-path="url(#corner)"><circle cx="48" cy="48" r="32"/></g></svg>');
+				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96px" height="96px" viewBox="0 0 96 96" zoomAndPan="disable">\3c style>circle {fill: transparent; stroke: #{_palette(invert, fg-bold)}; stroke-width: 1.5px; }\3c /style><defs><clipPath id="corner"><polygon points="0,0 48,0 48,48 96,48 96,96 0,96" /></clipPath></defs><g clip-path="url(#corner)"><circle cx="48" cy="48" r="32"/></g></svg>');
 				background-position: center;
 				background-repeat: no-repeat;
 				background-size: 4rem;
 				opacity: 0;
 			}
 
-			&:after {
+			&::after {
 				content: '';
 				display: block;
 				position: absolute;
@@ -540,7 +550,7 @@
 				width: 4rem;
 				height: 4rem;
 				cursor: pointer;
-				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 64 64" zoomAndPan="disable"><style>line {stroke: #{_palette(invert, fg-bold)};stroke-width: 1.5px;}</style><line x1="20" y1="20" x2="44" y2="44" /><line x1="20" y1="44" x2="44" y2="20" /></svg>');
+				background-image: svg-url('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 64 64" zoomAndPan="disable">\3c style>line {stroke: #{_palette(invert, fg-bold)};stroke-width: 1.5px;}\3c /style><line x1="20" y1="20" x2="44" y2="44" /><line x1="20" y1="44" x2="44" y2="20" /></svg>');
 				background-position: center;
 				background-repeat: no-repeat;
 				background-size: 3rem;
@@ -552,6 +562,7 @@
 					'opacity #{_duration(gallery-lightbox) * 0.5} ease',
 					'transform #{_duration(gallery-lightbox) * 0.5} ease'
 				));
+
 				opacity: 0;
 
 				img {
@@ -564,11 +575,12 @@
 
 			&.visible {
 				@include vendor('pointer-events', 'auto');
+
 				visibility: visible;
 				opacity: 1;
 				z-index: _misc(z-index-base) + 1;
 
-				&:before {
+				&::before {
 					opacity: 1;
 				}
 			}
@@ -580,11 +592,13 @@
 						'opacity #{_duration(gallery-lightbox)} ease',
 						'transform #{_duration(gallery-lightbox)} ease'
 					));
+
 					opacity: 1;
 				}
 
-				&:before {
+				&::before {
 					@include vendor('transition-delay', '0s');
+
 					opacity: 0;
 				}
 			}
