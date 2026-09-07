@@ -19,6 +19,14 @@
  *   - Responsive behaviour. jsdom has no viewport to resize, so the 360px
  *     floor and other breakpoint-dependent behaviour is untested here. It is
  *     verified by hand at 360, 640, 900 and 1200px.
+ *   - Client-side script behaviour. The one script the site ships (the
+ *     gallery lightbox, component-library.md rule 3) is emitted by Astro as
+ *     `<script type="module">`, and jsdom cannot execute module scripts at
+ *     all — not under any `runScripts` setting; see the JSDOM options below
+ *     for how this was confirmed rather than assumed. So this check always
+ *     scans pre-interaction markup, never "the DOM after the lightbox ran".
+ *     Whether the lightbox actually works is a keyboard/manual check, not
+ *     something this tool can speak to at any settings.
  *   - Everything automated tooling structurally cannot see: sensible reading
  *     order, whether alt text is actually *useful*, whether a keyboard user
  *     can operate a custom widget, whether focus goes somewhere sane. Axe's
@@ -49,9 +57,25 @@ const DIST_DIR = path.resolve(
 const RUN_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"];
 
 /*
- * Rules explicitly disabled, and why. This list must only ever grow for
- * "cannot produce a meaningful result under jsdom" reasons — never because a
- * rule is currently failing and disabling it is easier than fixing the page.
+ * These two lists are one policy, split in two only because axe offers two
+ * different levers for it — read them together:
+ *
+ *   - DISABLED_RULES: a rule that CANNOT run under jsdom at all, so it is
+ *     switched off outright. It will never appear in violations, passes, OR
+ *     incomplete, because axe never attempts it.
+ *   - INCOMPLETE_ALLOWLIST (below the hit-testing polyfill, once the reason
+ *     for it has been explained): a rule that CAN mostly run under jsdom,
+ *     but is allowed to land in axe's "incomplete" bucket — an "I couldn't
+ *     tell" result, not a violation — for cases jsdom structurally cannot
+ *     resolve, without failing the run.
+ *
+ * Both lists must only ever grow for "cannot produce a meaningful result
+ * under jsdom" reasons — never because a rule is currently failing and
+ * disabling/allowlisting it is easier than fixing the page. And a rule
+ * should only ever be in ONE of the two: something unresolvable often
+ * enough to disable outright (color-contrast, below) has no business also
+ * sitting in the allowlist "just in case" — that would be the same bug this
+ * pair of lists exists to prevent, hiding behind a second name.
  *
  * - color-contrast: needs an actual rendered pixel (composited backgrounds,
  *   gradients, images-behind-text) to sample, which requires layout and
@@ -60,7 +84,10 @@ const RUN_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"];
  *   Confirmed empirically here too — under jsdom it reports "incomplete"
  *   (an error inside the check, not a considered pass) rather than a real
  *   result. Contrast is covered instead by the computed ratios in
- *   docs/overhaul/colour-scheme.md.
+ *   docs/overhaul/colour-scheme.md. Disabled outright rather than
+ *   allowlisted below: it doesn't fail sometimes and pass others depending
+ *   on the page, it is unresolvable under jsdom every time, so there is
+ *   nothing for axe to usefully attempt.
  */
 const DISABLED_RULES = {
   "color-contrast": { enabled: false },
@@ -91,8 +118,29 @@ function polyfillHitTesting(window) {
 }
 
 /*
- * jsdom's own diagnostic channel distinguishes exactly the two things we
- * need to tell apart, via `.type` on the emitted Error (see
+ * The other half of the DISABLED_RULES policy above: rules allowed to land
+ * in axe's "incomplete" bucket without failing the run, because jsdom made
+ * THIS rule specifically unable to reach a verdict — the same "cannot
+ * produce a meaningful result under jsdom" bar as DISABLED_RULES, just for
+ * a rule still worth running for the cases jsdom *can* resolve, rather than
+ * switched off wholesale.
+ *
+ * Empty today, and that emptiness is load-bearing, not an oversight:
+ * color-contrast is the one rule known to be unresolvable under jsdom, and
+ * it is disabled outright above instead — axe never gets far enough to
+ * report it "incomplete" because it never runs at all. If color-contrast
+ * (or any other rule) ever turns up in the unexpected-incomplete report
+ * below, the fix is almost certainly to move it into DISABLED_RULES with
+ * the same evidence color-contrast has, not to add it here — allowlisting
+ * silences the exact silent-degradation signal this pair of lists exists to
+ * surface, elsewhere in this same file, of a rule dying into "incomplete"
+ * and reporting a false pass (see polyfillHitTesting above).
+ */
+const INCOMPLETE_ALLOWLIST = new Set([]);
+
+/*
+ * jsdom's own diagnostic channel distinguishes exactly the things we need
+ * to tell apart, via `.type` on the emitted Error (see
  * jsdom/lib/jsdom/{browser/not-implemented,browser/resources/per-document-
  * resource-loader,living/css/helpers/stylesheets,living/helpers/runtime-
  * script-errors}.js):
@@ -100,19 +148,27 @@ function polyfillHitTesting(window) {
  *   - "not-implemented": a DOM feature jsdom doesn't implement was touched
  *     (e.g. HTMLCanvasElement#getContext, which axe's own colour sampling
  *     pokes at even though we've disabled the rule that needs it).
- *   - "resource-loading": a subresource — the woff2 fonts, favicon.svg —
- *     couldn't be fetched. Expected: the build's root-absolute URLs don't
- *     resolve against jsdom's synthetic http://localhost/ base, on purpose
- *     (see the JSDOM options below), so there is nothing to load.
+ *   - "resource-loading": a subresource couldn't be fetched. Not currently
+ *     expected to fire at all — see the JSDOM options below on why this
+ *     script doesn't ask jsdom to fetch anything in the first place — but
+ *     kept in the filtered set because it names the same "not a real bug"
+ *     category if it ever does (e.g. from something axe-core itself tries
+ *     to load), same reasoning as "not-implemented" above.
  *   - "css-parsing": jsdom's CSS parser is stricter/older than a browser's;
  *     harmless for a structural a11y pass.
- *   - "unhandled-exception": the page's *own* script threw. This is the one
- *     case that must not be swallowed — a component's client-side JS
- *     breaking is a real bug, not an artefact of running outside a browser.
+ *   - "unhandled-exception": something running live in the jsdom window
+ *     threw. Once meant "the page's own <script> threw" — it no longer can
+ *     mean that (see loadPage below: no page-authored script executes
+ *     here, of either kind jsdom can or can't run). What it can still catch
+ *     is a genuine error inside axe-core's own machinery once injected —
+ *     event listeners, MutationObservers and rAF/timer callbacks it sets
+ *     up on this window all still route through jsdom's normal exception
+ *     reporting regardless of the runScripts setting. That is a real bug in
+ *     this check's own operation, not an artefact of running outside a
+ *     browser, so it is the one type left to propagate rather than filter.
  *
- * The first three are exactly "resource loading errors" and "things jsdom
- * doesn't implement" — noise this script promises not to fail on or print.
- * The fourth is a real script error, and is left to propagate.
+ * The first three are noise this script promises not to fail on or print.
+ * The fourth is left to propagate.
  */
 const EXPECTED_NOISE_TYPES = new Set(["not-implemented", "resource-loading", "css-parsing"]);
 
@@ -122,14 +178,17 @@ function buildVirtualConsole(filePath, onRealError) {
     if (EXPECTED_NOISE_TYPES.has(error.type)) {
       return;
     }
-    onRealError(new Error(`${filePath}: unhandled error while running the page's own script`, { cause: error }));
+    onRealError(new Error(`${filePath}: unhandled error while scanning (see "unhandled-exception" above)`, { cause: error }));
   });
   return virtualConsole;
 }
 
 /**
- * Loads one built HTML file into jsdom and returns a live `window` with the
- * page's own scripts run and axe-core injected, ready to scan.
+ * Loads one built HTML file into jsdom and returns a live `window` with
+ * axe-core injected, ready to scan. Does NOT run the page's own scripts —
+ * see the `runScripts` option below for why that line was removed rather
+ * than fixed, and the file-level "WHAT THIS DOES NOT COVER" note above for
+ * the consequence.
  */
 async function loadPage(filePath) {
   const html = await readFile(filePath, "utf8");
@@ -141,34 +200,69 @@ async function loadPage(filePath) {
 
   const dom = new JSDOM(html, {
     /*
-     * Components may ship client-side JS (a nav toggle, a lightbox) that
-     * sets ARIA state on load or on first interaction. Running it — rather
-     * than leaving <script> inert — is what lets axe see the DOM a real
-     * visitor gets rather than the pre-hydration markup. This is our own
-     * build output, not third-party content, so executing it is a
-     * reasonable trust boundary.
+     * This file used to set "dangerously" here, on the theory that running
+     * the page's own client-side JS (a nav toggle, a lightbox) is what lets
+     * axe see the DOM a real visitor gets, and that a script throwing would
+     * surface via the "unhandled-exception" case above. That was wrong, and
+     * verified wrong rather than merely suspected:
+     *
+     *   - jsdom does not execute `<script type="module">` at all, under any
+     *     runScripts setting — a long-standing jsdom/module-script gap
+     *     (jsdom/jsdom#2475), not something this project's setup can work
+     *     around. Confirmed empirically: a module script assigning to a
+     *     global, and separately one that throws synchronously, produced no
+     *     effect and no jsdomError under "dangerously" — jsdom silently
+     *     never runs it, it doesn't fail loudly.
+     *   - Astro emits this site's one script (the gallery lightbox,
+     *     component-library.md rule 3) as exactly that: an inline
+     *     `<script type="module">`. There is no classic script anywhere in
+     *     the build for "dangerously" to have been doing anything for.
+     *
+     * So "dangerously" bought this check nothing — the "unhandled-exception"
+     * guard could never have fired for the one script that ships — while
+     * running arbitrary embedded script (including inline event-handler
+     * attributes, javascript: URLs, etc.) is a wider execution surface than
+     * this tool needs.
+     *
+     * "outside-only" is the minimum jsdom actually requires of us: it is
+     * what makes `window.eval` work below, which is how axe-core (a
+     * self-executing, non-module bundle) gets injected into the page — see
+     * that call for why eval is the supported way to do it. Per jsdom's own
+     * docs, "outside-only" provides exactly that "run script from the
+     * outside" capability without running any `<script>` element or inline
+     * event-handler attribute found IN the page. Confirmed empirically
+     * against this repo's own built output: axe still injects and runs
+     * (0 violations, 0 incomplete on a clean build) with no jsdomError of
+     * any kind, using "outside-only" and without "resources" below.
      */
-    runScripts: "dangerously",
+    runScripts: "outside-only",
     /*
      * Several DOM APIs (matchMedia, requestAnimationFrame, getComputedStyle
      * returning something other than defaults) are only defined at all in
-     * jsdom's "visual" mode. Components that branch on them need it to
-     * behave like a browser rather than throw on a missing API.
+     * jsdom's "visual" mode. axe-core itself, once injected, branches on
+     * some of these — it needs to behave like a browser rather than throw
+     * on a missing API, independently of whether any page script runs.
      */
     pretendToBeVisual: true,
     /*
-     * Lets jsdom attempt to fetch subresources (fonts, the favicon) rather
-     * than ignoring them outright, so a real fetch failure is what produces
-     * the "resource-loading" diagnostic filtered out above — a considered
-     * decision, not just silence.
+     * No `resources` option is set, deliberately — this check doesn't fetch
+     * subresources (fonts, the favicon) at all, rather than attempting the
+     * fetch and filtering the resulting "resource-loading" failure as
+     * before. Once running-scripts stopped being the goal, there was
+     * nothing left that needed a fetch to happen: axe evaluates DOM
+     * structure and ARIA, not painted output, so a font or favicon loading
+     * has no effect on what it reports. Confirmed empirically: omitting
+     * this option against the real build produces zero jsdomErrors of any
+     * type, where the previous `resources: "usable"` setting existed
+     * specifically to produce (and then filter) "resource-loading" ones.
      */
-    resources: "usable",
     /*
      * The build emits root-absolute URLs (href="/favicon.svg"). A
-     * non-routable, nothing-listening base keeps every resulting fetch a
-     * fast local connection refusal instead of either resolving relative to
-     * the filesystem root or, worse, reaching out to the real production
-     * site over the network from a build check.
+     * non-routable, nothing-listening base is still worth keeping even with
+     * no fetches attempted: it is what `window.location` and any
+     * relative-URL resolution axe-core does resolve against, and keeps this
+     * a fast, offline, deterministic check rather than one that could
+     * reach out to the real production site if that ever changed.
      */
     url: "http://localhost/",
     virtualConsole,
@@ -216,25 +310,42 @@ function snippet(html, max = 300) {
 }
 
 /**
- * Runs axe against one loaded page and returns its violations, or throws if
- * axe itself errors out (as opposed to reporting inapplicable/incomplete
- * results, which are not violations and are not treated as failures here).
+ * Runs axe against one loaded page. Returns `violations` (confirmed
+ * failures) and `unexpectedIncomplete` (results axe could not reach a
+ * verdict on, filtered to exclude INCOMPLETE_ALLOWLIST). Throws if axe
+ * itself errors out — as opposed to reporting inapplicable/incomplete
+ * results, which are not violations and are not, on their own, treated as
+ * failures here (see `unexpectedIncomplete`, which is).
+ *
+ * `incomplete` is not a soft "probably fine": it is axe's way of saying a
+ * rule could not decide, which under jsdom usually means the rule died
+ * partway through (see polyfillHitTesting above — this is precisely the
+ * failure mode that polyfill exists to prevent for hit-testing, and the
+ * same class of silent-degradation risk applies to every other rule too).
+ * A version bump to jsdom or axe-core could reopen that gap for a rule this
+ * polyfill doesn't cover, and without this check the run would report
+ * clean for having quietly stopped checking something, not for having
+ * checked it and found it fine. Discarding `results.incomplete` entirely,
+ * as this function used to, made that failure mode invisible by design.
  */
 async function scanPage(dom) {
   const results = await dom.window.axe.run(dom.window.document, {
     runOnly: { type: "tag", values: RUN_TAGS },
     rules: DISABLED_RULES,
   });
-  return results.violations;
+  const unexpectedIncomplete = results.incomplete.filter(
+    (result) => !INCOMPLETE_ALLOWLIST.has(result.id),
+  );
+  return { violations: results.violations, unexpectedIncomplete };
 }
 
-function printViolations(filePath, violations) {
-  console.error(`\nFAIL ${filePath}`);
-  for (const violation of violations) {
-    console.error(`  ${violation.id} (${violation.impact ?? "unknown"} impact)`);
-    console.error(`    ${violation.help}`);
-    console.error(`    ${violation.helpUrl}`);
-    violation.nodes.forEach((node, index) => {
+function printResultGroup(filePath, label, results) {
+  console.error(`\n${label} ${filePath}`);
+  for (const result of results) {
+    console.error(`  ${result.id} (${result.impact ?? "unknown"} impact)`);
+    console.error(`    ${result.help}`);
+    console.error(`    ${result.helpUrl}`);
+    result.nodes.forEach((node, index) => {
       const selector = node.target.join(" ");
       console.error(`    ${index + 1}) ${selector}`);
       console.error(`       ${snippet(node.html)}`);
@@ -272,6 +383,8 @@ async function main() {
 
   let violationCount = 0;
   let filesWithViolations = 0;
+  let incompleteCount = 0;
+  let filesWithIncomplete = 0;
   let hadScriptError = false;
 
   for (const filePath of htmlFiles) {
@@ -279,11 +392,21 @@ async function main() {
     let dom;
     try {
       dom = await loadPage(filePath);
-      const violations = await scanPage(dom);
+      const { violations, unexpectedIncomplete } = await scanPage(dom);
       if (violations.length > 0) {
         filesWithViolations += 1;
         violationCount += violations.length;
-        printViolations(relativePath, violations);
+        printResultGroup(relativePath, "FAIL", violations);
+      }
+      if (unexpectedIncomplete.length > 0) {
+        filesWithIncomplete += 1;
+        incompleteCount += unexpectedIncomplete.length;
+        // Deliberately as loud as a violation, not a quieter aside: an
+        // unexpected "incomplete" means a rule died rather than ran, which
+        // is the exact silent-degradation this check exists to catch (see
+        // scanPage above) — it must be at least as visible as a confirmed
+        // failure, or it will be ignored like one that matters less.
+        printResultGroup(relativePath, "INCOMPLETE", unexpectedIncomplete);
       }
     } catch (error) {
       // A real script error (see buildVirtualConsole above) or an axe
@@ -302,22 +425,31 @@ async function main() {
   }
 
   console.error(
-    "\na11y: does not check colour contrast (see docs/overhaul/colour-scheme.md) or responsive " +
-      "behaviour, and automated checks catch only a minority of real accessibility defects — " +
-      "this is a structural regression guard, not a sign-off.",
+    "\na11y: does not check colour contrast (see docs/overhaul/colour-scheme.md), responsive " +
+      "behaviour, or client-side script behaviour (jsdom cannot execute this site's module " +
+      "script — see the file-level comment), and automated checks catch only a minority of " +
+      "real accessibility defects — this is a structural regression guard, not a sign-off.",
   );
 
-  if (violationCount > 0 || hadScriptError) {
+  if (violationCount > 0 || incompleteCount > 0 || hadScriptError) {
     if (violationCount > 0) {
       console.error(
         `\na11y: ${violationCount} violation(s) across ${filesWithViolations}/${htmlFiles.length} file(s).`,
+      );
+    }
+    if (incompleteCount > 0) {
+      console.error(
+        `\na11y: ${incompleteCount} unexpected incomplete result(s) across ${filesWithIncomplete}/${htmlFiles.length} ` +
+          "file(s) — a rule could not reach a verdict. Either fix the underlying cause, or if it is " +
+          "genuinely unresolvable under jsdom, move it from an ad-hoc pass into DISABLED_RULES or " +
+          "INCOMPLETE_ALLOWLIST in scripts/a11y.mjs with the same evidence color-contrast has.",
       );
     }
     process.exitCode = 1;
     return;
   }
 
-  console.log(`a11y: clean — ${htmlFiles.length} file(s) checked, 0 violations.`);
+  console.log(`a11y: clean — ${htmlFiles.length} file(s) checked, 0 violations, 0 unexpected incomplete results.`);
 }
 
 await main();
