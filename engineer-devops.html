@@ -73,10 +73,10 @@
             <div class="content">
               <p>I'm Terraform and Ansible SME across multiple programmes at QinetiQ, and have automated
                 99% of development and production deployments through idempotent provisioning. The
-                evaluation environment for the ARCD AI Cyber Range &mdash; a platform measuring how
-                effectively AI defends networks against adversarial attack &mdash; builds from nothing in a
-                single run, letting the test and evaluation team rebuild clean environments on demand
-                rather than waiting on someone to do it by hand.</p>
+                evaluation environment for the ARCD AI Cyber Range, a platform measuring how effectively AI
+                defends networks against adversarial attack, builds from nothing in a single run, letting
+                the test and evaluation team rebuild clean environments on demand rather than waiting on
+                someone to do it by hand.</p>
               <p>As Senior DevOps (CI/CD) Engineer I was brought into an existing development team to
                 protect delivery against a fixed contract timescale, building the CI pipeline and
                 infrastructure-as-code that took manual build and deployment steps out of the critical
@@ -102,18 +102,18 @@
                 something disposable: CI pipelines, pre-commit formatting and static analysis, with
                 attempts public in GitLab and GitHub.</p>
               <p>The same instinct runs my home server: an UnRAID box built on a traditional expandable
-                array with dual parity &mdash; it survives two simultaneous drive failures and, unlike a
-                ZFS pool, is easy to grow one drive at a time &mdash; with a ZFS cache pool alongside it,
-                since a fixed-size cache is exactly where ZFS's integrity guarantees earn their keep
-                without its awkward expansion story getting in the way. Docker workloads run mostly from
-                the LinuxServer.io image set, with offsite backups via Duplicati.</p>
+                array with dual parity. It survives two simultaneous drive failures and, unlike a ZFS pool,
+                is easy to grow one drive at a time. A ZFS cache pool sits alongside it, since a
+                fixed-size cache is exactly where ZFS's integrity guarantees earn their keep without its
+                awkward expansion story getting in the way. Docker workloads run mostly from the
+                LinuxServer.io image set, with offsite backups via Duplicati.</p>
               <p>When the dashboard and every container's web UI went dark one week, with the box still
                 answering to ping, the root cause turned out to be a long-abandoned VPN peer configuration
                 that had silently rebound the web GUI's nginx to a tunnel interface instead of the LAN on
-                every boot. Diagnosed with ss -tlnp, docker ps, free -m and a grep through syslog &mdash;
-                no systemd journal on this box, so that's the only trail there is &mdash; then fixed for
-                good by clearing out the stale VPN config so the GUI regenerates bound to the right
-                interface on every reboot.</p>
+                every boot. Diagnosed with ss -tlnp, docker ps, free -m and a grep through syslog, since
+                there's no systemd journal on this box and that's the only trail there is. Fixed for good
+                by clearing out the stale VPN config so the GUI regenerates bound to the right interface on
+                every reboot.</p>
             </div>
           </section>
         </div>
