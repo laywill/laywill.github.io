@@ -40,7 +40,9 @@ jobs:
           set -euo pipefail
           mkdir -p _site/assets/css
 
-          cp index.html engineer.html photographer.html prod_tech.html \
+          cp index.html engineer.html engineer-devops.html engineer-ai.html \
+             engineer-firmware.html leader.html photographer.html prod_tech.html \
+             bellringing.html cars.html coffee.html travel.html \
              terms-and-conditions.html under_construction.html \
              CNAME google519c92453ea72bf0.html _site/
 
@@ -48,6 +50,12 @@ jobs:
           cp -r assets/fonts assets/js _site/assets/
 
           cp -r images _site/
+
+          # Kept in the repo for reference but never linked from any page -
+          # JPEGs_FBK/ (compressed) and gallery fulls/ (via thumbs/) are what
+          # the site actually serves. Don't publish full-res originals.
+          rm -rf _site/images/will/JPEGs
+          rm -rf _site/images/gallery/photographer/product
       - name: Setup Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
       - name: Upload artifact
