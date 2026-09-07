@@ -2,13 +2,13 @@
   "name": "laywill-github-io",
   "version": "1.0.0",
   "private": true,
-  "description": "v1 of williamlay.co.uk. A 2017 HTML5 UP 'Story' template, hand-edited since. There is no bundler and no framework: the HTML is served as authored, and the only build step is compiling assets/sass/ to assets/css/main.css.",
+  "description": "v1 of williamlay.co.uk. A 2017 HTML5 UP 'Story' template, hand-edited since. There is no bundler and no framework: the HTML is served as authored, and the only build step is compiling assets/sass/ to assets/css/main.css. The sass version is pinned exactly, not with a caret: the pre-commit hook, CI and any local build must all use the same compiler or they disagree about what main.css should contain.",
   "license": "SEE LICENSE IN LICENSE.txt",
   "scripts": {
     "css": "sass --no-source-map --style=expanded assets/sass/main.scss assets/css/main.css",
     "css:check": "npm run css && git diff --exit-code -- assets/css/main.css"
   },
   "devDependencies": {
-    "sass": "^1.83.0"
+    "sass": "1.104.0"
   }
 }
