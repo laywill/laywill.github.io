@@ -14,6 +14,18 @@ repos:
     hooks:
       - id: standard
         args: [--fix, --no-ignore]
+        # --no-ignore makes standard lint everything it is handed, including
+        # third-party minified bundles we do not maintain. It has already
+        # reformatted jquery.scrollex.min.js and jquery.scrolly.min.js in
+        # place. Keep vendor libraries out of its reach so upgrading one is a
+        # clean file swap rather than a swap plus a reformat.
+        exclude: |
+          (?x)^(
+            assets/js/jquery\.min\.js|
+            assets/js/jquery\.scrollex\.min\.js|
+            assets/js/jquery\.scrolly\.min\.js|
+            assets/js/skel\.min\.js
+          )$
 
   ########################################
   # Linters to validate beautifiers output
