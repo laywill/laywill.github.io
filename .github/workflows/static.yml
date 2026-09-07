@@ -38,7 +38,7 @@ jobs:
         # lint/CI config, sass sources and dotfiles must never be published.
         run: |
           set -euo pipefail
-          mkdir -p _site/assets/css _site/docs
+          mkdir -p _site/assets/css
 
           cp index.html engineer.html photographer.html prod_tech.html \
              terms-and-conditions.html under_construction.html \
@@ -48,7 +48,6 @@ jobs:
           cp -r assets/fonts assets/js _site/assets/
 
           cp -r images _site/
-          cp docs/CV_William_Lay.pdf _site/docs/
       - name: Setup Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
       - name: Upload artifact
