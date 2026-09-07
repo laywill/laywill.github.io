@@ -15,6 +15,18 @@
  * supply a title.
  */
 interface Props {
+  /**
+   * Explicit id for the heading/landmark. Required — not merely
+   * recommended — whenever `title` may repeat across a page: the fallback
+   * below derives a slug from `title`, so two sections sharing a title
+   * collide on
+   * the same id. That produces a duplicate `id` (an axe `duplicate-id-aria`
+   * violation, since both feed `aria-labelledby`) and, at runtime, an
+   * `aria-labelledby` on the second section that resolves back to the
+   * *first* section's heading. Nothing here detects a repeated title and
+   * warns — callers are responsible for passing a distinct `id` themselves
+   * when that's possible.
+   */
   id?: string;
   title?: string;
   /**
@@ -70,8 +82,20 @@ const Heading = level === 1 ? "h1" : level === 3 ? "h3" : "h2";
   .section {
     /* Vertical rhythm from the space scale — component-library.md asks for
     "consistent vertical rhythm from the space tokens", not a bespoke value
-    per band. */
-    padding-block: var(--space-2xl);
+    per band. Mobile-first: --space-xl is documented in tokens.css as "band
+    padding, narrow" and was previously never referenced — every band paid
+    --space-2xl (64px top *and* bottom = 128px between adjacent sections)
+    even at the 360px floor, on exactly the viewport design-direction.md
+    flags for its above-the-fold budget. --space-xl applies below `md`
+    (900px, component-library.md's breakpoint table); --space-2xl takes
+    over at `md` and above, where the extra vertical room is affordable. */
+    padding-block: var(--space-xl);
+  }
+
+  @media (min-width: 900px) {
+    .section {
+      padding-block: var(--space-2xl);
+    }
   }
 
   .section-title {

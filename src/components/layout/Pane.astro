@@ -4,11 +4,12 @@
  * (docs/overhaul/component-library.md, "Layout — layout/" and "Decision:
  * the gloss vocabulary").
  *
- * Depth is bought with --elevation-1 (a hairline drop shadow) plus --sheen
- * (a 1px inset top highlight) at rest, per the gloss-vocabulary decision —
- * never a gradient, never a glow. Panes are static containers, not
- * interactive controls, so there is no hover-raise here: component-library
- * .md reserves the elevation-2 hover state for *interactive* surfaces.
+ * Depth is bought with --elevation-1 (a hairline drop shadow, kept on
+ * .pane) and --sheen (a 1px inset top highlight, declared on .pane-header
+ * — see that rule for why it lives there and not on .pane). Never a
+ * gradient, never a glow. Panes are static containers, not interactive
+ * controls, so there is no hover-raise here: component-library.md reserves
+ * the elevation-2 hover state for *interactive* surfaces.
  *
  * `headingLevel` decides whether the tab header is content or chrome:
  *   - given  -> the filename is a real heading; the header participates in
@@ -69,12 +70,10 @@ const HeadingTag = headingLevel === 3 ? "h3" : "h2";
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background-color: var(--bg-editor);
-    /* Depth vocabulary settled by component-library.md: a hairline shadow
-    plus a lit top edge, combined as two shadow layers rather than a fill —
-    neither breaches the flat-colour rule. */
-    box-shadow:
-      var(--elevation-1),
-      var(--sheen);
+    /* Depth vocabulary settled by component-library.md: a hairline drop
+    shadow. The lit-top-edge half of the vocabulary, --sheen, used to live
+    here too — see .pane-header for why it moved. */
+    box-shadow: var(--elevation-1);
     overflow: hidden;
   }
 
@@ -87,19 +86,43 @@ const HeadingTag = headingLevel === 3 ? "h3" : "h2";
     background-color: var(--bg-sidebar);
     font-family: var(--font-mono);
 
+    /* --sheen belongs here, not on .pane. An inset box-shadow paints above
+    its own element's background but below that element's descendants —
+    box-shadow is always beneath content in the paint order, regardless of
+    inset/outset. .pane-header is .pane's first child, is full-bleed at the
+    top of .pane's padding box, and paints an opaque --bg-sidebar fill of
+    its own. A sheen declared on .pane would therefore paint on .pane's
+    background layer, then get completely covered by .pane-header's own
+    background layer painting on top of it — a 1px highlight visible to
+    nobody. Declaring it on .pane-header instead means the highlight paints
+    above *this* element's background, with only this element's text nodes
+    above it (which don't tile edge-to-edge), so it actually reaches the
+    screen. The header sits flush with .pane's own top edge, so this still
+    reads as a lit top edge on the card as a whole — it's just declared on
+    the element that is actually able to paint it. */
+    box-shadow: var(--sheen);
+
     /*
-     * --font-size-base, not --font-size-sm, and deliberately not
-     * conditional on `isDecorative`. --font-size-sm (12.8px) sits below
-     * both legibility floors design-direction.md's accessibility
-     * corrections set (the 14px floor colour-scheme.md gives muted text,
-     * and the 16px body floor in typography.md); that size is only
-     * permitted for content reliably hidden from assistive tech. This
-     * header is aria-hidden only when headingLevel is omitted, so sizing
-     * it per-state would make legibility depend on a prop a caller might
-     * flip either way — fixing it at the base size keeps it legible
-     * regardless.
+     * --font-size-sm, not --font-size-base. A previous version of this
+     * comment justified --font-size-base by claiming --font-size-sm was
+     * 12.8px (the raw 1.25-ratio step) and therefore below both legibility
+     * floors. That number was wrong: --font-size-sm is pinned at
+     * 0.875rem, i.e. 14px (component-library.md rule 8), specifically so
+     * it clears the general floor rather than falling under it. Rule 8
+     * sets two floors, not one: 14px for "any text a visitor reads" in
+     * general, and 16px specifically for *body copy* (prose set in
+     * --font-body). This header is a mono tab label, not body copy — the
+     * same category as Tag.astro's pills and Nav.astro's glyph/pending-
+     * note text, which already use --font-size-sm on that basis — so only
+     * the 14px floor applies here, and --font-size-sm meets it exactly.
+     * With the premise corrected, the original conclusion no longer
+     * holds: there was never a real reason to reach for --font-size-base.
+     * This is still fixed unconditionally rather than varying with
+     * `isDecorative`, for the reason the original comment gave and which
+     * the correction doesn't disturb — legibility shouldn't depend on a
+     * prop a caller might flip either way.
      */
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     line-height: var(--line-height-normal);
   }
 
@@ -112,7 +135,21 @@ const HeadingTag = headingLevel === 3 ? "h3" : "h2";
   }
 
   .pane-status {
-    flex: none;
+    /* Was `flex: none` (0 0 auto), which pins this at its intrinsic width
+    forever. `text-overflow: ellipsis` only ever fires once an element's
+    rendered width is forced below its content's natural width — for a
+    flex item that means it must be allowed to *shrink*. `flex: 0 1 auto`
+    turns shrinking back on, and `min-width: 0` removes the shrink item's
+    implicit `min-width: auto` (its min-content width), which is what was
+    actually stopping it shrinking at all: without it, a flex item never
+    shrinks past its content's own minimum size regardless of
+    flex-shrink. Together, when the header is tight — e.g. at the 360px
+    floor, where "experience.ts" plus this status note can exceed the
+    header's content box — the note now truncates with an ellipsis instead
+    of running past the edge and being silently clipped by .pane's
+    `overflow: hidden`. */
+    flex: 0 1 auto;
+    min-width: 0;
     color: var(--fg-secondary);
     white-space: nowrap;
     overflow: hidden;

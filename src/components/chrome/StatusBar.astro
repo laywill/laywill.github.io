@@ -116,13 +116,31 @@ const {
     line-height: 1;
   }
 
+  /* This is the one real link among four look-alike items (Ln 1, Col 1;
+  UTF-8; the language; this link), all set in the same colour, weight and
+  font — the aria-hidden trio are decoration, but nothing *visible*
+  previously told a sighted user that only one of the four was a control.
+  A resting underline is the fix: text carries the distinction rather than
+  colour (rule 4), and it doesn't need a hover to be discovered in the
+  first place. text-underline-offset is a space token, not a bespoke
+  value, per rule 1. */
   .item--link {
     color: inherit;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: var(--space-3xs);
   }
 
+  /* Hover still needs its own cue now the resting state is underlined,
+  else the two states would render identically. A background swap (the
+  gloss vocabulary's usual "state" lever) was considered and dropped:
+  --bg-highlight/--bg-active are tuned for the dark --bg-editor/
+  --bg-sidebar surfaces, and would read as a mismatched patch against
+  --statusbar-blue rather than a highlight. font-weight has no token (rule
+  1 only tokenises hex/font-stack/spacing/radius/duration/z-index), so a
+  literal step is legitimate here — same footing as the literal weights in
+  Section.astro and IconGrid.astro. */
   .item--link:hover {
-    text-decoration: underline;
+    font-weight: 700;
   }
 
   .item--link:focus-visible {
