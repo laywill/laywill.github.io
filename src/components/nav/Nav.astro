@@ -50,9 +50,18 @@ const { entries = NAV, activeId, class: className } = Astro.props;
               exist yet must never ship as a dead link, so this is a <span>,
               not an <a> — inert, not focusable, and understood by the "no
               client JS unless earned" rule to need no click-blocking
-              handler because there is nothing to click. The visually-hidden
-              suffix carries the "not yet available" fact to a screen
-              reader; `title` gives sighted mouse users the same on hover. */
+              handler because there is nothing to click.
+
+              A visually-hidden suffix and a `title` attribute are not
+              enough on their own: `title` is neither keyboard- nor
+              touch-reachable, and a screen-reader-only string gives sighted
+              touch/keyboard users nothing at all — this row would otherwise
+              render pixel-identical to a real link except on mouse hover,
+              which is the mirror of rule 4 ("colour is never the only
+              cue"): here it's not colour carrying the distinction alone,
+              it's nothing. `.pending-note` is therefore real, visible text
+              — the same "(coming soon)" fact, exposed to every audience at
+              once — so nothing extra needs hiding from assistive tech. */
               <span class="row row--pending" title="Coming soon">
                 <span
                   class="glyph"
@@ -62,7 +71,7 @@ const { entries = NAV, activeId, class: className } = Astro.props;
                   {entry.glyph}
                 </span>
                 <span class="file">{entry.file}</span>
-                <span class="visually-hidden"> (coming soon)</span>
+                <span class="pending-note">(coming soon)</span>
               </span>
             ) : (
               /* The glyph is decorative (aria-hidden); the visible text is
@@ -136,6 +145,16 @@ const { entries = NAV, activeId, class: className } = Astro.props;
   }
 
   .row {
+    /* Contains the absolutely-positioned .visually-hidden child below.
+    Without it that child's containing block is an ancestor outside .nav, so
+    it escapes the tab strip's overflow clipping entirely: at the 360px floor
+    the strip scrolls internally to ~1200px, and the escaped 1px span landed
+    at x=596, dragging the whole document's scroll width with it. A 1px
+    invisible element was the sole cause of horizontal page scroll at the one
+    width the brief calls non-negotiable. Found by measuring in a real
+    browser - no check in this repo can see it. */
+    position: relative;
+
     display: flex;
     align-items: center;
     gap: var(--space-3xs);
@@ -183,6 +202,19 @@ const { entries = NAV, activeId, class: className } = Astro.props;
     cursor: default;
   }
 
+  .pending-note {
+    /* The permanent, sighted-and-touch-reachable cue findings above call
+    for. --font-size-sm is used, not --font-size-base, on the same footing
+    as Tag.astro's pill text: this is a UI label, not body copy, so rule 8's
+    16px body floor does not apply — only its 14px absolute floor does, and
+    --font-size-sm is pinned at exactly that. Colour is --fg-secondary
+    (5.86:1 on --bg-sidebar) rather than --fg-muted (4.15:1 there), which
+    fails AA for text this size — see design-direction.md's accessibility
+    correction 1. */
+    font-size: var(--font-size-sm);
+    color: var(--fg-secondary);
+  }
+
   /* Standard clip-based visually-hidden pattern (matches ui/Button.astro).
   The four 1px-scale values are the technique itself, not a design/spacing
   value, so they are not drawn from the space scale. */
@@ -205,8 +237,31 @@ const { entries = NAV, activeId, class: className } = Astro.props;
       height: 100%;
       border-bottom: none;
       border-right: 1px solid var(--border);
-      overflow-x: visible;
+
+      /* Explicitly hidden, not `visible`. When one axis is `visible` and the
+      other is not, CSS computes the `visible` one to `auto` - so the rail
+      grew a horizontal scrollbar of its own the moment overflow-y was set,
+      which is exactly the "fake pane with independent scroll" the design
+      direction rules out. */
+      overflow-x: hidden;
       overflow-y: auto;
+    }
+
+    /* The tab-bar form keeps every row on one line because the strip scrolls
+    sideways. The sidebar does not scroll sideways, so a row that does not fit
+    the rail's width has to wrap instead of being clipped - which is what a
+    long filename plus its "(coming soon)" note does at 240px.
+
+    The note takes a full-width flex line rather than wrapping mid-phrase
+    beside the filename, so a pending row reads as two tidy lines instead of
+    "experience.ts (coming" / "soon)" squeezed against each other. */
+    .row {
+      flex-wrap: wrap;
+      white-space: normal;
+    }
+
+    .pending-note {
+      flex-basis: 100%;
     }
 
     .site-label {
