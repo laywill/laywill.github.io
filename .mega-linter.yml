@@ -38,6 +38,13 @@ DISABLE_LINTERS:
   - REPOSITORY_CHECKOV       # IaC scanner - no Terraform/CloudFormation here
   - REPOSITORY_TRIVY         # Container/IaC scanner - no Dockerfiles here
   - REPOSITORY_DEVSKIM       # Overlaps with the secret scanners; noisy on vendored JS
+  # DustiLock walks the working directory rather than the git tree, so it picks
+  # up package.json files inside ignored scratch directories (Claude Code
+  # worktrees under .claude/) that FILTER_REGEX_EXCLUDE cannot keep it out of,
+  # and then dies on a missing .megalinter-secretlintignore. Its
+  # dependency-confusion check adds nothing over osv-scanner and grype for a
+  # project whose only dependency is sass.
+  - REPOSITORY_DUSTILOCK
 
 # Lychee resolves relative links against the local filesystem and is prone to
 # transient network failures in CI, so it reports without failing the run.

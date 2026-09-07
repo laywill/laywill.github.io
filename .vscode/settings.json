@@ -23,7 +23,7 @@
         100,
         120
     ],
-    // Wherther or not to run VSCodes formatters on save.
+    // Whether or not to run VSCodes formatters on save.
     "editor.formatOnSave": true,
     // YAML Specific settings
     "[yaml]": {
