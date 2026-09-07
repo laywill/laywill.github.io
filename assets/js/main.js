@@ -23,11 +23,23 @@
     // Disable animations/transitions until the page has loaded.
     $body.addClass('is-loading')
 
-    $window.on('load', function () {
+    const clearLoading = function () {
       window.setTimeout(function () {
         $body.removeClass('is-loading')
       }, 100)
-    })
+    }
+
+    // jQuery 3 resolves .ready() asynchronously, so on a warm cache the window
+    // 'load' event can fire before this handler is bound - and jQuery does not
+    // replay an event that has already fired. Left unhandled, body.is-loading
+    // is never removed, and the stylesheet's
+    // `body.is-loading .banner.onload-image-fade-in .image img { opacity: 0 }`
+    // keeps the hero image invisible for good.
+    if (document.readyState === 'complete') {
+      clearLoading()
+    } else {
+      $window.on('load', clearLoading)
+    }
 
     // Fix: Placeholder polyfill.
     $('form').placeholder()
@@ -168,15 +180,10 @@
         }
       })
       .children('.inner')
-      // .css('overflow', 'hidden')
       .css('overflow-y', skel.vars.mobile ? 'visible' : 'hidden')
       .css('overflow-x', skel.vars.mobile ? 'scroll' : 'hidden')
       .scrollLeft(0)
 
-    // Style #1.
-    // ...
-
-    // Style #2.
     $('.gallery')
       .on('wheel', '.inner', function (event) {
         const $this = $(this)
@@ -216,7 +223,9 @@
         const href = $a.attr('href')
 
         // Not an image? Bail.
-        if (!href.match(/\.(jpg|gif|png|mp4)$/)) { return }
+        // Case-sensitive matching would silently degrade a .JPG into a plain
+        // navigation away from the page instead of opening the lightbox.
+        if (!href.match(/\.(jpg|jpeg|gif|png|mp4)$/i)) { return }
 
         // Prevent default.
         event.preventDefault()
