@@ -2,6 +2,11 @@
 # Ignore MegaLinter local run output
 megalinter-reports/
 
+### Python ###
+# Ignore virtual environments
+venv/
+.venv/
+
 ### Claude Code ###
 
 # Ignore Claude Code config files
