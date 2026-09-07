@@ -84,6 +84,17 @@ const terminalLines: readonly TerminalLine[] = [
   { kind: "output", text: "N years in production" },
 ];
 
+/**
+ * `cursor={false}` coverage: `terminalLines` above always renders with the
+ * default trailing block cursor, so this second, shorter transcript is the
+ * only place the static-by-default cursor rule (design-direction.md
+ * correction 4) is demonstrated with the cursor turned off outright.
+ */
+const staticCursorLines: readonly TerminalLine[] = [
+  { kind: "command", text: "echo done" },
+  { kind: "output", text: "placeholder output, no trailing prompt" },
+];
+
 /*
  * Alt text is placeholder-describing on purpose. These are flat colour
  * plates, not photographs, and pretending otherwise in the alt attribute
@@ -105,8 +116,31 @@ const galleryItems: readonly GalleryItem[] = [
   description="Preview harness for the site's component library. Placeholder content throughout."
   noindex
 >
+  {
+    /*
+     * `activeNavId` is a required prop on AppShell (no optional-friendly
+     * fallback to omit it from here) — checked directly on AppShell.astro's
+     * Props interface before making this call. Passing "about" would have
+     * marked the "about.md" row's <a> aria-current="page" even though this
+     * route is served at /components/, which is exactly the false claim
+     * flagged in review: a screen-reader user would be told the About page
+     * is "the current page" while reading the component-library preview.
+     *
+     * "harness" matches no id in src/data/nav.ts's NAV array (about,
+     * experience, toolbox, certs, writing, contact), so Nav.astro's
+     * `entry.id === activeId` check never matches and no row gets
+     * aria-current. Deliberately not reusing a real-looking word like
+     * "components" for the sentinel: NAV could grow a row with that id one
+     * day and silently reintroduce the bug this exists to avoid.
+     *
+     * Consequence, accepted: this harness no longer demonstrates the nav's
+     * active-row (aria-current + --statusbar-blue marker) state. Nothing
+     * else on the page exercises it either. If that coverage gap matters,
+     * it needs a real route with a real active id, not a workaround here.
+     */
+  }
   <AppShell
-    activeNavId="about"
+    activeNavId="harness"
     breadcrumb={["william-lay", "components", "## Component library"]}
     outline={outline}
     activeOutlineId="buttons"
@@ -135,6 +169,17 @@ const galleryItems: readonly GalleryItem[] = [
         >
           Download CV
         </Button>
+        {
+          /* `download` variant coverage: both real CTAs above use `external`
+          (they leave the site), so this is the only place `download` is
+          exercised. A same-origin download would not also set
+          target="_blank" in real use — pairing it with `external` here too
+          would exercise both attributes on one link but misrepresent how
+          the prop is actually meant to be used, so this is `download` alone. */
+        }
+        <Button href="/placeholder-cv.pdf" variant="secondary" icon="lucide:download" download>
+          Download variant (download attribute)
+        </Button>
       </div>
     </Section>
 
@@ -148,6 +193,13 @@ const galleryItems: readonly GalleryItem[] = [
         <Tag as="li" accent="teal" icon="simple-icons:kubernetes">Kubernetes</Tag>
         <Tag as="li" accent="yellow" icon="simple-icons:githubactions">Actions</Tag>
         <Tag as="li" accent="orange" quoted>pair programming</Tag>
+        {
+          /* lightblue and green complete the accent set (src/lib/accents.ts)
+          — neither has a real toolbox row in this harness's placeholder
+          data, so they're demonstrated directly rather than left untested. */
+        }
+        <Tag as="li" accent="lightblue" icon="lucide:tag">lightblue demo</Tag>
+        <Tag as="li" accent="green" icon="lucide:git-branch">green demo</Tag>
       </ul>
     </Section>
 
@@ -164,6 +216,7 @@ const galleryItems: readonly GalleryItem[] = [
 
     <Section title="Terminal" level={2} id="terminal">
       <Terminal lines={terminalLines} />
+      <Terminal title="bash — cursor demo" lines={staticCursorLines} cursor={false} class="cursor-demo" />
     </Section>
 
     <Section title="Panes" level={2} id="panes">
@@ -198,6 +251,45 @@ const galleryItems: readonly GalleryItem[] = [
         class="single"
       />
       <Gallery id="demo" items={galleryItems} />
+    </Section>
+
+    {
+      /*
+       * This untitled `Section` (the <div> branch — see Section.astro's
+       * file-level comment) doubles as coverage for two things review
+       * flagged as never exercised anywhere on this page:
+       *
+       *   - `Section` with no `title` at all. Every other Section above
+       *     supplies one, so this is the only place the div branch (no
+       *     phantom landmark) ever renders.
+       *   - `Pane`'s `headingLevel` prop. Every Pane above omits it, which
+       *     is the *decorative*, aria-hidden header branch. This is the
+       *     only Pane on the page whose filename header is a real heading
+       *     instead — and, by also omitting `accent`, it covers that
+       *     prop's "lightblue" default at the same time.
+       *
+       * This Section renders no landmark of its own, but the Pane inside
+       * it still adds one real heading to the page. Placed last, after
+       * "Images and gallery" (h2), a further h2 here is a sibling, not a
+       * skip — see the heading-hierarchy note in this page's own top
+       * comment expectations (h1 -> h2x5 -> h3 -> h4x4 -> h3 -> h3 -> h2,
+       * now with one more h2 on the end).
+       *
+       * Not added to `outline` above: like the career-graph's h4 role
+       * headings, this is coverage-only rather than a navigable section of
+       * the page, so the in-page table of contents does not need to
+       * mirror it.
+       */
+    }
+    <Section id="variants">
+      <Pane file="variants.json" status="headingLevel demo" headingLevel={2}>
+        <p>
+          Placeholder body for Pane&rsquo;s <code>headingLevel</code> prop:
+          the filename above renders as a real, accessible heading here,
+          not the decorative, aria-hidden header every other Pane on this
+          page uses.
+        </p>
+      </Pane>
     </Section>
   </AppShell>
 </BaseLayout>
@@ -246,5 +338,9 @@ const galleryItems: readonly GalleryItem[] = [
 
   .single {
     margin-block: var(--space-md);
+  }
+
+  .cursor-demo {
+    margin-block-start: var(--space-md);
   }
 </style>
