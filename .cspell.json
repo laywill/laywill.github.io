@@ -81,6 +81,8 @@
         "vendorized",
         "vendorizes",
         "zizmor",
+        // AI tooling named in the copy
+        "Ollama",
         // Cars, coffee and travel hobby pages
         "Hoffmann",
         "Inverness",
@@ -94,6 +96,6 @@
         "fulls"
     ],
     "ignoreWords": [
-        "laywill.github.io",
+        "laywill.github.io"
     ]
 }
