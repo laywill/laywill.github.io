@@ -1,5 +1,11 @@
-# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,git,jekyll,visualstudiocode
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,git,jekyll,visualstudiocode
+### MegaLinter local run output ###
+# Ignore MegaLinter local run output
+megalinter-reports/
+
+### Python ###
+# Ignore virtual environments
+venv/
+.venv/
 
 ### Claude Code ###
 
@@ -7,6 +13,18 @@
 .claude/
 # Ignore Claude Code instructions file
 CLAUDE.md
+
+### v2 build artefacts ###
+
+# `main` (the v2 Astro rebuild) is developed from the same working directory.
+# Its build output and dependencies are not part of the v1 site and must
+# never be committed here or published by the Pages deploy.
+node_modules/
+dist/
+.astro/
+
+# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,git,jekyll,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,git,jekyll,visualstudiocode
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:

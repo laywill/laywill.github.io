@@ -17,6 +17,7 @@
 					$x: 'body.is-loading &';
 					$y: _duration(on-load);
 				}
+
 				@else if ($event == 'scroll') {
 					$x: '&.is-inactive';
 					$y: _duration(on-scroll);
@@ -34,6 +35,7 @@
 						#{$x} {
 							.content {
 								@include vendor('transform', 'translateY(1rem)');
+
 								opacity: 0;
 							}
 						}
@@ -50,6 +52,7 @@
 						#{$x} {
 							.content {
 								@include vendor('transform', 'translateY(-1rem)');
+
 								opacity: 0;
 							}
 						}
@@ -66,6 +69,7 @@
 						#{$x} {
 							.content {
 								@include vendor('transform', 'translateX(1rem)');
+
 								opacity: 0;
 							}
 						}
@@ -82,6 +86,7 @@
 						#{$x} {
 							.content {
 								@include vendor('transform', 'translateX(-1rem)');
+
 								opacity: 0;
 							}
 						}
@@ -116,6 +121,7 @@
 						#{$x} {
 							.image {
 								@include vendor('transform', 'translateY(1rem)');
+
 								opacity: 0;
 
 								img {
@@ -141,6 +147,7 @@
 						#{$x} {
 							.image {
 								@include vendor('transform', 'translateY(-1rem)');
+
 								opacity: 0;
 
 								img {
@@ -166,6 +173,7 @@
 						#{$x} {
 							.image {
 								@include vendor('transform', 'translateX(1rem)');
+
 								opacity: 0;
 
 								img {
@@ -191,6 +199,7 @@
 						#{$x} {
 							.image {
 								@include vendor('transform', 'translateX(-1rem)');
+
 								opacity: 0;
 
 								img {
@@ -233,6 +242,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-direction', 'row');
 		@include vendor('justify-content', 'flex-end');
+
 		position: relative;
 		overflow-x: hidden;
 		text-align: left;
@@ -242,6 +252,7 @@
 			@include vendor('align-self', 'center');
 			@include vendor('flex-grow', '1');
 			@include vendor('flex-shrink', '1');
+
 			width: 65%;
 			max-width: _size(inner);
 			margin: 0 auto;
@@ -250,6 +261,7 @@
 		.image {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			width: 35%;
 			min-width: 25rem;
 			border-radius: 0;
@@ -257,6 +269,7 @@
 			img {
 				@include vendor('object-fit', 'cover');
 				@include vendor('object-position', 'center');
+
 				display: block;
 				position: absolute;
 				top: 0;
@@ -282,6 +295,7 @@
 		@include breakpoint(medium) {
 			.content {
 				@include padding(_size(padding, medium) * 1.25, _size(padding, medium));
+
 				width: 50%;
 				min-width: 0;
 			}
@@ -299,6 +313,7 @@
 
 			@include orientation(portrait) {
 				@include vendor('flex-direction', 'column-reverse');
+
 				text-align: center !important;
 
 				.content {
@@ -379,6 +394,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-direction', 'row-reverse');
 		@include vendor('justify-content', 'center');
+
 		position: relative;
 		overflow-x: hidden;
 		text-align: left;
@@ -391,6 +407,7 @@
 		.image {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			width: $image-size;
 			height: $image-size;
 			border-radius: 100%;
@@ -399,6 +416,7 @@
 			img {
 				@include vendor('object-fit', 'cover');
 				@include vendor('object-position', 'center');
+
 				display: block;
 				width: 100%;
 				height: 100%;
@@ -437,6 +455,7 @@
 		@include orientation(portrait) {
 			@include vendor('align-items', 'center');
 			@include vendor('flex-direction', 'column-reverse');
+
 			text-align: center !important;
 
 			.content {
@@ -525,6 +544,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-direction', 'row-reverse');
 		@include vendor('justify-content', 'center');
+
 		position: relative;
 		overflow-x: hidden;
 		text-align: left;
@@ -536,6 +556,7 @@
 
 		.image {
 			@include phone($image-width);
+
 			margin-right: (_size(element-margin) * 1.75);
 		}
 
@@ -567,6 +588,7 @@
 		@include orientation(portrait) {
 			@include vendor('align-items', 'center');
 			@include vendor('flex-direction', 'column-reverse');
+
 			text-align: center !important;
 
 			.content {
@@ -657,6 +679,7 @@
 		@include vendor('align-items', 'center');
 		@include vendor('display', 'flex');
 		@include vendor('justify-content', 'center');
+
 		background-color: inherit;
 		position: relative;
 		overflow-x: hidden;
@@ -664,6 +687,7 @@
 
 		.content {
 			@include padding(_size(padding, default) * 0.5, _size(padding, default) * 0.5);
+
 			position: relative;
 			width: (_size(inner) * 0.625);
 			max-width: 50%;
@@ -676,6 +700,7 @@
 		.image {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			position: absolute;
 			width: 100%;
 			height: 100%;
@@ -686,6 +711,7 @@
 			img {
 				@include vendor('object-fit', 'cover');
 				@include vendor('object-position', 'center');
+
 				display: block;
 				position: absolute;
 				top: 0;
@@ -748,6 +774,7 @@
 			// Orientation.
 				&.orient-left {
 					@include vendor('justify-content', 'flex-start');
+
 					padding-left: 0;
 
 					.content {
@@ -762,6 +789,7 @@
 
 				&.orient-right {
 					@include vendor('justify-content', 'flex-end');
+
 					padding-right: 0;
 
 					.content {
@@ -813,6 +841,7 @@
 		@include vendor('align-items', 'center');
 		@include vendor('display', 'flex');
 		@include vendor('justify-content', 'center');
+
 		background-color: inherit;
 		position: relative;
 		overflow-x: hidden;
@@ -820,6 +849,7 @@
 
 		.content {
 			@include padding(_size(padding, default) * 0.5, _size(padding, default) * 0.5);
+
 			position: relative;
 			width: (_size(inner) * 0.625);
 			max-width: 52.5%;
@@ -832,6 +862,7 @@
 		.image {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			position: absolute;
 			width: 100%;
 			height: 100%;
@@ -842,6 +873,7 @@
 			img {
 				@include vendor('object-fit', 'cover');
 				@include vendor('object-position', 'center');
+
 				display: block;
 				position: absolute;
 				top: 0;

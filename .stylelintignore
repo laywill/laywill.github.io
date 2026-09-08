@@ -1,0 +1,12 @@
+# Generated from assets/sass/ by `npm run css`. The Sass is the source, and is
+# what gets linted; fixing the generated file instead would desync the pair.
+assets/css/main.css
+
+# Third-party, shipped as published.
+assets/css/font-awesome.min.css
+
+# skel.io's own Sass library plus the HTML5 UP mixins and variables it ships
+# with, including an inlined copy of normalize.css. Vendored source, not ours to
+# reformat - the same reasoning that keeps jquery.min.js and skel.min.js out of
+# the JavaScript linter.
+assets/sass/libs/

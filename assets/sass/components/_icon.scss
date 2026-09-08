@@ -8,6 +8,7 @@
 
 	.icon {
 		@include icon;
+
 		border-bottom: none;
 		position: relative;
 		text-align: center;
@@ -17,7 +18,7 @@
 		}
 
 		&.style2 {
-			&:before {
+			&::before {
 				border-radius: 2.75em;
 				display: inline-block;
 				height: 2.75em;
@@ -28,9 +29,9 @@
 
 		&.major {
 			display: block;
-			margin: 0 0 (_size(element-margin) * 0.5) 0;
+			margin: 0 0 (_size(element-margin) * 0.5);
 
-			&:before {
+			&::before {
 				font-size: 1.25rem;
 			}
 		}
@@ -38,7 +39,7 @@
 
 	a.icon {
 		&.style2 {
-			&:before {
+			&::before {
 				@include vendor('transition', (
 					'background-color #{_duration(transition)} ease-in-out',
 					'box-shadow #{_duration(transition)} ease-in-out',
@@ -51,7 +52,7 @@
 	@mixin color-icon($p: null) {
  		.icon {
  			&.style2 {
- 				&:before {
+ 				&::before {
 					box-shadow: inset 0 0 0 _size(border-width) _palette($p, border);
  				}
  			}
@@ -60,14 +61,14 @@
 		a.icon {
 			&.style2 {
 				&:hover {
-					&:before {
+					&::before {
 						box-shadow: inset 0 0 0 _size(border-width) _palette($p, accent);
 						color: _palette($p, accent);
 					}
 				}
 
 				&:active {
-					&:before {
+					&::before {
 						background-color: transparentize(_palette($p, accent), 0.9);
 						box-shadow: inset 0 0 0 _size(border-width) _palette($p, accent);
 						color: _palette($p, accent);

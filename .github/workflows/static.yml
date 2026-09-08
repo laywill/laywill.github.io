@@ -2,9 +2,13 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Deploys happen from v* tags and nowhere else, matching main's tag-gated
+  # release.yml - a push to master runs mega-linter.yml, css.yml, codeql.yml
+  # and scorecard.yml but does not publish. Same "no branch push, no
+  # schedule" rule release.yml documents, so a v1 fix can't go live before
+  # it's reviewed and deliberately tagged.
   push:
-    branches: ["master"]
+    tags: ["v*"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -30,14 +34,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          # Upload entire repository
-          path: '.'
+          persist-credentials: false
+      - name: Assemble site artifact
+        # Allowlist only what the site actually serves - repo tooling,
+        # lint/CI config, sass sources and dotfiles must never be published.
+        run: |
+          set -euo pipefail
+          mkdir -p _site/assets/css
+
+          cp index.html engineer.html engineer-devops.html engineer-ai.html \
+             engineer-firmware.html leader.html photographer.html prod_tech.html \
+             bellringing.html cars.html coffee.html travel.html \
+             terms-and-conditions.html under_construction.html \
+             CNAME google519c92453ea72bf0.html _site/
+
+          cp assets/css/main.css assets/css/font-awesome.min.css _site/assets/css/
+          cp -r assets/fonts assets/js _site/assets/
+
+          cp -r images _site/
+
+          # Kept in the repo for reference but never linked from any page -
+          # JPEGs_FBK/ (compressed) and gallery fulls/ (via thumbs/) are what
+          # the site actually serves. Don't publish full-res originals.
+          rm -rf _site/images/will/JPEGs
+          rm -rf _site/images/gallery/photographer/product
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1

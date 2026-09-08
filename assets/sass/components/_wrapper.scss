@@ -9,6 +9,7 @@
 	.wrapper.style1 {
 		> .inner {
 			@include padding(_size(padding, default), _size(padding, default) * 0.5);
+
 			margin: 0 auto;
 			max-width: 100%;
 			width: _size(inner);
@@ -55,6 +56,7 @@
 
 		> .inner {
 			@include padding(_size(padding, default) * 0.75, _size(padding, default) * 0.5);
+
 			background-color: _palette(bg);
 			border-radius: _size(border-radius-alt);
 			margin: 0 auto;

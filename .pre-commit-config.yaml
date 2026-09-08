@@ -14,6 +14,51 @@ repos:
     hooks:
       - id: standard
         args: [--fix, --no-ignore]
+        # --no-ignore makes standard lint everything it is handed, including
+        # third-party minified bundles we do not maintain. It has already
+        # reformatted jquery.scrollex.min.js and jquery.scrolly.min.js in
+        # place. Keep vendor libraries out of its reach so upgrading one is a
+        # clean file swap rather than a swap plus a reformat.
+        exclude: |
+          (?x)^(
+            assets/js/jquery\.min\.js|
+            assets/js/jquery\.scrollex\.min\.js|
+            assets/js/jquery\.scrolly\.min\.js|
+            assets/js/skel\.min\.js
+          )$
+
+  ########################################
+  # Generated assets
+  ########################################
+  # assets/css/main.css is compiled from assets/sass/. Rebuilding here means the
+  # generated stylesheet is correct *before* the commit exists, so what gets
+  # reviewed (and, later, tagged for release - static.yml deploys only on a v*
+  # tag, not on every push) is what ships. Having CI commit the rebuilt file
+  # instead would stack an unreviewed bot commit onto the merge and reject
+  # your next push until you pulled.
+  #
+  # The hook installs its own sass so a fresh clone can commit without running
+  # `npm install` first, but the command itself stays in package.json so there
+  # is one definition of how the stylesheet is built.
+  #
+  # additional_dependencies MUST match devDependencies.sass in package.json
+  # exactly. Different sass versions emit different CSS for identical input -
+  # 1.104.0 writes `-0rem` where 1.83.0 wrote `0rem`, for instance - so a
+  # mismatch means the hook and css.yml disagree about what the correct output
+  # is, and CI fails on a file that was just rebuilt. Both are pinned exactly,
+  # with no caret, for that reason.
+  #
+  # css.yml stays as the backstop for commits made with --no-verify or through
+  # the GitHub web UI.
+  - repo: local
+    hooks:
+      - id: build-css
+        name: rebuild assets/css/main.css from assets/sass/
+        entry: npm run css
+        language: node
+        additional_dependencies: ['sass@1.104.0']
+        pass_filenames: false
+        files: ^assets/(sass/.*\.scss|css/main\.css)$
 
   ########################################
   # Linters to validate beautifiers output

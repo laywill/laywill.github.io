@@ -10,11 +10,13 @@
 		> * {
 			@include padding(3rem, 0);
 			@include vendor('display', 'flex');
+
 			border-top: solid 1px;
 
 			> header {
 				@include vendor('flex-grow', '0');
 				@include vendor('flex-shrink', '0');
+
 				width: 15rem;
 			}
 

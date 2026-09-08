@@ -17,6 +17,7 @@
 					$x: 'body.is-loading &';
 					$y: _duration(on-load);
 				}
+
 				@else if ($event == 'scroll') {
 					$x: '&.is-inactive';
 					$y: _duration(on-scroll);
@@ -62,6 +63,7 @@
 		&.#{$name} {
 			> * {
 				@include padding($padding, $padding);
+
 				width: #{100% / $size};
 
 				&:nth-child(-n + #{$size}) {
@@ -93,12 +95,14 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-wrap', 'wrap');
 		@include vendor('justify-content', 'center');
+
 		margin: (_size(element-margin) * 1.5) 0;
 		position: relative;
 
 		> * {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			border-style: solid;
 			border-left-width: _size(border-width);
 			border-top-width: _size(border-width);
@@ -119,7 +123,6 @@
 				@include breakpoint(medium) {
 					@include items-style1-size-reset(medium, 3);
 					@include items-style1-size(medium, 2, _size(gutter));
-
 					@include items-style1-size-reset(small, 3);
 					@include items-style1-size(small, 2, _size(gutter));
 				}
@@ -127,10 +130,8 @@
 				@include breakpoint(xsmall) {
 					@include items-style1-size-reset(big, 2);
 					@include items-style1-size(big, 1, _size(gutter) * 0.75);
-
 					@include items-style1-size-reset(medium, 2);
 					@include items-style1-size(medium, 1, _size(gutter) * 0.75);
-
 					@include items-style1-size-reset(small, 2);
 					@include items-style1-size(small, 1, _size(gutter) * 0.75);
 
@@ -166,6 +167,7 @@
 		&.#{$name} {
 			> * {
 				@include padding($padding, $padding);
+
 				width: #{100% / $size};
 
 				&:nth-child(-n + #{$size}) {
@@ -197,6 +199,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-wrap', 'wrap');
 		@include vendor('justify-content', 'center');
+
 		margin: (_size(element-margin) * 1.5) 0;
 		position: relative;
 		border: solid _size(border-width);
@@ -205,6 +208,7 @@
 		> * {
 			@include vendor('flex-grow', '0');
 			@include vendor('flex-shrink', '0');
+
 			border-style: solid;
 			border-left-width: _size(border-width);
 			border-top-width: _size(border-width);
@@ -225,7 +229,6 @@
 				@include breakpoint(medium) {
 					@include items-style2-size-reset(medium, 3);
 					@include items-style2-size(medium, 2, _size(gutter));
-
 					@include items-style2-size-reset(small, 3);
 					@include items-style2-size(small, 2, _size(gutter));
 				}
@@ -233,10 +236,8 @@
 				@include breakpoint(xsmall) {
 					@include items-style2-size-reset(big, 2);
 					@include items-style2-size(big, 1, _size(gutter) * 0.75);
-
 					@include items-style2-size-reset(medium, 2);
 					@include items-style2-size(medium, 1, _size(gutter) * 0.75);
-
 					@include items-style2-size-reset(small, 2);
 					@include items-style2-size(small, 1, _size(gutter) * 0.75);
 				}
@@ -249,6 +250,7 @@
 		&.#{$name} {
 			> * {
 				@include padding($padding, $padding);
+
 				width: #{100% / $size};
 			}
 		}
@@ -258,6 +260,7 @@
 		@include vendor('display', 'flex');
 		@include vendor('flex-wrap', 'wrap');
 		@include vendor('justify-content', 'center');
+
 		margin: (_size(element-margin) * 1.5) 0;
 		position: relative;
 

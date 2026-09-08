@@ -1,0 +1,102 @@
+---
+# MegaLinter Configuration
+# https://megalinter.io/
+#
+# This is the v1 site on `master`: a 2017 HTML5 UP "Story" template, hand-edited
+# since, with plain CSS, its original Sass sources, jQuery-era JavaScript, and no
+# build step beyond compiling the Sass. The v2 Astro rebuild lives on `main` and
+# has its own, different, MegaLinter configuration.
+#
+# ENABLE is scoped to what this tree actually contains. There is no Python, Go,
+# Java, PHP, Ruby, Rust, TypeScript or Markdown here, so those linters would
+# install and find nothing.
+
+APPLY_FIXES: yes
+DISABLE_ERRORS: false
+
+# MegaLinter classes any linter that can auto-fix as a "formatter" and downgrades
+# formatter errors to non-blocking by default. Keep them blocking; otherwise most
+# of what runs here is advisory and the gate means nothing.
+FORMATTERS_DISABLE_ERRORS: false
+SHOW_ELAPSED_TIME: true
+PARALLEL: true
+FILEIO_REPORTER: false
+
+ENABLE:
+  - ACTION       # GitHub Actions workflow linting (actionlint, zizmor)
+  - CSS          # assets/sass/ - see .stylelintrc.json and .stylelintignore
+  - HTML         # The six pages that are the site
+  - JAVASCRIPT   # assets/js/main.js and assets/js/util.js
+  - JSON         # .cspell.json, .vscode/, .devcontainer/
+  - REPOSITORY   # Secret scanning and repo-level checks
+  - SPELL        # cspell and lychee
+  - YAML         # Workflows, dependabot, pre-commit, this file
+
+DISABLE_LINTERS:
+  - JSON_PRETTIER            # Conflicts with JSON_JSONLINT's formatting opinions
+  - YAML_PRETTIER            # Conflicts with YAML_YAMLLINT
+  - REPOSITORY_CHECKOV       # IaC scanner - no Terraform/CloudFormation here
+  - REPOSITORY_TRIVY         # Container/IaC scanner - no Dockerfiles here
+  - REPOSITORY_DEVSKIM       # Overlaps with the secret scanners; noisy on vendored JS
+  # DustiLock walks the working directory rather than the git tree, so it picks
+  # up package.json files inside ignored scratch directories (Claude Code
+  # worktrees under .claude/) that FILTER_REGEX_EXCLUDE cannot keep it out of,
+  # and then dies on a missing .megalinter-secretlintignore. Its
+  # dependency-confusion check adds nothing over osv-scanner and grype for a
+  # project whose only dependency is sass.
+  - REPOSITORY_DUSTILOCK
+
+# Lychee findings block the run like any other linter here. unsplash.com's
+# bot-rejection status codes are excluded via .lycheeignore (see that file)
+# rather than accepted globally, so a real broken link still fails the build.
+SPELL_LYCHEE_DISABLE_ERRORS: false
+
+# The default 300s budget isn't enough to walk every external link on the
+# hobby/career pages plus retries; give it more room rather than have it kill
+# the linter mid-run.
+SPELL_LYCHEE_TIMEOUT_SECONDS: 600
+
+# LinkedIn answers unauthenticated bots with HTTP 999, which is not a broken
+# link. --accept is global (lychee has no per-domain accept), but every
+# LinkedIn link here is the same footer/nav profile link, not a page whose
+# content we're otherwise verifying, so accepting 999 everywhere is low-risk
+# in a way blanket-accepting unsplash.com's codes was not.
+SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,999'
+
+# Zizmor's "artipacked" audit calls the GitHub API to resolve pinned action SHAs.
+# In CI that runs with a repo-scoped GITHUB_TOKEN, which the API rejects for
+# unrelated public repos, so restrict zizmor to its offline audits.
+ACTION_ZIZMOR_ARGUMENTS: '--no-online-audits'
+
+# JSON Configuration
+# --comments          .devcontainer/devcontainer.json and .vscode/settings.json
+#                     are JSONC
+# --trailing-commas   .cspell.json has one
+JSON_JSONLINT_ARGUMENTS: '--comments --trailing-newline --trailing-commas'
+
+# CSpell Config
+SPELL_CSPELL_FILTER_REGEX_EXCLUDE: '(\.cspell\.json|\.gitignore)'
+
+# Filter Configuration
+#
+# MUST stay on one line. A YAML folded scalar (>-) joins its lines with spaces,
+# which silently breaks a regex alternation - every branch after the first then
+# starts with a space and matches nothing. That is how font-awesome.min.css and
+# the Google site-verification file ended up being linted.
+#
+# Three categories are excluded, for different reasons:
+#
+# 1. Not ours. jQuery, skel, the two jQuery plugins and Font Awesome are
+#    third-party libraries shipped as published. Linting a minified bundle
+#    produces thousands of findings about code we do not maintain, and
+#    auto-fixing one turns the next version bump into a swap plus a reformat.
+#    (.pre-commit-config.yaml excludes the same set from the `standard` hook.)
+#
+# 2. Generated. assets/css/main.css is compiled from assets/sass/ by
+#    `npm run css`. The Sass is the source and is what gets linted; fixing the
+#    generated file instead would silently desync the pair.
+#
+# 3. Not source at all. Binary assets, the PDF CV, MegaLinter's own reports, the
+#    Google site-verification stub (which is deliberately not valid HTML), and
+#    the Astro build output and worktrees that share this working directory.
+FILTER_REGEX_EXCLUDE: '(^|/)(\.git|\.venv|\.claude|\.pytest_cache|node_modules|dist|\.astro|images|docs|megalinter-reports)/|^assets/js/(jquery\.min|jquery\.scrollex\.min|jquery\.scrolly\.min|skel\.min)\.js$|^assets/css/(main|font-awesome\.min)\.css$|^LICENSE\.txt$|^google[0-9a-f]+\.html$'
