@@ -31,11 +31,11 @@ repos:
   # Generated assets
   ########################################
   # assets/css/main.css is compiled from assets/sass/. Rebuilding here means the
-  # generated stylesheet is correct *before* the commit exists, so there is one
-  # commit and one deploy, and what gets reviewed is what ships. Having CI commit
-  # the rebuilt file instead would push a second deploy on top of every change
-  # (static.yml deploys on every push to master), stack an unreviewed bot commit
-  # onto the merge, and reject your next push until you pulled.
+  # generated stylesheet is correct *before* the commit exists, so what gets
+  # reviewed (and, later, tagged for release - static.yml deploys only on a v*
+  # tag, not on every push) is what ships. Having CI commit the rebuilt file
+  # instead would stack an unreviewed bot commit onto the merge and reject
+  # your next push until you pulled.
   #
   # The hook installs its own sass so a fresh clone can commit without running
   # `npm install` first, but the command itself stays in package.json so there

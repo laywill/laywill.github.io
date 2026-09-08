@@ -2,9 +2,13 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Deploys happen from v* tags and nowhere else, matching main's tag-gated
+  # release.yml - a push to master runs mega-linter.yml, css.yml, codeql.yml
+  # and scorecard.yml but does not publish. Same "no branch push, no
+  # schedule" rule release.yml documents, so a v1 fix can't go live before
+  # it's reviewed and deliberately tagged.
   push:
-    branches: ["master"]
+    tags: ["v*"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
