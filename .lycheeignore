@@ -1,7 +1,8 @@
-# Unsplash blanket-rejects unauthenticated/bot traffic on these
-# photographer-credit badge links (401/403 depending on the request), which
-# is not a broken link. lychee's --accept is global, not per-domain, so the
-# only way to stop that from masking a real break elsewhere is to skip
-# checking unsplash.com rather than accept the code everywhere. See
+# Unsplash and Pexels both blanket-reject unauthenticated/bot traffic on
+# these photo/photographer-credit links (401/403 depending on the request),
+# which is not a broken link. lychee's --accept is global, not per-domain, so
+# the only way to stop that from masking a real break elsewhere is to skip
+# checking these domains rather than accept the code everywhere. See
 # .mega-linter.yml for the matching SPELL_LYCHEE_ARGUMENTS note.
 unsplash\.com
+pexels\.com
