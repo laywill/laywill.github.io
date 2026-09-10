@@ -61,12 +61,16 @@ jobs:
           rm -rf _site/images/will/JPEGs
           rm -rf _site/images/gallery/photographer/product
       - name: Setup Node
-        # No `cache: npm` here - this job builds the artifact that gets
-        # deployed to production, and a poisoned npm cache would poison
-        # that artifact. Caching is fine in CI-only workflows, not this one.
+        # No `cache: npm` here, and package-manager-cache explicitly disabled:
+        # this job builds the artifact that gets deployed to production, and
+        # a poisoned npm cache would poison that artifact. setup-node v7
+        # auto-enables its package-manager-cache heuristically, so omitting
+        # `cache: npm` alone isn't enough to opt out. Caching is fine in
+        # CI-only workflows, not this one.
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
         with:
           node-version: 22
+          package-manager-cache: false
       - name: Install dependencies
         run: npm ci
       - name: Optimize images
