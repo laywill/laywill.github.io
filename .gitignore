@@ -1,3 +1,8 @@
+### Lighthouse ###
+# Ignore Lighthouse reports
+lighthouse-report/
+lighthouse-reports/
+
 ### MegaLinter local run output ###
 # Ignore MegaLinter local run output
 megalinter-reports/
