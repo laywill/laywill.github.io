@@ -62,17 +62,17 @@ SPELL_LYCHEE_TIMEOUT_SECONDS: 600
 #                footer/nav profile link, not a page whose content we're
 #                otherwise verifying, so accepting 999 everywhere is low-risk
 #                in a way blanket-accepting unsplash.com's codes was not.
-# --accept 429   "Too Many Requests" means the server is up and throttling us,
-#                never that the link is broken. GitHub runners share egress
-#                IPs, so per-IP throttles are often spent before we arrive. An
-#                accepted status also exits lychee's retry loop immediately.
 # --max-retries 1 --timeout 15
 #                lychee's adaptive per-host backoff (up to 60s) is paid on
 #                every attempt, on top of the per-request timeout. At the
 #                defaults (3 retries, 20s) one slow host could cost ~5 minutes;
 #                this caps it at ~2.5.
+#                429 is deliberately NOT accepted: it means the request was
+#                never checked, not that the link works, so accepting it
+#                would pass a broken link on any host that throttles us. A
+#                throttled run fails fast and names the URL; re-run it.
 # --host-stats   Names the slow host when a run is slow but completes.
-SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,429,999 --max-retries 1 --timeout 15 --host-stats'
+SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,999 --max-retries 1 --timeout 15 --host-stats'
 
 # package-lock.json's registry tarball and funding URLs aren't site content.
 SPELL_LYCHEE_FILTER_REGEX_EXCLUDE: '(^|/)package-lock\.json$'
