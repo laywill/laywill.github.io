@@ -2,6 +2,8 @@
 
 Personal site for William Lay, an Engineering Team Leader & Tech Lead, Production Technician for Live and Theatre events, and a Photographer based in Bath, UK.
 
+- [Home](index.html) - Landing page and site overview
+
 ## Professional Pages
 
 - [Engineering & Tech Leadership](engineer.html) - Overview of engineering work and technical leadership
