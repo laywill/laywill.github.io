@@ -24,4 +24,5 @@ Personal site for William Lay, an Engineering Team Leader & Tech Lead, Productio
 
 ## Legal
 
+- [Site Map](sitemap.html) - Full list of every page on this site
 - [Terms and Conditions](terms-and-conditions.html)
