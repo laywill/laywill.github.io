@@ -51,10 +51,9 @@ DISABLE_LINTERS:
 # rather than accepted globally, so a real broken link still fails the build.
 SPELL_LYCHEE_DISABLE_ERRORS: false
 
-# A healthy run takes seconds. This is a backstop only: the arguments below
-# bound lychee's own worst case well inside it, so a slow run reports what it
-# found instead of being killed with no output (#74).
-SPELL_LYCHEE_TIMEOUT_SECONDS: 600
+# A healthy run takes seconds. If it's not healthy, we'd rather know in 90s
+# than have CI sit on it for the old 10-minute cap (#74).
+SPELL_LYCHEE_TIMEOUT_SECONDS: 90
 
 # --accept 999   LinkedIn answers unauthenticated bots with HTTP 999, which is
 #                not a broken link. --accept is global (lychee has no
@@ -62,17 +61,17 @@ SPELL_LYCHEE_TIMEOUT_SECONDS: 600
 #                footer/nav profile link, not a page whose content we're
 #                otherwise verifying, so accepting 999 everywhere is low-risk
 #                in a way blanket-accepting unsplash.com's codes was not.
-# --max-retries 1 --timeout 15
-#                lychee's adaptive per-host backoff (up to 60s) is paid on
-#                every attempt, on top of the per-request timeout. At the
-#                defaults (3 retries, 20s) one slow host could cost ~5 minutes;
-#                this caps it at ~2.5.
+# --max-retries 8 --retry-wait-time 1 --timeout 3
+#                More retries than lychee's default (3), spaced closer
+#                together (1s base backoff, 3s per-request timeout instead of
+#                20s) - a flaky link gets more chances, but each chance is
+#                cheap, so the total still lands well inside the 90s backstop.
 #                429 is deliberately NOT accepted: it means the request was
 #                never checked, not that the link works, so accepting it
 #                would pass a broken link on any host that throttles us. A
 #                throttled run fails fast and names the URL; re-run it.
 # --host-stats   Names the slow host when a run is slow but completes.
-SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,999 --max-retries 1 --timeout 15 --host-stats'
+SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,999 --max-retries 8 --retry-wait-time 1 --timeout 3 --host-stats'
 
 # package-lock.json's registry tarball and funding URLs aren't site content.
 SPELL_LYCHEE_FILTER_REGEX_EXCLUDE: '(^|/)package-lock\.json$'
