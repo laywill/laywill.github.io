@@ -29,9 +29,34 @@
     // added, so the banner stays visible rather than being hidden for good by
     // CSS that nothing will ever remove.
 
+    // jquery.scrollex evaluates an element on 'scroll', and once more from a
+    // synthetic scroll it fires in its own window 'load' handler. Nothing
+    // re-measures when the layout settles after that. Since each registration
+    // below adds is-inactive in its initialize callback, and the handler only
+    // touches the class when the computed state changes, a section that
+    // measures as out of view during that single evaluation stays hidden until
+    // a real scroll happens.
+    //
+    // At the top of a page that is invisible - everything below the fold is
+    // meant to be inactive, and the first scroll corrects it. Reload part-way
+    // down and the sections being looked at never come back (#87).
+    //
+    // Two ways the single evaluation misses: scrollex binds its 'load' handler
+    // when its own script runs, while registration happens in this async ready
+    // callback, so the synthetic scroll can fire against an empty registry;
+    // and loading="lazy" images do not block 'load', so sections holding them
+    // can still be mid-reflow when it does fire.
+    const refreshScrollex = function () {
+      $window.trigger('scroll')
+    }
+
     const clearLoading = function () {
       window.setTimeout(function () {
         $body.removeClass('is-loading')
+
+        // Re-measure once the page has settled, covering reflow from anything
+        // that is not an image - late webfonts, restored scroll position.
+        refreshScrollex()
       }, 100)
     }
 
@@ -189,6 +214,16 @@
       .css('overflow-y', skel.vars.mobile ? 'visible' : 'hidden')
       .css('overflow-x', skel.vars.mobile ? 'scroll' : 'hidden')
       .scrollLeft(0)
+
+    // Everything is registered now, so evaluate against the real scroll
+    // position rather than trusting scrollex's one synthetic scroll, then
+    // again as each image settles the layout it is measured against. Images
+    // already in the cache are complete before this binds and need no handler.
+    refreshScrollex()
+
+    $('img').each(function () {
+      if (!this.complete) { $(this).one('load error', refreshScrollex) }
+    })
 
     $('.gallery')
       .on('wheel', '.inner', function (event) {
