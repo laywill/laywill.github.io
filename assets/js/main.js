@@ -47,6 +47,12 @@
     // and loading="lazy" images do not block 'load', so sections holding them
     // can still be mid-reflow when it does fire.
     const refreshScrollex = function () {
+      // body.is-loading suppresses every transition on the page, so revealing
+      // a section while it is still set snaps that section into place instead
+      // of fading it. Hold off until the class is gone; clearLoading runs this
+      // again at that point, and scrollex re-measures from scratch each time.
+      if ($body.hasClass('is-loading')) { return }
+
       $window.trigger('scroll')
     }
 
@@ -54,8 +60,12 @@
       window.setTimeout(function () {
         $body.removeClass('is-loading')
 
-        // Re-measure once the page has settled, covering reflow from anything
-        // that is not an image - late webfonts, restored scroll position.
+        // Only now can scroll-triggered sections be revealed with their fade
+        // intact, so this is where the first real evaluation happens. It also
+        // re-measures after any reflow that is not an image - late webfonts,
+        // restored scroll position. scrollex defers its own handler by the
+        // configured delay, so the class removal above lands in an earlier
+        // style recalc than the reveal and the transition is live for it.
         refreshScrollex()
       }, 100)
     }
@@ -215,12 +225,11 @@
       .css('overflow-x', skel.vars.mobile ? 'scroll' : 'hidden')
       .scrollLeft(0)
 
-    // Everything is registered now, so evaluate against the real scroll
-    // position rather than trusting scrollex's one synthetic scroll, then
-    // again as each image settles the layout it is measured against. Images
-    // already in the cache are complete before this binds and need no handler.
-    refreshScrollex()
-
+    // Re-measure as each image settles the layout it is measured against,
+    // rather than trusting scrollex's one synthetic scroll. No evaluation is
+    // kicked off here: body.is-loading is still set for everything registered
+    // above, so refreshScrollex would decline anyway. Images already in the
+    // cache are complete before this binds and need no handler.
     $('img').each(function () {
       if (!this.complete) { $(this).one('load error', refreshScrollex) }
     })
