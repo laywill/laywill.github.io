@@ -20,8 +20,14 @@
     const $body = $('body')
     const $wrapper = $('#wrapper')
 
-    // Disable animations/transitions until the page has loaded.
-    $body.addClass('is-loading')
+    // body.is-loading disables animations/transitions and hides the banner's
+    // load-in targets. It is applied by an inline script at the top of every
+    // page's <body>, before the banner is parsed, so the banner is never painted
+    // visible. Adding it here instead ran after the first paint, so the banner
+    // flashed up, snapped to hidden, then faded in (#85). Leaving it to the
+    // markup also means that with JavaScript unavailable the class is never
+    // added, so the banner stays visible rather than being hidden for good by
+    // CSS that nothing will ever remove.
 
     const clearLoading = function () {
       window.setTimeout(function () {
