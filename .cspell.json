@@ -68,6 +68,7 @@
         "ghcr",
         "htmlhint",
         "kingfisher",
+        "llms",
         "linters",
         "lychee",
         "megalinter",

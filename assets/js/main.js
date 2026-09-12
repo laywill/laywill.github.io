@@ -237,8 +237,10 @@
         // Lock.
         $modal[0]._locked = true
 
-        // Set src.
+        // Set src, alt (copied from the triggering thumbnail so the
+        // lightbox image isn't left with no accessible name).
         $modalImg.attr('src', href)
+        $modalImg.attr('alt', $a.find('img').attr('alt') || '')
 
         // Set visible.
         $modal.addClass('visible')
@@ -275,8 +277,9 @@
             .removeClass('visible')
 
           setTimeout(function () {
-            // Clear src.
+            // Clear src, alt.
             $modalImg.attr('src', '')
+            $modalImg.attr('alt', '')
 
             // Unlock.
             $modal[0]._locked = false
@@ -292,7 +295,7 @@
         // Escape? Hide modal.
         if (event.keyCode === 27) { $modal.trigger('click') }
       })
-      .prepend('<div class="modal" tabIndex="-1"><div class="inner"><img src="" /></div></div>')
+      .prepend('<div class="modal" tabIndex="-1"><div class="inner"><img src="" alt="" /></div></div>')
       .find('img')
       .on('load', function (event) {
         const $modalImg = $(this)

@@ -1,0 +1,30 @@
+# William Lay
+
+Personal site for William Lay, an Engineering Team Leader & Tech Lead, Production Technician for Live and Theatre events, and a Photographer based in Bath, UK.
+
+- [Home](index.html) - Landing page and site overview
+
+## Professional Pages
+
+- [Engineering & Tech Leadership](engineer.html) - Overview of engineering work and technical leadership
+- [Firmware Engineering](engineer-firmware.html) - VHDL, Verilog, and SystemVerilog work
+- [DevOps Engineering](engineer-devops.html) - Cloud infrastructure, Terraform, Ansible, and automation
+- [AI Engineering](engineer-ai.html) - AI and machine learning projects
+- [Leadership & Team Management](leader.html) - Technical team leadership and mentoring
+
+## Creative & Technical Work
+
+- [Photography](photographer.html) - Event and portfolio photography
+- [Production Technician](prod_tech.html) - Live events, sound, and lighting technical work
+
+## Personal Interests
+
+- [Travel](travel.html) - Travel experiences and photography
+- [Coffee](coffee.html) - Coffee interests
+- [Bellringing](bellringing.html) - Change ringing and bellringing
+- [Cars](cars.html) - Automotive interests
+
+## Legal
+
+- [Site Map](sitemap.html) - Full list of every page on this site
+- [Terms and Conditions](terms-and-conditions.html)

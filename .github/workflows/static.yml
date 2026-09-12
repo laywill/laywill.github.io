@@ -47,7 +47,8 @@ jobs:
           cp index.html engineer.html engineer-devops.html engineer-ai.html \
              engineer-firmware.html leader.html photographer.html prod_tech.html \
              bellringing.html cars.html coffee.html travel.html \
-             terms-and-conditions.html under_construction.html \
+             terms-and-conditions.html under_construction.html sitemap.html \
+             sitemap.xml robots.txt \
              CNAME google519c92453ea72bf0.html _site/
 
           cp assets/css/main.css assets/css/font-awesome.min.css _site/assets/css/
