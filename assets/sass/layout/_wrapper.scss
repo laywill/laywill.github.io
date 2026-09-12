@@ -45,5 +45,13 @@
 					box-shadow: none !important;
 				}
 			}
+
+			// The page footer is a sibling of #wrapper, not a child, so it is
+			// not matched by `> *` above and would lose the 1px rule that
+			// separates it from the section before it. Keyed on the tag rather
+			// than #footer so it holds regardless of the element's id.
+			+ footer {
+				box-shadow: inset 0 1px 0 0 _palette(border-alt);
+			}
 		}
 	}
