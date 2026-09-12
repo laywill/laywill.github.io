@@ -15,7 +15,7 @@ You are a senior software engineer collaborating with a peer. Prioritize thoroug
 ## Critical context: this repo contains two different websites
 
 | Branch   | What it is                                                                                                                                     |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+|----------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | `master` | Frozen v1 (2017 HTML5 UP static site), tagged `v1.0.0`. **Still serving the live site** until cutover. Also still the repo's *default* branch. |
 | `main`   | The v2 Astro rebuild. **Orphan branch — shares no history with `master`.** All current work happens here.                                      |
 
@@ -79,7 +79,7 @@ Astro + strict TypeScript, static output, zero runtime dependencies on third par
 Read the relevant doc before changing the thing it governs — these record decisions with reasoning, and several files state explicitly that they and the code must keep saying the same thing.
 
 | Doc                                                    | Governs                                                                                                                 |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | `component-library.md`                                 | Component inventory, the rules every component obeys, breakpoints, what the a11y and viewport checks do and don't cover |
 | `design-direction.md`                                  | What the page looks like; the semantic colour map                                                                       |
 | `colour-scheme.md`                                     | Palette tokens **and the computed contrast ratios** — the only contrast check that exists                               |
