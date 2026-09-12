@@ -209,18 +209,22 @@
 						}
 					}
 
+					// Fades the .image container, not the img inside it. The container
+					// carries a placeholder tint (see color-banner/color-spotlight), so
+					// fading only the img leaves that tint painted at full opacity in the
+					// first frame and cross-fades the photo over it - a grey block, or on
+					// the circular style3 hero a grey disc (#85). Fading the container
+					// takes tint and photo up together as one unit. Both are deliberately
+					// not faded at once: their alphas would multiply, giving a sluggish
+					// non-linear start that does not match the content fade.
 					&.on#{$event}-image-fade-in {
 						.image {
-							img {
-								@include vendor('transition', 'opacity #{$y} ease-in-out');
-							}
+							@include vendor('transition', 'opacity #{$y} ease-in-out');
 						}
 
 						#{$x} {
 							.image {
-								img {
-									opacity: 0;
-								}
+								opacity: 0;
 							}
 						}
 					}
