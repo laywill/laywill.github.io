@@ -25,7 +25,7 @@ FILEIO_REPORTER: false
 ENABLE:
   - ACTION       # GitHub Actions workflow linting (actionlint, zizmor)
   - CSS          # assets/sass/ - see .stylelintrc.json and .stylelintignore
-  - HTML         # The six pages that are the site
+  - HTML         # The site's pages
   - JAVASCRIPT   # assets/js/main.js and assets/js/util.js
   - JSON         # .cspell.json, .vscode/, .devcontainer/
   - REPOSITORY   # Secret scanning and repo-level checks
