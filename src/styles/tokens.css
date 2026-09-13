@@ -59,6 +59,14 @@
   --accent-purple: #c586c0;
   --statusbar-blue: #007acc;
 
+  /* Hover state for a --statusbar-blue fill. VS Code's own
+  button.hoverBackground, so it is the palette's answer rather than an
+  invented one, and it lifts rather than darkens - on a dark UI a lighter
+  step is what actually reads as hover. It also improves the white-text
+  ratio it has to carry, from 4.51:1 to 4.79:1, so the hover state is never
+  the weaker of the two. */
+  --statusbar-blue-hover: #17b;
+
   /* Text colour for use on accent-coloured surfaces (e.g. the status-bar
   footer) — kept as a token rather than a literal so nothing outside this
   file ever hard-codes a hex value. */
@@ -88,9 +96,18 @@
   /* Code / IDE motifs (terminal, status bar, tags) */
   --font-mono: var(--font-jetbrains-mono);
 
-  /* Typography — modular type scale (ratio 1.25, base 16px) */
+  /* Typography — modular type scale (ratio 1.25, base 16px), with one
+  documented exception at the smallest step; see --font-size-sm. */
 
-  --font-size-sm: 0.8rem; /* 12.8px, captions/metadata */
+  /* 14px, captions/metadata. Deliberately NOT the 0.8rem (12.8px) that the
+  1.25 ratio would give: accessibility correction 2 in
+  docs/overhaul/design-direction.md requires anything below the floors to be
+  either scaled up or confined to content hidden from assistive tech, and a
+  token used for real captions cannot rely on the latter. 14px is also the
+  floor colour-scheme.md attaches to --fg-muted, so pinning the smallest step
+  here means no component can breach it by picking the smallest token. The
+  ratio therefore breaks at this one end, on purpose. */
+  --font-size-sm: 0.875rem;
   --font-size-base: 1rem; /* 16px, body minimum per typography.md */
   --font-size-md: 1.25rem; /* 20px, lead paragraphs */
   --font-size-lg: 1.563rem; /* 25px, h3 */
@@ -103,4 +120,118 @@
 
   /* Prose measure cap (Notes pages) */
   --measure: 70ch;
+
+  /* --------------------------------------------------------------------
+   * Space scale — 4px base, used for every gap, padding and margin.
+   * Components must not invent one-off rem values; if a step is missing,
+   * add it here rather than hard-coding it at the call site.
+   * ------------------------------------------------------------------ */
+
+  --space-3xs: 0.25rem; /* 4px  — glyph gutters, pill inset */
+  --space-2xs: 0.5rem; /* 8px  — tight stacks, tag gaps */
+  --space-xs: 0.75rem; /* 12px — control padding */
+  --space-sm: 1rem; /* 16px — default gap */
+  --space-md: 1.5rem; /* 24px — pane padding */
+  --space-lg: 2rem; /* 32px — pane gaps */
+  --space-xl: 3rem; /* 48px — band padding, narrow */
+  --space-2xl: 4rem; /* 64px — band padding, wide */
+
+  /* --------------------------------------------------------------------
+   * Corner radii. VS Code's own chrome is close to square; these stay
+   * small deliberately so the IDE motif does not soften into generic
+   * rounded-card design (design-brief.md anti-pattern 5).
+   * ------------------------------------------------------------------ */
+
+  --radius-sm: 2px; /* tag pills, badges */
+  --radius-md: 4px; /* buttons, panes, cards */
+  --radius-lg: 6px; /* terminal card, lightbox figure */
+
+  /* --------------------------------------------------------------------
+   * Depth and elevation — the "gloss" vocabulary deferred to issue #27 by
+   * docs/overhaul/design-direction.md. See docs/overhaul/component-library.md
+   * for the decision in full. Short version: the flat-colour rule in
+   * colour-scheme.md STANDS. Gloss is bought with depth, state and motion,
+   * never with gradients.
+   *
+   * --shadow-color is an unprefixed RGB triplet so the alpha can vary per
+   * step via rgb(... / a) without a token per opacity.
+   * ------------------------------------------------------------------ */
+
+  --shadow-color: 0 0 0;
+  --elevation-1: 0 1px 2px rgb(var(--shadow-color) / 35%); /* panes at rest */
+  --elevation-2: 0 2px 8px rgb(var(--shadow-color) / 45%); /* hovered/raised */
+  --elevation-3: 0 8px 24px rgb(var(--shadow-color) / 55%); /* lightbox */
+
+  /* Modal scrim, for a <dialog>'s ::backdrop. Distinct from the elevation
+  steps: those describe how far a surface sits above the page, this one dims
+  everything behind a surface that has taken over the viewport. */
+  --scrim: rgb(var(--shadow-color) / 70%);
+
+  /* A 1px inner top highlight. Not a gradient and not a fill: it reads as
+  a lit top edge on a raised surface, which is the whole of the "glossier
+  than the artboard" ask that flat colour cannot supply. */
+  --sheen: inset 0 1px 0 rgb(255 255 255 / 4%);
+
+  /* --------------------------------------------------------------------
+   * Motion. Every transition uses a duration token, so the reduced-motion
+   * override at the foot of this file collapses all of them at once.
+   * ------------------------------------------------------------------ */
+
+  --duration-fast: 120ms; /* colour/background state changes */
+  --duration-base: 180ms; /* transform, opacity, elevation */
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Terminal cursor blink period. Deliberately outside the pair above: the
+  reduced-motion block collapses those to 1ms, which would turn a blink into
+  a strobe. The cursor animation is instead suppressed wholesale by its own
+  prefers-reduced-motion guard, so its period must not be collapsed. */
+  --duration-cursor-blink: 1s;
+
+  /* --------------------------------------------------------------------
+   * Focus. A visible focus indicator is required on every interactive
+   * element; --accent-lightblue is 11.18:1 on --bg-editor, far clear of
+   * the 3:1 non-text minimum, and is not used as a fill anywhere so it
+   * cannot be confused with a resting state.
+   * ------------------------------------------------------------------ */
+
+  --focus-ring-color: var(--accent-lightblue);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* --------------------------------------------------------------------
+   * Layout. Breakpoints are NOT tokens: custom properties are not usable
+   * in media-query conditions. The shipped breakpoints are documented
+   * once in docs/overhaul/component-library.md and written literally in
+   * each component — 640px, 900px and 1200px min-width, with 360px as the
+   * no-horizontal-scroll floor.
+   * ------------------------------------------------------------------ */
+
+  --sidebar-width: 15rem;
+  --content-max: 72rem;
+
+  /* Stacking order, in one place, so no component invents a z-index. */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-statusbar: 20;
+
+  /* The skip link is only ever painted while focused, but when it is it must
+  clear the sticky nav rail and the status bar both — otherwise the first
+  thing a keyboard user reaches is a control they cannot see. */
+  --z-skip-link: 30;
+  --z-lightbox: 100;
+}
+
+/*
+ * Reduced motion. Collapsing the duration tokens disables every
+ * token-driven transition in one place; components therefore do not each
+ * need their own prefers-reduced-motion block for colour/opacity fades.
+ * Anything that *animates on its own* — the terminal cursor, the lightbox
+ * entry transform — must still opt out explicitly, because suppressing the
+ * duration of a looping animation is not the same as not running it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-base: 1ms;
+  }
 }

@@ -1,0 +1,51 @@
+---
+/*
+ * SplitPanes.astro — the two-column pane arrangement
+ * (docs/overhaul/component-library.md, "Layout — layout/";
+ * docs/overhaul/design-direction.md, "4. Split panes" and the "narrow
+ * viewports" decision).
+ *
+ * `left` renders before `right` in the DOM unconditionally, both stacked
+ * and side-by-side. That is what makes the stacked (below `lg`) order
+ * "career before toolbox" with no `order` property needed — the reading
+ * order and the DOM order are the same thing.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["split-panes", className]}>
+  <div class="split-panes-left">
+    <slot name="left" />
+  </div>
+  <div class="split-panes-right">
+    <slot name="right" />
+  </div>
+</div>
+
+<style>
+  .split-panes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .split-panes-left,
+  .split-panes-right {
+    /* Stops long unbroken mono content (commit hashes, refs) from forcing
+    a track wider than its share and reintroducing horizontal scroll. */
+    min-width: 0;
+  }
+
+  @media (min-width: 1200px) {
+    .split-panes {
+      /* The `lg` breakpoint (component-library.md): roughly 1.15fr / 1fr
+      per design-direction.md's split-pane proportions — career (left)
+      reads first and gets a touch more width than the toolbox column. */
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+</style>

@@ -1,9 +1,29 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
 
+import icon from "astro-icon";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://williamlay.co.uk",
+
+  /*
+   * Icons are Iconify sets resolved at *build* time by astro-icon: the
+   * <Icon> component inlines the SVG into the HTML, so there is no icon
+   * font, no runtime sprite fetch and no third-party request. Only the
+   * icons actually referenced are emitted.
+   *
+   * Two sets are installed, and each is installed for a different reason:
+   *   - simple-icons: brand marks for the toolbox grid (CC0).
+   *   - lucide:       interface glyphs (close, chevrons, external link).
+   * Adding a set means adding an @iconify-json/* dependency; the sets are
+   * npm packages, not network lookups, so builds stay hermetic.
+   *
+   * `include` is deliberately absent: astro-icon reads the sets on demand
+   * from the installed packages, and listing icons here would be a second
+   * place to keep in sync with the components.
+   */
+  integrations: [icon()],
 
   /*
    * Fonts are declared here rather than as hand-rolled @font-face rules so

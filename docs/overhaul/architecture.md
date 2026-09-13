@@ -20,6 +20,7 @@
 - MegaLinter
 - Astro build (`astro check` + `astro build`)
 - Internal link check on the built output
+- Accessibility check: axe-core over the built output (`npm run a11y`). Structure, naming and ARIA only — jsdom does no layout, so contrast is governed by the computed ratios in [colour-scheme.md](colour-scheme.md) instead. See [component-library.md](component-library.md)
 - SAST: CodeQL (JS/TS), dependency review (PRs), OSSF Scorecard; secret scanning + push protection enabled in repo settings
 
 ### Deploys — tag-gated only
@@ -27,9 +28,9 @@
 Deploys happen **only from `v*` tags**. The release workflow:
 
 ```text
-tag push v* ──► lint ─┐
-             ├► SAST ─┼──► build ──► deploy (needs: all previous)
-             └► check ┘
+tag push v* ──► lint ─┐                  ┌► link check ─┐
+             ├► SAST ─┼──► build ────────┤              ├► deploy
+             └► check ┘                  └► a11y ───────┘  (needs: all)
 ```
 
 - The `deploy` job `needs:` every check job — no deployment can occur except from a tagged version that passed everything.
@@ -64,7 +65,7 @@ GoatCounter: free personal tier, privacy-friendly (no cookies, no consent banner
 
 ## Cutover runbook (E6)
 
-1. Pre-flight: `v2.0.0-rc.N` tag green end-to-end (lint, SAST, build, link check; deploy step skipped).
+1. Pre-flight: `v2.0.0-rc.N` tag green end-to-end (lint, SAST, build, link check, accessibility; deploy step skipped).
 2. Confirm DNS: apex + `www` CNAME records in place; `public/CNAME` = `williamlay.co.uk`.
 3. Flip repo default branch `master` → `main`.
 4. Disable `master`'s `static.yml` workflow (delete on a tiny final master commit, or disable via Actions UI).

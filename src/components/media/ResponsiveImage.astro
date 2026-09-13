@@ -1,0 +1,100 @@
+---
+/*
+ * ResponsiveImage.astro — thin wrapper over astro:assets' <Picture>
+ * (docs/overhaul/component-library.md, "Media"; docs/overhaul/architecture.md,
+ * "Images via astro:assets").
+ *
+ * Astro's <Picture> already does the hard part: it generates a <source> per
+ * requested format plus a raster <img> fallback, computes intrinsic
+ * width/height on the <img> so nothing shifts on load, and — as of this
+ * Astro version — makes its own `alt` prop required (Picture throws
+ * AstroError "ImageMissingAlt" if it is omitted). So this component adds
+ * exactly two things over calling <Picture> directly:
+ *
+ *   1. `alt` is required *in this component's own Props type*, not just at
+ *      Picture's runtime check, so a missing alt is a build-time TypeScript
+ *      error under astro check rather than a runtime throw. Astro's own
+ *      "required" is enforced dynamically because `alt` is threaded through
+ *      a generic that ultimately allows `undefined`; re-stating it here
+ *      turns that into a static guarantee. The v1 site shipped no alt text
+ *      at all — every <img> was missing the attribute outright — so a caller
+ *      being unable to *forget* alt, rather than merely being warned, is the
+ *      actual defect fix. A genuinely decorative image still passes
+ *      `alt=""` — that's a deliberate, visible act of authoring, not the
+ *      absence this component exists to prevent.
+ *   2. Sensible defaults for a mostly-below-the-fold site: `loading="lazy"`
+ *      unless a caller opts an above-the-fold image into `"eager"`, and
+ *      AVIF/WebP requested ahead of the raster fallback so modern browsers
+ *      never pay for the larger format.
+ *
+ * Everything else — `widths`, `sizes`, `fetchpriority`, `class` — passes
+ * straight through. This component deliberately does NOT invent a default
+ * `widths` step list or `sizes` value: what widths are worth generating and
+ * what the layout's slot width is are page/content decisions, not something
+ * a generic wrapper can guess without either over- or under-generating
+ * renditions. A caller that omits `widths` still gets a correctly sized
+ * single-resolution image (Picture falls back to the source's intrinsic
+ * size) — just not a srcset — which is a reasonable default, not a broken
+ * one.
+ */
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: ImageMetadata;
+  /** REQUIRED, no default. A genuinely decorative image passes "" explicitly. */
+  alt: string;
+  widths?: number[];
+  sizes?: string;
+  loading?: "lazy" | "eager";
+  fetchpriority?: "high" | "low" | "auto";
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  widths,
+  sizes,
+  loading = "lazy",
+  fetchpriority,
+  class: className,
+} = Astro.props;
+---
+
+<Picture
+  src={src}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={["avif", "webp"]}
+  loading={loading}
+  fetchpriority={fetchpriority}
+  class={className}
+/>
+
+<style>
+  /*
+   * The component is called ResponsiveImage, so it has to actually be one.
+   * astro:assets emits real intrinsic width/height attributes - which is what
+   * removes layout shift - but those are also what make an unstyled <img>
+   * paint at its full natural size. A 2000px source in a 328px column then
+   * pushes the document's scroll width to 2000px, which is precisely the
+   * "no horizontal scroll at 360px" floor the brief calls non-negotiable.
+   *
+   * Caught by driving a real browser at 360px, not by astro check or by the
+   * axe run: jsdom has no layout, so nothing automated in this repo could
+   * have seen it.
+   *
+   * height: auto is the other half - without it, capping the width while the
+   * height attribute still applies squashes the aspect ratio.
+   *
+   * :global because the element is emitted by <Picture>, so Astro's scoping
+   * attribute lands on the <picture> wrapper rather than on the <img> inside
+   * it.
+   */
+  picture :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+</style>

@@ -1,0 +1,354 @@
+---
+/*
+ * The component library's preview harness.
+ *
+ * It exists for two reasons, and the second is the one that justifies it
+ * shipping at all:
+ *
+ *   1. The library can be reviewed in one place, at every variant, without
+ *      first building a page that happens to use each component.
+ *   2. CI's `astro build`, internal link check and axe run all exercise every
+ *      component. Without this page they would only ever see whatever the
+ *      landing page reaches for, and a component nobody has wired up yet
+ *      would be type-checked but never rendered.
+ *
+ * Every word of copy here is placeholder. Real content is issue #28, sourced
+ * from the CV. Nothing on this page should be read as a claim about William.
+ *
+ * The route is marked noindex/nofollow. Whether it survives launch as living
+ * documentation or is deleted at cutover is an open decision recorded in
+ * docs/overhaul/component-library.md and carried to issue #36.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AppShell from "../../components/layout/AppShell.astro";
+import Section from "../../components/layout/Section.astro";
+import Pane from "../../components/layout/Pane.astro";
+import SplitPanes from "../../components/layout/SplitPanes.astro";
+import Button from "../../components/ui/Button.astro";
+import Tag from "../../components/ui/Tag.astro";
+import Callout from "../../components/ui/Callout.astro";
+import Terminal from "../../components/ui/Terminal.astro";
+import type { TerminalLine } from "../../components/ui/Terminal.astro";
+import IconGrid from "../../components/content/IconGrid.astro";
+import CertBadges from "../../components/content/CertBadges.astro";
+import CareerGraph from "../../components/content/CareerGraph.astro";
+import Gallery from "../../components/media/Gallery.astro";
+import type { GalleryItem } from "../../components/media/Gallery.astro";
+import ResponsiveImage from "../../components/media/ResponsiveImage.astro";
+import type { OutlineItem } from "../../components/nav/Outline.astro";
+
+import placeholder01 from "../../assets/demo/placeholder-01.jpg";
+import placeholder02 from "../../assets/demo/placeholder-02.jpg";
+import placeholder03 from "../../assets/demo/placeholder-03.jpg";
+import placeholder04 from "../../assets/demo/placeholder-04.jpg";
+import placeholder05 from "../../assets/demo/placeholder-05.jpg";
+import placeholder06 from "../../assets/demo/placeholder-06.jpg";
+
+/*
+ * The outline mirrors the headings this page actually renders. Keeping it
+ * hand-written rather than generated is deliberate here: the harness is
+ * exercising Outline.astro's contract, and generating the input from the
+ * output would test nothing.
+ */
+const outline: readonly OutlineItem[] = [
+  { id: "buttons", label: "Buttons", level: 2 },
+  { id: "tags", label: "Tags", level: 2 },
+  { id: "callouts", label: "Callouts", level: 2 },
+  { id: "terminal", label: "Terminal", level: 2 },
+  { id: "panes", label: "Panes", level: 2 },
+  { id: "career", label: "Career graph", level: 3 },
+  { id: "toolbox", label: "Toolbox", level: 3 },
+  { id: "certifications", label: "Certifications", level: 3 },
+  { id: "media", label: "Images and gallery", level: 2 },
+];
+
+const terminalLines: readonly TerminalLine[] = [
+  { kind: "command", text: "whoami" },
+  { kind: "output", text: "placeholder.name" },
+  { kind: "blank" },
+  { kind: "command", text: "cat roles.txt" },
+  {
+    kind: "output",
+    spans: [
+      { text: "role one", accent: "lightblue" },
+      { text: " → " },
+      { text: "role two", accent: "teal" },
+      { text: " → " },
+      { text: "role three", accent: "yellow" },
+      { text: " → " },
+      { text: '"role four"', accent: "orange" },
+    ],
+  },
+  { kind: "blank" },
+  { kind: "command", text: "uptime" },
+  { kind: "output", text: "N years in production" },
+];
+
+/**
+ * `cursor={false}` coverage: `terminalLines` above always renders with the
+ * default trailing block cursor, so this second, shorter transcript is the
+ * only place the static-by-default cursor rule (design-direction.md
+ * correction 4) is demonstrated with the cursor turned off outright.
+ */
+const staticCursorLines: readonly TerminalLine[] = [
+  { kind: "command", text: "echo done" },
+  { kind: "output", text: "placeholder output, no trailing prompt" },
+];
+
+/*
+ * Alt text is placeholder-describing on purpose. These are flat colour
+ * plates, not photographs, and pretending otherwise in the alt attribute
+ * would be exactly the sort of decorative-alt noise the brief is trying to
+ * remove from the old site.
+ */
+const galleryItems: readonly GalleryItem[] = [
+  { src: placeholder01, alt: "Placeholder plate one", caption: "Caption one" },
+  { src: placeholder02, alt: "Placeholder plate two" },
+  { src: placeholder03, alt: "Placeholder plate three", caption: "Caption three" },
+  { src: placeholder04, alt: "Placeholder plate four" },
+  { src: placeholder05, alt: "Placeholder plate five", caption: "Caption five" },
+  { src: placeholder06, alt: "Placeholder plate six" },
+];
+---
+
+<BaseLayout
+  title="Component library — williamlay.co.uk"
+  description="Preview harness for the site's component library. Placeholder content throughout."
+  noindex
+>
+  {
+    /*
+     * `activeNavId` is a required prop on AppShell (no optional-friendly
+     * fallback to omit it from here) — checked directly on AppShell.astro's
+     * Props interface before making this call. Passing "about" would have
+     * marked the "about.md" row's <a> aria-current="page" even though this
+     * route is served at /components/, which is exactly the false claim
+     * flagged in review: a screen-reader user would be told the About page
+     * is "the current page" while reading the component-library preview.
+     *
+     * "harness" matches no id in src/data/nav.ts's NAV array (about,
+     * experience, toolbox, certs, writing, contact), so Nav.astro's
+     * `entry.id === activeId` check never matches and no row gets
+     * aria-current. Deliberately not reusing a real-looking word like
+     * "components" for the sentinel: NAV could grow a row with that id one
+     * day and silently reintroduce the bug this exists to avoid.
+     *
+     * Consequence, accepted: this harness no longer demonstrates the nav's
+     * active-row (aria-current + --statusbar-blue marker) state. Nothing
+     * else on the page exercises it either. If that coverage gap matters,
+     * it needs a real route with a real active id, not a workaround here.
+     */
+  }
+  <AppShell
+    activeNavId="harness"
+    breadcrumb={["william-lay", "components", "## Component library"]}
+    outline={outline}
+    activeOutlineId="buttons"
+  >
+    <Section title="Component library" level={1} id="intro">
+      <p class="lede">
+        Every component in the library, at every variant, with placeholder
+        content throughout. Nothing here is real copy — see issue #28.
+      </p>
+    </Section>
+
+    <Section title="Buttons" level={2} id="buttons">
+      <p>
+        Primary and secondary are distinguished by fill versus outline, not by
+        colour alone.
+      </p>
+      <div class="row">
+        <Button href="https://www.linkedin.com/" icon="simple-icons:linkedin" external>
+          Connect on LinkedIn
+        </Button>
+        <Button
+          href="https://github.com/laywill"
+          variant="secondary"
+          icon="lucide:download"
+          external
+        >
+          Download CV
+        </Button>
+        {
+          /* `download` variant coverage: both real CTAs above use `external`
+          (they leave the site), so this is the only place `download` is
+          exercised. A same-origin download would not also set
+          target="_blank" in real use — pairing it with `external` here too
+          would exercise both attributes on one link but misrepresent how
+          the prop is actually meant to be used, so this is `download` alone.
+
+          It points at the favicon rather than a plausible-looking
+          placeholder-cv.pdf for two reasons: the file has to actually exist
+          or the internal link check fails on it, and `download` is ignored
+          entirely on a cross-origin URL - so a link to the real CV release
+          asset would demonstrate the prop doing nothing. The real CV link
+          lives on the landing page (#28) and is cross-origin, which is worth
+          remembering when that button is built. */
+        }
+        <Button href="/favicon.svg" variant="secondary" icon="lucide:download" download>
+          Download variant (demo)
+        </Button>
+      </div>
+    </Section>
+
+    <Section title="Tags" level={2} id="tags">
+      <p>
+        Tag pills carry their domain as colour, but never as colour alone — the
+        row label in the toolbox below names each category in text.
+      </p>
+      <ul class="row row--plain">
+        <Tag as="li" accent="blue" icon="simple-icons:typescript">TypeScript</Tag>
+        <Tag as="li" accent="teal" icon="simple-icons:kubernetes">Kubernetes</Tag>
+        <Tag as="li" accent="yellow" icon="simple-icons:githubactions">Actions</Tag>
+        <Tag as="li" accent="orange" quoted>pair programming</Tag>
+        {
+          /* lightblue and green complete the accent set (src/lib/accents.ts)
+          — neither has a real toolbox row in this harness's placeholder
+          data, so they're demonstrated directly rather than left untested. */
+        }
+        <Tag as="li" accent="lightblue" icon="lucide:tag">lightblue demo</Tag>
+        <Tag as="li" accent="green" icon="lucide:git-branch">green demo</Tag>
+      </ul>
+    </Section>
+
+    <Section title="Callouts" level={2} id="callouts">
+      <div class="stack">
+        <Callout type="info" title="Currently">
+          <p>Placeholder body copy for the informational callout.</p>
+        </Callout>
+        <Callout type="tip" title="Fast path">
+          <p>Placeholder body copy for the tip callout.</p>
+        </Callout>
+      </div>
+    </Section>
+
+    <Section title="Terminal" level={2} id="terminal">
+      <Terminal lines={terminalLines} />
+      <Terminal title="bash — cursor demo" lines={staticCursorLines} cursor={false} class="cursor-demo" />
+    </Section>
+
+    <Section title="Panes" level={2} id="panes">
+      <SplitPanes>
+        <Pane slot="left" file="experience.ts" status="git log --graph" accent="teal">
+          <h3 id="career">Career graph</h3>
+          <CareerGraph headingLevel={4} />
+        </Pane>
+        <div slot="right" class="stack">
+          <Pane file="toolbox.json" status="4 categories" accent="yellow">
+            <h3 id="toolbox">Toolbox</h3>
+            <IconGrid />
+          </Pane>
+          <Pane file="certs.json" status="placeholder" accent="yellow">
+            <h3 id="certifications">Certifications</h3>
+            <CertBadges />
+          </Pane>
+        </div>
+      </SplitPanes>
+    </Section>
+
+    <Section title="Images and gallery" level={2} id="media">
+      <p>
+        A single responsive image, then the gallery. The gallery's grid
+        renditions are small; the full-size rendition is fetched only when the
+        lightbox opens.
+      </p>
+      <ResponsiveImage
+        src={placeholder01}
+        alt="Placeholder plate one, shown at full content width"
+        sizes="(min-width: 900px) 60ch, 100vw"
+        class="single"
+      />
+      <Gallery id="demo" items={galleryItems} />
+    </Section>
+
+    {
+      /*
+       * This untitled `Section` (the <div> branch — see Section.astro's
+       * file-level comment) doubles as coverage for two things review
+       * flagged as never exercised anywhere on this page:
+       *
+       *   - `Section` with no `title` at all. Every other Section above
+       *     supplies one, so this is the only place the div branch (no
+       *     phantom landmark) ever renders.
+       *   - `Pane`'s `headingLevel` prop. Every Pane above omits it, which
+       *     is the *decorative*, aria-hidden header branch. This is the
+       *     only Pane on the page whose filename header is a real heading
+       *     instead — and, by also omitting `accent`, it covers that
+       *     prop's "lightblue" default at the same time.
+       *
+       * This Section renders no landmark of its own, but the Pane inside
+       * it still adds one real heading to the page. Placed last, after
+       * "Images and gallery" (h2), a further h2 here is a sibling, not a
+       * skip — see the heading-hierarchy note in this page's own top
+       * comment expectations (h1 -> h2x5 -> h3 -> h4x4 -> h3 -> h3 -> h2,
+       * now with one more h2 on the end).
+       *
+       * Not added to `outline` above: like the career-graph's h4 role
+       * headings, this is coverage-only rather than a navigable section of
+       * the page, so the in-page table of contents does not need to
+       * mirror it.
+       */
+    }
+    <Section id="variants">
+      <Pane file="variants.json" status="headingLevel demo" headingLevel={2}>
+        <p>
+          Placeholder body for Pane&rsquo;s <code>headingLevel</code> prop:
+          the filename above renders as a real, accessible heading here,
+          not the decorative, aria-hidden header every other Pane on this
+          page uses.
+        </p>
+      </Pane>
+    </Section>
+  </AppShell>
+</BaseLayout>
+
+<style>
+  /*
+   * Harness-only layout. These rules exist to space the demonstrations apart
+   * and belong to this page, not to the library — a component that needed
+   * them to look right would be an incomplete component.
+   */
+  .lede {
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-relaxed);
+    max-width: var(--measure);
+  }
+
+  p {
+    max-width: var(--measure);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    align-items: center;
+  }
+
+  .row--plain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  h3 {
+    font-family: var(--font-body);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-tight);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .single {
+    margin-block: var(--space-md);
+  }
+
+  .cursor-demo {
+    margin-block-start: var(--space-md);
+  }
+</style>
