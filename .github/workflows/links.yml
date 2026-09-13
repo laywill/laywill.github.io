@@ -107,9 +107,11 @@ jobs:
       # --host-stats      Names the slow host. It has never printed before,
       #                   because every failing run was killed first.
       - name: Check external links
+        timeout-minutes: 3
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
         with:
           args: >-
+            --verbose
             --no-progress
             --accept 200..=299,999
             --max-concurrency 8
