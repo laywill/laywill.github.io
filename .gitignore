@@ -20,8 +20,6 @@ venv/
 
 # Ignore Claude Code config files
 .claude/
-# Ignore Claude Code instructions file
-CLAUDE.md
 
 ### v2 build artefacts ###
 
