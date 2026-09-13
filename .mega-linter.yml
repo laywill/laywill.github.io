@@ -84,11 +84,21 @@ ACTION_ZIZMOR_ARGUMENTS: '--no-online-audits'
 # JSON Configuration
 # --comments          .devcontainer/devcontainer.json and .vscode/settings.json
 #                     are JSONC
-# --trailing-commas   .cspell.json has one
+# --trailing-commas   .vscode/settings.json has one
 JSON_JSONLINT_ARGUMENTS: '--comments --trailing-newline --trailing-commas'
 
 # CSpell Config
-SPELL_CSPELL_FILTER_REGEX_EXCLUDE: '(\.cspell\.json|\.gitignore)'
+#
+# .cspell.json is strict JSON on purpose. MegaLinter's cspell descriptor reads
+# it with Python's json module to build the "proposed .cspell.json" block of the
+# text report, and that parser rejects comments, so a JSONC config makes every
+# run log a spurious "Unable to parse .cspell.json JSON data" error. The word
+# list therefore lives in .cspell/project-words.txt, a cspell dictionary file,
+# where "#" comments can explain what each group of words is for (#91).
+#
+# Neither file is worth spell checking: one is a list of deliberate oddities and
+# the other is the dictionary that defines them, so checking it is circular.
+SPELL_CSPELL_FILTER_REGEX_EXCLUDE: '(\.cspell\.json|\.cspell/|\.gitignore)'
 
 # Filter Configuration
 #

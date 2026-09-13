@@ -6,8 +6,3 @@
 # .mega-linter.yml for the matching SPELL_LYCHEE_ARGUMENTS note.
 unsplash\.com
 pexels\.com
-
-# TEMPORARY - remove in #75. robots.txt (added in #64) points at the live
-# sitemap.xml, which 404s until a v* tag deploys it; static.yml publishes on
-# tags only, not on merge. Anchored so only this exact URL is skipped.
-^https://williamlay\.co\.uk/sitemap\.xml$
