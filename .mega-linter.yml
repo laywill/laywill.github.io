@@ -25,7 +25,7 @@ FILEIO_REPORTER: false
 ENABLE:
   - ACTION       # GitHub Actions workflow linting (actionlint, zizmor)
   - CSS          # assets/sass/ - see .stylelintrc.json and .stylelintignore
-  - HTML         # The six pages that are the site
+  - HTML         # The 15 pages that are the site
   - JAVASCRIPT   # assets/js/main.js and assets/js/util.js
   - JSON         # .cspell.json, .vscode/, .devcontainer/
   - REPOSITORY   # Secret scanning and repo-level checks
@@ -45,36 +45,21 @@ DISABLE_LINTERS:
   # dependency-confusion check adds nothing over osv-scanner and grype for a
   # project whose only dependency is sass.
   - REPOSITORY_DUSTILOCK
-
-# Lychee findings block the run like any other linter here. unsplash.com's
-# bot-rejection status codes are excluded via .lycheeignore (see that file)
-# rather than accepted globally, so a real broken link still fails the build.
-SPELL_LYCHEE_DISABLE_ERRORS: false
-
-# A healthy run takes seconds. If it's not healthy, we'd rather know in 90s
-# than have CI sit on it for the old 10-minute cap (#74).
-SPELL_LYCHEE_TIMEOUT_SECONDS: 90
-
-# --accept 999   LinkedIn answers unauthenticated bots with HTTP 999, which is
-#                not a broken link. --accept is global (lychee has no
-#                per-domain accept), but every LinkedIn link here is the same
-#                footer/nav profile link, not a page whose content we're
-#                otherwise verifying, so accepting 999 everywhere is low-risk
-#                in a way blanket-accepting unsplash.com's codes was not.
-# --max-retries 8 --retry-wait-time 1 --timeout 3
-#                More retries than lychee's default (3), spaced closer
-#                together (1s base backoff, 3s per-request timeout instead of
-#                20s) - a flaky link gets more chances, but each chance is
-#                cheap, so the total still lands well inside the 90s backstop.
-#                429 is deliberately NOT accepted: it means the request was
-#                never checked, not that the link works, so accepting it
-#                would pass a broken link on any host that throttles us. A
-#                throttled run fails fast and names the URL; re-run it.
-# --host-stats   Names the slow host when a run is slow but completes.
-SPELL_LYCHEE_ARGUMENTS: '--accept 200..=299,999 --max-retries 8 --retry-wait-time 1 --timeout 3 --host-stats'
-
-# package-lock.json's registry tarball and funding URLs aren't site content.
-SPELL_LYCHEE_FILTER_REGEX_EXCLUDE: '(^|/)package-lock\.json$'
+  # Link checking moved to .github/workflows/links.yml in #80. It is not
+  # disabled because link rot stopped mattering; it is disabled because
+  # MegaLinter is the wrong host for it. MegaLinter buffers linter stdout and
+  # prints it on completion, so when lychee was killed at
+  # SPELL_LYCHEE_TIMEOUT_SECONDS the output went with it - every failing run
+  # reported a bare timeout and --host-stats never printed once. The dedicated
+  # workflow also gets a GitHub token through to lychee (github.com is most of
+  # this site's external links, and anonymous checks are capped at 60/hr per
+  # shared runner IP), caches results between runs, and re-runs in seconds
+  # rather than re-pulling MegaLinter's image for ~2m30s first.
+  #
+  # If you are re-enabling this: don't. Change links.yml instead. Twice now
+  # (#74, then #80) the lychee settings here have been altered by a PR about
+  # something else entirely and nobody noticed until CI jammed.
+  - SPELL_LYCHEE
 
 # Zizmor's "artipacked" audit calls the GitHub API to resolve pinned action SHAs.
 # In CI that runs with a repo-scoped GITHUB_TOKEN, which the API rejects for
@@ -122,4 +107,4 @@ SPELL_CSPELL_FILTER_REGEX_EXCLUDE: '(\.cspell\.json|\.cspell/|\.gitignore)'
 # 3. Not source at all. Binary assets, the PDF CV, MegaLinter's own reports, the
 #    Google site-verification stub (which is deliberately not valid HTML), and
 #    the Astro build output and worktrees that share this working directory.
-FILTER_REGEX_EXCLUDE: '(^|/)(\.git|\.venv|\.claude|\.pytest_cache|node_modules|dist|\.astro|images|docs|megalinter-reports)/|^assets/js/(jquery\.min|jquery\.scrollex\.min|jquery\.scrolly\.min|skel\.min)\.js$|^assets/css/(main|font-awesome\.min)\.css$|^LICENSE\.txt$|^google[0-9a-f]+\.html$'
+FILTER_REGEX_EXCLUDE: '(^|/)(\.git|\.venv|\.claude|\.pytest_cache|node_modules|dist|\.astro|images|docs|megalinter-reports)/|^assets/js/(jquery\.min|jquery\.scrollex\.min|jquery\.scrolly\.min|skel\.min)\.js$|^assets/css/(main|font-awesome\.min)\.css$|^LICENSE\.txt$|^google[0-9a-f]+\.html$|^\.lycheecache$'

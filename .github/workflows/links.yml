@@ -1,0 +1,141 @@
+---
+name: Links
+
+# Link checking for the v1 site. This used to run as `SPELL_LYCHEE` inside
+# MegaLinter; it moved here in #80 because MegaLinter is the wrong host for it:
+#
+#  - MegaLinter buffers linter stdout and prints it on completion, so when
+#    lychee was killed at its timeout the output was discarded. Ten-plus failed
+#    runs produced no diagnostic information at all and `--host-stats` never
+#    once printed.
+#  - Re-running a flaky link check meant re-running MegaLinter, which spends
+#    ~2m30s pulling its Docker image before linting starts. This job takes
+#    seconds, so a genuine rate-limit trip is cheap to retry.
+#  - lychee-action passes a GitHub token through to lychee, which routes
+#    github.com links via the API (1,000 req/hr/repo) instead of anonymous HTTP
+#    (60 req/hr per IP, shared across all runners). Most of this site's external
+#    links are github.com, so that was the single largest source of throttling.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: links-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  links:
+    name: Link Check
+    runs-on: ubuntu-latest
+
+    # A healthy run is a few seconds. This is a backstop against a hang, not a
+    # budget: the linter arguments below are what actually bound the runtime.
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Pass 1: in-repo links only. --offline blocks all network access, so this
+      # can never be rate limited and is never cached - every run verifies the
+      # relative links and #fragments against the files actually on disk.
+      # --include-fragments also resolves #anchors, so a link to a heading or
+      # section id that no longer exists is caught too.
+      #
+      # There is no tracked Markdown on `master` today, so '*.md' logs a
+      # harmless "No files found for this input source" warning. It is listed
+      # anyway so that the first README or doc added here is link-checked
+      # without anyone having to remember to come back and add it.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
+        with:
+          args: >-
+            --offline
+            --include-fragments
+            --no-progress
+            '*.html' '*.md' llms.txt robots.txt sitemap.xml
+          output: lychee/internal.md
+
+      # Pass 2 restores this; pass 1 deliberately runs before it, so a broken
+      # in-repo link fails without spending any network time at all.
+      - name: Restore lychee cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            lychee-${{ runner.os }}-
+
+      # Pass 2: external links.
+      #
+      # --max-retries 1   The fix for #80. --timeout bounds a single request; it
+      #                   does NOT bound the exponential backoff between
+      #                   attempts, which lychee caps at ~60s each. The old
+      #                   `--max-retries 8` therefore let one throttled host
+      #                   stall a single URL for ~500s. Not 0, so a genuine
+      #                   transient blip still gets one more chance.
+      # --timeout 15      3s was aggressive enough to manufacture failures,
+      #                   which then consumed the (much larger) retry budget.
+      # --max-concurrency 8
+      #                   Default is 128. This site has ~45 unique external
+      #                   URLs; firing them at once from a shared runner IP is
+      #                   what trips per-IP throttles. At 8 the run still
+      #                   finishes in seconds.
+      # --cache --max-cache-age 1d
+      #                   External links change slowly. Note 1d is already the
+      #                   default; it is spelled out because it is a deliberate
+      #                   choice, not an accident.
+      # --cache-exclude-status
+      #                   Without this a throttled 429 is written to the cache,
+      #                   so re-running replays the throttle instead of actually
+      #                   re-checking. 429 is still NOT accepted as success (see
+      #                   #74): it means the link was never checked.
+      # --accept 999      LinkedIn answers unauthenticated bots with HTTP 999,
+      #                   which is not a broken link.
+      # --host-stats      Names the slow host. It has never printed before,
+      #                   because every failing run was killed first.
+      # timeout-minutes bounds the step rather than the job, so a stall fails
+      # this step and still lets the cache-save step below run. If it ever does
+      # stall: add --verbose to the args and re-run. lychee-action writes its
+      # report to a file at the end, so without --verbose a killed run reports
+      # nothing at all - that blindness is what made #74/#80 take so long to
+      # diagnose. Run 34786169023 was the first time the output survived, and
+      # it named both offending hosts immediately.
+      - name: Check external links
+        timeout-minutes: 3
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
+        with:
+          args: >-
+            --no-progress
+            --accept 200..=299,999
+            --max-concurrency 8
+            --max-retries 1
+            --retry-wait-time 2
+            --timeout 15
+            --cache
+            --max-cache-age 1d
+            --cache-exclude-status 429,500..599
+            --host-stats
+            '*.html' '*.md' llms.txt robots.txt sitemap.xml
+          output: lychee/external.md
+
+      # always(), so the links that did verify are still cached when a later one
+      # fails; the retry then only re-checks what actually needs re-checking.
+      - name: Save lychee cache
+        if: always()
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: .lycheecache
+          key: lychee-${{ runner.os }}-${{ github.run_id }}
