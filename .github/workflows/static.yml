@@ -40,6 +40,13 @@ jobs:
       - name: Assemble site artifact
         # Allowlist only what the site actually serves - repo tooling,
         # lint/CI config, sass sources and dotfiles must never be published.
+        #
+        # Adding a served file means adding it here too. Nothing derives
+        # this list from the rest of the tooling, so a file can be linted
+        # and link-checked on every PR - links.yml reads '*.html', llms.txt,
+        # robots.txt and sitemap.xml straight from the repo - and still 404
+        # in production simply by being absent below. That is what happened
+        # to llms.txt (#99).
         run: |
           set -euo pipefail
           mkdir -p _site/assets/css
@@ -48,7 +55,7 @@ jobs:
              engineer-firmware.html leader.html photographer.html prod_tech.html \
              bellringing.html cars.html coffee.html travel.html \
              terms-and-conditions.html under_construction.html sitemap.html \
-             sitemap.xml robots.txt \
+             llms.txt sitemap.xml robots.txt \
              CNAME google519c92453ea72bf0.html _site/
 
           cp assets/css/main.css assets/css/font-awesome.min.css _site/assets/css/
