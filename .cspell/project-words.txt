@@ -43,9 +43,11 @@ Selex
 Sennheiser
 tlnp
 
-# The 2017 stack: skel breakpoint names, jQuery plugins, Sass
+# The 2017 stack: skel breakpoint names, jQuery plugins, Sass, and the
+# browser-rendering vocabulary the JS comments explain it with
 jquery
 MSIE
+recalc
 sass
 scrollex
 scrolly
