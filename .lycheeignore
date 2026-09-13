@@ -1,8 +1,29 @@
-# Unsplash and Pexels both blanket-reject unauthenticated/bot traffic on
-# these photo/photographer-credit links (401/403 depending on the request),
-# which is not a broken link. lychee's --accept is global, not per-domain, so
-# the only way to stop that from masking a real break elsewhere is to skip
-# checking these domains rather than accept the code everywhere. See
-# .github/workflows/links.yml for the matching --accept note.
+# Hosts that cannot be checked from CI, and why.
+#
+# Every entry here is a host that refuses unauthenticated or datacenter
+# traffic, not a link that is broken. lychee's --accept is global rather than
+# per-domain, so accepting these status codes would accept them everywhere and
+# mask a genuine break on some other host. Skipping the domain is the only
+# per-domain lever lychee offers. See .github/workflows/links.yml for the
+# matching --accept note.
+#
+# Before adding a host here, confirm it is actually unreachable from a GitHub
+# runner rather than merely slow - compare a local `curl -w %{time_total}`
+# against the CI log. Slow is a --timeout problem; blocked is this file.
+
+# Unsplash and Pexels blanket-reject unauthenticated/bot traffic on these
+# photo/photographer-credit links (401/403 depending on the request).
 unsplash\.com
 pexels\.com
+
+# Instagram answers unauthenticated datacenter traffic with 429 and then
+# redirect-loops to /accounts/login (10+ hops observed in run 34786169023).
+# 429 is deliberately not accepted globally - see #74 - because it means the
+# link was never checked, so the domain is skipped instead.
+instagram\.com
+
+# bb.ringingworld.co.uk responds in ~0.54s from a UK connection but never
+# answers a GitHub runner at all: [TIMEOUT] on every attempt in run
+# 34786169023, at a 15s timeout. That is a cloud/geo block, not slowness, so
+# no timeout value would fix it. The links are correct; check them locally.
+bb\.ringingworld\.co\.uk

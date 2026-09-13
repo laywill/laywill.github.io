@@ -106,12 +106,18 @@ jobs:
       #                   which is not a broken link.
       # --host-stats      Names the slow host. It has never printed before,
       #                   because every failing run was killed first.
+      # timeout-minutes bounds the step rather than the job, so a stall fails
+      # this step and still lets the cache-save step below run. If it ever does
+      # stall: add --verbose to the args and re-run. lychee-action writes its
+      # report to a file at the end, so without --verbose a killed run reports
+      # nothing at all - that blindness is what made #74/#80 take so long to
+      # diagnose. Run 34786169023 was the first time the output survived, and
+      # it named both offending hosts immediately.
       - name: Check external links
         timeout-minutes: 3
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
         with:
           args: >-
-            --verbose
             --no-progress
             --accept 200..=299,999
             --max-concurrency 8
