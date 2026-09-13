@@ -230,11 +230,15 @@
     $wrapper.children()
       .scrollex(scrollexOptions(0))
 
-    // Items.
+    // Items. The .inner wrapper the fade targets is authored into the markup
+    // rather than built here with wrapInner (#103). Created in this ready
+    // callback it did not exist at first paint, so the CSS rule hiding
+    // `.items.onscroll-fade-in > * > .inner` matched nothing and the grid
+    // painted at full opacity, blanked when wrapInner ran, then faded - the
+    // #85 flash a fourth component over. Authored markup lets the same
+    // body.is-loading gate as banner, spotlight and gallery cover first paint.
     $('.items')
       .scrollex(scrollexOptions(50))
-      .children()
-      .wrapInner('<div class="inner"></div>')
 
     // Gallery.
     $('.gallery')
