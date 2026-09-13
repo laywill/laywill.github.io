@@ -3,6 +3,6 @@
 # which is not a broken link. lychee's --accept is global, not per-domain, so
 # the only way to stop that from masking a real break elsewhere is to skip
 # checking these domains rather than accept the code everywhere. See
-# .mega-linter.yml for the matching SPELL_LYCHEE_ARGUMENTS note.
+# .github/workflows/links.yml for the matching --accept note.
 unsplash\.com
 pexels\.com
