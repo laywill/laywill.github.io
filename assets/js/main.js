@@ -20,12 +20,99 @@
     const $body = $('body')
     const $wrapper = $('#wrapper')
 
-    // Disable animations/transitions until the page has loaded.
-    $body.addClass('is-loading')
+    // body.is-loading disables animations/transitions and hides the banner's
+    // load-in targets. It is applied by an inline script at the top of every
+    // page's <body>, before the banner is parsed, so the banner is never painted
+    // visible. Adding it here instead ran after the first paint, so the banner
+    // flashed up, snapped to hidden, then faded in (#85). Leaving it to the
+    // markup also means that with JavaScript unavailable the class is never
+    // added, so the banner stays visible rather than being hidden for good by
+    // CSS that nothing will ever remove.
+
+    // jquery.scrollex evaluates an element on 'scroll', and once more from a
+    // synthetic scroll it fires in its own window 'load' handler. Nothing
+    // re-measures when the layout settles after that. Since each registration
+    // below adds is-inactive in its initialize callback, and the handler only
+    // touches the class when the computed state changes, a section that
+    // measures as out of view during that single evaluation stays hidden until
+    // a real scroll happens.
+    //
+    // At the top of a page that is invisible - everything below the fold is
+    // meant to be inactive, and the first scroll corrects it. Reload part-way
+    // down and the sections being looked at never come back (#87).
+    //
+    // Two ways the single evaluation misses: scrollex binds its 'load' handler
+    // when its own script runs, while registration happens in this async ready
+    // callback, so the synthetic scroll can fire against an empty registry;
+    // and loading="lazy" images do not block 'load', so sections holding them
+    // can still be mid-reflow when it does fire.
+    const refreshScrollex = function () {
+      // body.is-loading suppresses every transition on the page, so revealing
+      // a section while it is still set snaps that section into place instead
+      // of fading it. Hold off until the class is gone; clearLoading runs this
+      // again at that point, and scrollex re-measures from scratch each time.
+      if ($body.hasClass('is-loading')) { return }
+
+      $window.trigger('scroll')
+    }
+
+    // The guard above only covers the triggers this file makes. scrollex binds
+    // its own window 'load' handler when its script tag runs, which is before
+    // this ready callback exists, so the synthetic scroll it fires there always
+    // evaluates ahead of clearLoading's timeout below - at delay 0 for wrapper
+    // children, 50ms for items and galleries, against clearLoading's 100ms.
+    //
+    // Anything measuring as in view at that point - reload part-way down with a
+    // warm cache and the restored scroll position makes that likely - had
+    // is-inactive taken off it while `body.is-loading *` still forced
+    // transition: none, so it snapped in rather than fading. scrollex latches
+    // state and only acts on a change, so enter never fired again to correct
+    // it (#88).
+    //
+    // No trigger-side guard can fix that, because the trigger is not ours.
+    // Gate the reveal itself: hold it while the class is set, and let
+    // clearLoading release it once transitions are live again.
+    const pendingReveals = []
+
+    const reveal = function (element) {
+      if ($body.hasClass('is-loading')) {
+        if (pendingReveals.indexOf(element) === -1) { pendingReveals.push(element) }
+
+        return
+      }
+
+      $(element).removeClass('is-inactive')
+    }
+
+    const cancelReveal = function (element) {
+      const i = pendingReveals.indexOf(element)
+
+      if (i !== -1) { pendingReveals.splice(i, 1) }
+    }
 
     const clearLoading = function () {
       window.setTimeout(function () {
         $body.removeClass('is-loading')
+
+        // Read a layout property to settle that class removal in a style recalc
+        // of its own, before the reveals below. Belt and braces rather than a
+        // fix for a known failure: CSS Transitions decides whether to run from
+        // the after-change style, so a before-change style still saying
+        // transition: none does not suppress the fade, and the banner proves it
+        // - the same single class removal both restores its transition and
+        // changes its opacity, and it fades. Kept because one forced layout per
+        // page load is cheap and the ordering it guarantees is what the reveals
+        // below assume.
+        $body.prop('offsetHeight')
+
+        // Reveals scrollex asked for too early, now that they will fade.
+        while (pendingReveals.length) { $(pendingReveals.shift()).removeClass('is-inactive') }
+
+        // Only now can scroll-triggered sections be revealed with their fade
+        // intact, so this is where the first real evaluation happens. It also
+        // re-measures after any reflow that is not an image - late webfonts,
+        // restored scroll position.
+        refreshScrollex()
       }, 100)
     }
 
@@ -33,7 +120,7 @@
     // 'load' event can fire before this handler is bound - and jQuery does not
     // replay an event that has already fired. Left unhandled, body.is-loading
     // is never removed, and the stylesheet's
-    // `body.is-loading .banner.onload-image-fade-in .image img { opacity: 0 }`
+    // `body.is-loading .banner.onload-image-fade-in .image { opacity: 0 }`
     // keeps the hero image invisible for good.
     if (document.readyState === 'complete') {
       clearLoading()
@@ -111,11 +198,14 @@
     $('.smooth-scroll').scrolly()
     $('.smooth-scroll-middle').scrolly({ anchor: 'middle' })
 
-    // Wrapper.
-    $wrapper.children()
-      .scrollex({
+    // Every registration below wants the same behaviour and differs only in
+    // delay: hide on registration, reveal once in view, and re-hide on the way
+    // out for the elements that opt into it.
+    const scrollexOptions = function (delay) {
+      return {
         top: '30vh',
         bottom: '30vh',
+        delay,
         initialize: function () {
           $(this).addClass('is-inactive')
         },
@@ -123,36 +213,26 @@
           $(this).removeClass('is-inactive')
         },
         enter: function () {
-          $(this).removeClass('is-inactive')
+          reveal(this)
         },
         leave: function () {
           const $this = $(this)
 
-          if ($this.hasClass('onscroll-bidirectional')) { $this.addClass('is-inactive') }
+          if ($this.hasClass('onscroll-bidirectional')) {
+            cancelReveal(this)
+            $this.addClass('is-inactive')
+          }
         }
-      })
+      }
+    }
+
+    // Wrapper.
+    $wrapper.children()
+      .scrollex(scrollexOptions(0))
 
     // Items.
     $('.items')
-      .scrollex({
-        top: '30vh',
-        bottom: '30vh',
-        delay: 50,
-        initialize: function () {
-          $(this).addClass('is-inactive')
-        },
-        terminate: function () {
-          $(this).removeClass('is-inactive')
-        },
-        enter: function () {
-          $(this).removeClass('is-inactive')
-        },
-        leave: function () {
-          const $this = $(this)
-
-          if ($this.hasClass('onscroll-bidirectional')) { $this.addClass('is-inactive') }
-        }
-      })
+      .scrollex(scrollexOptions(50))
       .children()
       .wrapInner('<div class="inner"></div>')
 
@@ -160,29 +240,20 @@
     $('.gallery')
       .wrapInner('<div class="inner"></div>')
       .prepend(skel.vars.mobile ? '' : '<div class="forward"></div><div class="backward"></div>')
-      .scrollex({
-        top: '30vh',
-        bottom: '30vh',
-        delay: 50,
-        initialize: function () {
-          $(this).addClass('is-inactive')
-        },
-        terminate: function () {
-          $(this).removeClass('is-inactive')
-        },
-        enter: function () {
-          $(this).removeClass('is-inactive')
-        },
-        leave: function () {
-          const $this = $(this)
-
-          if ($this.hasClass('onscroll-bidirectional')) { $this.addClass('is-inactive') }
-        }
-      })
+      .scrollex(scrollexOptions(50))
       .children('.inner')
       .css('overflow-y', skel.vars.mobile ? 'visible' : 'hidden')
       .css('overflow-x', skel.vars.mobile ? 'scroll' : 'hidden')
       .scrollLeft(0)
+
+    // Re-measure as each image settles the layout it is measured against,
+    // rather than trusting scrollex's one synthetic scroll. No evaluation is
+    // kicked off here: body.is-loading is still set for everything registered
+    // above, so refreshScrollex would decline anyway. Images already in the
+    // cache are complete before this binds and need no handler.
+    $('img').each(function () {
+      if (!this.complete) { $(this).one('load error', refreshScrollex) }
+    })
 
     $('.gallery')
       .on('wheel', '.inner', function (event) {

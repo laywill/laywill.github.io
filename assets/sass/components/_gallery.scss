@@ -19,25 +19,37 @@
 				}
 
 				@else if ($event == 'scroll') {
-					$x: '&.is-inactive';
+					// Two hiding selectors, not one. is-inactive is added by scrollex's
+					// initialize, which runs inside main.js's ready callback - after the
+					// browser's first paint - so on its own it lets these sections paint at
+					// full opacity for one frame and then blank (#92; the #85 flash, one
+					// component over). body.is-loading is set pre-paint by the inline script
+					// at the top of every <body>, so it covers that first frame, and
+					// is-inactive has landed long before clearLoading removes it at load +
+					// 100ms - no frame has neither class hiding the element. The load event
+					// needs no equivalent: body.is-loading is already its only hiding class.
+					$x: '&.is-inactive, body.is-loading &';
 					$y: _duration(on-scroll);
 				}
 
 				&.on#{$event}-fade-in {
 					article {
+						// Fades the .image container, not the img inside it. The container
+						// carries a placeholder tint (see color-gallery), so fading only the
+						// img leaves that tint painted at full opacity in the first frame and
+						// cross-fades the photo over it - a grey tile where the thumbnail
+						// should be (#89). Fading the container takes tint and photo up
+						// together as one unit. This matches what banner and spotlight
+						// already do; this file was missed by 87778b5 when they were fixed.
 						.image {
-							img {
-								@include vendor('transition', 'opacity #{$y} ease-in-out');
-								@include vendor('transition-delay', '#{_misc(gallery-limit) * _duration(gallery-delay)}');
-							}
+							@include vendor('transition', 'opacity #{$y} ease-in-out');
+							@include vendor('transition-delay', '#{_misc(gallery-limit) * _duration(gallery-delay)}');
 						}
 
 						@for $i from 0 through _misc(gallery-limit) {
 							&:nth-child(#{$i + 1}) {
 								.image {
-									img {
-										@include vendor('transition-delay', '#{$i * _duration(gallery-delay)}');
-									}
+									@include vendor('transition-delay', '#{$i * _duration(gallery-delay)}');
 								}
 							}
 						}
@@ -46,9 +58,7 @@
 					#{$x} {
 						article {
 							.image {
-								img {
-									opacity: 0;
-								}
+								opacity: 0;
 							}
 						}
 					}

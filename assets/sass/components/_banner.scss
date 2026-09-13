@@ -19,7 +19,16 @@
 				}
 
 				@else if ($event == 'scroll') {
-					$x: '&.is-inactive';
+					// Two hiding selectors, not one. is-inactive is added by scrollex's
+					// initialize, which runs inside main.js's ready callback - after the
+					// browser's first paint - so on its own it lets these sections paint at
+					// full opacity for one frame and then blank (#92; the #85 flash, one
+					// component over). body.is-loading is set pre-paint by the inline script
+					// at the top of every <body>, so it covers that first frame, and
+					// is-inactive has landed long before clearLoading removes it at load +
+					// 100ms - no frame has neither class hiding the element. The load event
+					// needs no equivalent: body.is-loading is already its only hiding class.
+					$x: '&.is-inactive, body.is-loading &';
 					$y: _duration(on-scroll);
 				}
 
@@ -209,18 +218,22 @@
 						}
 					}
 
+					// Fades the .image container, not the img inside it. The container
+					// carries a placeholder tint (see color-banner/color-spotlight), so
+					// fading only the img leaves that tint painted at full opacity in the
+					// first frame and cross-fades the photo over it - a grey block, or on
+					// the circular style3 hero a grey disc (#85). Fading the container
+					// takes tint and photo up together as one unit. Both are deliberately
+					// not faded at once: their alphas would multiply, giving a sluggish
+					// non-linear start that does not match the content fade.
 					&.on#{$event}-image-fade-in {
 						.image {
-							img {
-								@include vendor('transition', 'opacity #{$y} ease-in-out');
-							}
+							@include vendor('transition', 'opacity #{$y} ease-in-out');
 						}
 
 						#{$x} {
 							.image {
-								img {
-									opacity: 0;
-								}
+								opacity: 0;
 							}
 						}
 					}
