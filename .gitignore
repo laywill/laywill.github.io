@@ -7,6 +7,10 @@ lighthouse-reports/
 # Ignore MegaLinter local run output
 megalinter-reports/
 
+### lychee ###
+# Ignore the lychee link-check cache (see .github/workflows/links.yml)
+.lycheecache
+
 ### Python ###
 # Ignore virtual environments
 venv/
