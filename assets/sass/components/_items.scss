@@ -19,7 +19,19 @@
 				}
 
 				@else if ($event == 'scroll') {
-					$x: '&.is-inactive';
+					// Two hiding selectors, not one. is-inactive is added by scrollex's
+					// initialize, which runs inside main.js's ready callback - after the
+					// browser's first paint - so on its own it lets these sections paint at
+					// full opacity for one frame and then blank (#92; the #85 flash, one
+					// component over). body.is-loading is set pre-paint by the inline script
+					// at the top of every <body>, so it covers that first frame, and
+					// is-inactive has landed long before clearLoading removes it at load +
+					// 100ms - no frame has neither class hiding the element. The load event
+					// needs no equivalent: body.is-loading is already its only hiding class.
+					// This one lagged the other three until #103 moved the .inner wrapper
+					// these rules target out of main.js's wrapInner and into the markup, so
+					// there is something for body.is-loading to hide at first paint.
+					$x: '&.is-inactive, body.is-loading &';
 					$y: _duration(on-scroll);
 				}
 
