@@ -1,6 +1,5 @@
 {
     "files.associations": {
-        ".cspell.json": "jsonc",
         ".vscode/settings.json": "jsonc"
     },
     // The default character set encoding to use when reading and writing files.

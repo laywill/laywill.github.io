@@ -1,0 +1,98 @@
+# Project word list for cspell.
+#
+# Loaded by .cspell.json as the "project-words" dictionary. It lives here, as a
+# dictionary file rather than a "words" array in .cspell.json, because cspell
+# dictionary files take "#" comments and strict JSON does not - and .cspell.json
+# has to stay strict JSON, because MegaLinter's cspell descriptor reads it with
+# Python's json module when it builds the "proposed .cspell.json" block of its
+# text report. cspell itself is happy either way; MegaLinter is not. See #91.
+#
+# One word per line, grouped by why the word is here. Keep new words in the
+# group they belong to rather than appending to the end - the grouping is the
+# only thing that makes a list this long reviewable.
+
+# People and projects credited in the site or its tooling
+ajlkn
+Bakshi
+communistopoly
+devcontainer
+devcontainers
+Duplicati
+gimmie
+Giraudel
+laywill
+Nikhomkhai
+Panumas
+Peng
+QinetiQ
+Redd
+Roke
+stefanzweifel
+Unraid
+
+# Kit, venues and qualifications named in the copy
+Andorra
+ARCD
+Audiotechnik
+IPAF
+ISTAR
+Milos
+Quatro
+Resolume
+Selex
+Sennheiser
+tlnp
+
+# The 2017 stack: skel breakpoint names, jQuery plugins, Sass, and the
+# browser-rendering vocabulary the JS comments explain it with
+jquery
+MSIE
+recalc
+sass
+scrollex
+scrolly
+xlarge
+xlink
+xsmall
+xxsmall
+
+# Linting and CI vocabulary
+artipacked
+betterleaks
+cspell
+desync
+djlint
+dustilock
+ghcr
+htmlhint
+kingfisher
+llms
+linters
+lychee
+megalinter
+ossf
+oxsecurity
+sarif
+secretlint
+stylelint
+trufflehog
+vendored
+vendorized
+vendorizes
+zizmor
+
+# AI tooling named in the copy
+Ollama
+
+# Cars, coffee and travel hobby pages
+Hoffmann
+Inverness
+Lopes
+Nurburgring
+Pexels
+Skye
+Spiske
+tiddled
+
+# Workflow copy
+fulls
