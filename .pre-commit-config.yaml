@@ -61,6 +61,21 @@ repos:
         files: ^assets/(sass/.*\.scss|css/main\.css)$
 
   ########################################
+  # Binary asset checks
+  ########################################
+  # Every decoder stops at a JPEG's EOI marker, so bytes committed after it
+  # are invisible until someone measures file size (#101: 18 gallery
+  # thumbnails were carrying ~70MB of an overwritten-but-never-truncated
+  # original). Catch it before it's committed rather than after.
+  - repo: local
+    hooks:
+      - id: check-jpeg-eoi
+        name: reject JPEGs with data after their EOI marker
+        entry: node scripts/check-jpeg-eoi.mjs
+        language: system
+        files: (?i)\.(jpg|jpeg)$
+
+  ########################################
   # Linters to validate beautifiers output
   ########################################
   - repo: https://github.com/pre-commit/pre-commit-hooks

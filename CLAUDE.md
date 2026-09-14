@@ -34,6 +34,7 @@ npm ci                      # sass + sharp, the only two dependencies
 npm run css                 # compile assets/sass/ -> assets/css/main.css
 npm run css:check           # rebuild, then fail if the result differs from what's committed
 npm run optimize-images -- <dir>   # resize/recompress in place; deploy runs it on _site/images
+npm run check-jpeg-eoi      # fail if any images/ JPEG has bytes after its EOI marker
 ```
 
 There is no dev server, no bundler and no test framework. Open the HTML files directly, or serve the repo root with any static server — the pages are served exactly as authored.
@@ -55,6 +56,7 @@ Static HTML served as authored. Two build-time transforms exist, and neither run
 
 - **Sass → CSS.** `assets/sass/main.scss` compiles to `assets/css/main.css`, which is the file the pages load. **The generated CSS is committed.** Edit the Sass, never `main.css`. The pre-commit hook rebuilds it so the reviewed commit already contains the right output, and `css.yml` is the backstop for commits made with `--no-verify` or through the web UI.
 - **Image optimisation.** `scripts/optimize-images.mjs` resizes and recompresses in place, with path-based rules (gallery `thumbs/` → 600px, gallery `fulls/` → 2000px, everything else → 1600px). It runs **at deploy time against `_site/images`**, so the full-resolution masters committed to the repo stay untouched. Never run it against the repo tree.
+- **JPEG EOI check.** `scripts/check-jpeg-eoi.mjs` rejects any `.jpg`/`.jpeg` under `images/` that has bytes after its end-of-image (`FFD9`) marker. Every decoder stops reading at EOI, so a trailer is invisible until someone measures file size — 18 gallery thumbnails carried ~70MB of an overwritten-but-never-truncated original this way (#101). Enforced by the `check-jpeg-eoi` pre-commit hook on staged files and by `jpeg-eoi.yml` against the whole tree as the CI backstop.
 
 `assets/sass/libs/` is skel.io's own Sass library plus HTML5 UP's mixins and variables, including an inlined normalize.css. It is vendored source — not ours to reformat, and excluded from stylelint. `_vars.scss` holds the palette, sizes and durations; `libs/_skel.scss` supplies the breakpoint and layout mixins. Breakpoints are declared twice and must agree: `assets/sass/main.scss` (`skel-breakpoints`) and `assets/js/main.js` (`skel.breakpoints`) — **xlarge 1680, large 1280, medium 980, small 736, xsmall 480, xxsmall 360**, all `max-width`.
 
@@ -130,6 +132,7 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 ## CI/CD
 
 - **`css.yml`** (push/PR to `master`): rebuilds `main.css` from the Sass and fails if it differs from the commit.
+- **`jpeg-eoi.yml`** (push/PR to `master`): fails if any JPEG under `images/` has bytes after its EOI marker.
 - **`mega-linter.yml`, `codeql.yml`, `dependency-review.yml`, `scorecard.yml`**: the rest of the gate. MegaLinter runs actionlint/zizmor, stylelint, HTML linting, `standard`, JSON/YAML, secret scanning, cspell and lychee.
 - **`static.yml` deploys only from `v*` tags** (plus manual dispatch). A push to `master` runs the checks and publishes nothing, matching `main`'s tag-gated release. The deploy job copies an allowlist into `_site/`, then strips `images/will/JPEGs/` and `images/gallery/photographer/product/` — full-resolution originals kept in the repo for reference but never served.
 - The deploy job deliberately disables setup-node's package-manager cache (`package-manager-cache: false`, not just omitting `cache: npm` — v7 enables it heuristically). It builds the production artefact; a poisoned cache would poison the artefact. Caching is fine in the CI-only workflows.
