@@ -15,6 +15,16 @@
 		img {
 			display: block;
 			border-radius: _size(border-radius);
+
+			// Neutralises the height content attribute. width/height on an <img> are
+			// presentational hints for the CSS width and height properties, not just a
+			// source for aspect-ratio, so with height undeclared a height="500" is a hard
+			// 500px used height and the ratio is never consulted (#95). Every .image img
+			// here gets its width from CSS, so height: auto is what makes the attribute
+			// pair do the one job it is there for: reserve the right box before the bytes
+			// arrive. The banner and spotlight rules override it with height: 100% and
+			// win on specificity, as they did before.
+			height: auto;
 		}
 
 		&.left,
