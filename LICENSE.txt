@@ -1,6 +1,19 @@
-This licence covers the site's own content and the HTML5 UP "Story" template
-it is built on. It does not cover bundled third-party assets (fonts, icon
-sets, etc) - see THIRD-PARTY.md for those.
+This repository uses a split licence.
+
+Site content - written text, photographs, and other creative works - is
+copyright (c) William Lay and is not licensed for reuse. All rights, implied
+or otherwise, are reserved.
+
+The HTML5 UP "Story" template underlying this site's markup and styling is
+licensed under the Creative Commons Attribution 3.0 Unported licence below.
+
+Bundled third-party assets carry their own licences, kept alongside the
+files they cover, not under either licence above:
+
+  Font Awesome 4.6.3 icon fonts   SIL OFL 1.1   assets/fonts/LICENSE-FontAwesome.txt
+  Font Awesome 4.6.3 CSS          MIT           assets/fonts/LICENSE-FontAwesome.txt
+
+--------------------------------------------------------------------------------
 
 Creative Commons Attribution 3.0 Unported
 http://creativecommons.org/licenses/by/3.0/
