@@ -136,7 +136,8 @@
   <script src="assets/js/jquery.scrolly.min.js"></script>
   <script src="assets/js/skel.min.js"></script>
   <script src="assets/js/util.js"></script>
-  <script src="assets/js/main.js"></script>
+  <!-- If main.js fails to load, nothing removes is-loading and every gated section stays hidden -->
+  <script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
 
 </body>
 
