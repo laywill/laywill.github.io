@@ -270,12 +270,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/jquery.min.js"></script>
+  <!-- onerror on the three scripts whose failure leaves body.is-loading set for good: jquery and skel both throw inside main.js before it binds clearLoading, and main.js may never arrive at all -->
+  <script src="assets/js/jquery.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/jquery.scrollex.min.js"></script>
   <script src="assets/js/jquery.scrolly.min.js"></script>
-  <script src="assets/js/skel.min.js"></script>
+  <script src="assets/js/skel.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/util.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
 
 </body>
 
