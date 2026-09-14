@@ -12,6 +12,13 @@ updates:
     labels:
       - "github_actions"
       - "chore"
+    groups:
+      # init/autobuild/analyze/upload-sarif share state via the config file
+      # init writes and refuse to run at mixed versions, so a bump of one
+      # subpath alone always fails CodeQL. Move them together.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
   # Maintain dependencies for Devcontainer dependencies
   - package-ecosystem: "devcontainers"
     directory: "/"
