@@ -62,7 +62,7 @@ JavaScript is jQuery-era and loaded as plain `<script>` tags in a fixed order: j
 
 ### Page structure
 
-Every page is standalone — there is no templating, no includes, no shared header/footer partial. **A change to the footer or the social links is a 15-file edit**, and the pages are expected to stay byte-identical in those regions.
+Every page is standalone — there is no templating, no includes, no shared header/footer partial. **A change to the footer or the social links is a 15-file edit**, and the pages are expected to stay byte-identical in those regions. The same holds for the two script regions — the inline pre-paint gate at the top of `<body>` and the `<!-- Scripts -->` block at the bottom — which are coupled to each other and to `assets/js/main.js`; see below.
 
 The skeleton every page follows:
 
@@ -74,6 +74,32 @@ The skeleton every page follows:
 The footer is a **sibling** of `#wrapper`, not a child. `assets/sass/layout/_wrapper.scss` gives `#wrapper > *` the 1px inset rule that separates sections, which the footer therefore misses; it is restored by a `~ footer` rule — keyed on the tag rather than `#footer` so it survives an id change, and using `~` rather than `+` so inserting anything between the two doesn't silently drop it.
 
 HTML is 2-space indented. djlint runs with `profile: html` and ignores `H021` (inline styles — the Pexels/Unsplash credit badges carry them) and `H023` (entity references).
+
+#### The `is-loading` gate couples every page to `main.js`
+
+A parser-blocking inline script at the top of each `<body>`, before the banner is parsed, asserts the hidden state at first paint:
+
+```html
+<script>document.body.classList.add('is-loading')</script>
+```
+
+`body.is-loading` is not cosmetic. The Sass hangs the load-in and scroll-in selectors off it across banner, spotlight and gallery, so while the class is set most of the page's content sits at `opacity: 0`. Nothing in the CSS ever takes it off again — `clearLoading` in `assets/js/main.js` does, at `load` + 100ms. The gate is therefore a hard runtime dependency: **if `main.js` never runs, the page stays blank, permanently.**
+
+The recovery is an `onerror` on the tag that loads it:
+
+```html
+<script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
+```
+
+It fires when the request for `main.js` fails — 404, network error, blocked by an extension — and reveals the content immediately. The reveal snaps rather than fades, deliberately: `main.js` is the transition machinery, so in this path there is nothing left to fade with, and content on screen beats content styled on its way in.
+
+`onerror` does **not** fire when `main.js` loads and then fails to reach `clearLoading` — a parse error, or a throw at execution such as a missing jQuery. Those remain uncovered. There is no watchdog timeout and deliberately so: a timeout generous enough not to fire on a slow connection is also slow enough to leave the page blank for a long time, and removing `is-loading` in a single style recalc reveals content with a snap, which is exactly what `clearLoading`'s 100ms delay exists to avoid (#86, #94).
+
+So, before editing here:
+
+- A new Sass rule keyed on `body.is-loading` widens what a `main.js` failure blanks. That is the cost of adding one.
+- `main.js` cannot be renamed, moved, or given `async`/`defer` without the inline gate and the `onerror` moving with it.
+- Anything that makes `clearLoading` unreachable brings the blank page back, and the `onerror` will not catch it.
 
 ### Adding, renaming or removing a page
 
