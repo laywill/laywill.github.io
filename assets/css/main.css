@@ -2094,6 +2094,7 @@ a.icon.style2:active::before {
 .image img {
   display: block;
   border-radius: 4px;
+  height: auto;
 }
 .image.left, .image.right {
   width: 40%;
