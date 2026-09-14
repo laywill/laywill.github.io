@@ -10,7 +10,7 @@ updates:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
     labels:
-      - "github_actions"
+      - "ci"
       - "chore"
     groups:
       # init/autobuild/analyze/upload-sarif share state via the config file
