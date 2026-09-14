@@ -6249,7 +6249,7 @@ body.is-loading .items.onload-fade-in > * > .inner {
   -ms-transition-delay: 2.4s;
   transition-delay: 2.4s;
 }
-.items.onscroll-fade-in.is-inactive > * > .inner {
+.items.onscroll-fade-in.is-inactive > * > .inner, body.is-loading .items.onscroll-fade-in > * > .inner {
   opacity: 0;
 }
 

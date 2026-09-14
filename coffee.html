@@ -84,24 +84,32 @@
         <h2>A French Press Starting Point</h2>
         <div class="items style1 medium onscroll-fade-in">
           <section>
-            <span class="icon style2 major fa-balance-scale"></span>
-            <h3>16g</h3>
-            <p>Coffee, ground coarse for a French press.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-balance-scale"></span>
+              <h3>16g</h3>
+              <p>Coffee, ground coarse for a French press.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-fire"></span>
-            <h3>92&deg;C</h3>
-            <p>Water temperature at the start of the brew.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-fire"></span>
+              <h3>92&deg;C</h3>
+              <p>Water temperature at the start of the brew.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-clock-o"></span>
-            <h3>6 Minutes</h3>
-            <p>Steep time before plunging.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-clock-o"></span>
+              <h3>6 Minutes</h3>
+              <p>Steep time before plunging.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-tint"></span>
-            <h3>600ml</h3>
-            <p>Water, giving a ratio just over 1:37.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-tint"></span>
+              <h3>600ml</h3>
+              <p>Water, giving a ratio just over 1:37.</p>
+            </div>
           </section>
         </div>
         <div class="inner align-left">
@@ -145,12 +153,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/jquery.min.js"></script>
+  <!-- onerror on the three scripts whose failure leaves body.is-loading set for good: jquery and skel both throw inside main.js before it binds clearLoading, and main.js may never arrive at all -->
+  <script src="assets/js/jquery.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/jquery.scrollex.min.js"></script>
   <script src="assets/js/jquery.scrolly.min.js"></script>
-  <script src="assets/js/skel.min.js"></script>
+  <script src="assets/js/skel.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/util.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
 
 </body>
 

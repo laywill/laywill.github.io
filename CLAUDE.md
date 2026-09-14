@@ -62,7 +62,7 @@ JavaScript is jQuery-era and loaded as plain `<script>` tags in a fixed order: j
 
 ### Page structure
 
-Every page is standalone — there is no templating, no includes, no shared header/footer partial. **A change to the footer or the social links is a 15-file edit**, and the pages are expected to stay byte-identical in those regions.
+Every page is standalone — there is no templating, no includes, no shared header/footer partial. **A change to the footer or the social links is a 15-file edit**, and the pages are expected to stay byte-identical in those regions. The same holds for the two script regions — the inline pre-paint gate at the top of `<body>` and the `<!-- Scripts -->` block at the bottom — which are coupled to each other and to `assets/js/main.js`; see below.
 
 The skeleton every page follows:
 
@@ -73,7 +73,47 @@ The skeleton every page follows:
 
 The footer is a **sibling** of `#wrapper`, not a child. `assets/sass/layout/_wrapper.scss` gives `#wrapper > *` the 1px inset rule that separates sections, which the footer therefore misses; it is restored by a `~ footer` rule — keyed on the tag rather than `#footer` so it survives an id change, and using `~` rather than `+` so inserting anything between the two doesn't silently drop it.
 
+The `.items` grid carries a structural rule of its own: **every `<section>` inside a `.items` block must contain a `<div class="inner">` wrapping its whole body.** `main.js` used to build that wrapper with `wrapInner` inside its ready callback, so it did not exist at first paint and the CSS gating the fade had nothing to match — the grid painted at full opacity, blanked when the JS ran, then faded (#103). It is now authored into the markup, which means nothing generates it and nothing in CI checks for it. A section missing its wrapper is visible while its siblings are still hidden, and loses its `:last-child` margin reset at the `xsmall` breakpoint.
+
 HTML is 2-space indented. djlint runs with `profile: html` and ignores `H021` (inline styles — the Pexels/Unsplash credit badges carry them) and `H023` (entity references).
+
+#### The `is-loading` gate couples every page to `main.js`
+
+A parser-blocking inline script at the top of each `<body>`, before the banner is parsed, asserts the hidden state at first paint:
+
+```html
+<script>document.body.classList.add('is-loading')</script>
+```
+
+`body.is-loading` is not cosmetic. The Sass hangs the load-in and scroll-in selectors off it across banner, spotlight and gallery, so while the class is set most of the page's content sits at `opacity: 0`. Nothing in the CSS ever takes it off again — `clearLoading` in `assets/js/main.js` does, at `load` + 100ms. The gate is therefore a hard runtime dependency: **if `main.js` never runs, the page stays blank, permanently.**
+
+The recovery is an `onerror` on each script whose failure would leave the class set:
+
+```html
+<script src="assets/js/jquery.min.js" onerror="document.body.classList.remove('is-loading')"></script>
+<script src="assets/js/skel.min.js" onerror="document.body.classList.remove('is-loading')"></script>
+<script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
+```
+
+Three of the six, not one, and which three follows from `main.js`'s own shape. It is `(function ($) { skel.breakpoints(…); $(function () { … }) })(window.jQuery)`, and the `load` handler that runs `clearLoading` is bound early inside that ready callback — before the `scrollex`, `scrolly` and `placeholder` calls that need the remaining plugins:
+
+| Missing script | What happens | Blanks the page? |
+| --- | --- | --- |
+| `jquery.min.js` | `$` is `undefined`, so `$(function () { … })` throws and the ready callback is never registered | yes |
+| `skel.min.js` | `skel.breakpoints` throws at the top of the IIFE, before the same registration | yes |
+| `main.js` | nothing runs at all | yes |
+| `jquery.scrollex.min.js`, `jquery.scrolly.min.js`, `util.js` | throws, but only after `clearLoading` is already bound to `load` | no, the page still reveals |
+
+`onerror` fires when the request for the script fails — 404, network error, blocked by an extension — and reveals the content immediately. The reveal snaps rather than fades, deliberately: `main.js` is the transition machinery, so in this path there is nothing left to fade with, and content on screen beats content styled on its way in.
+
+`onerror` does **not** fire when a script arrives and then fails at execution — a parse error, or a jQuery served successfully but too old for the calls `main.js` makes. Those remain uncovered. There is no watchdog timeout and deliberately so: a timeout generous enough not to fire on a slow connection is also slow enough to leave the page blank for a long time, and removing `is-loading` in a single style recalc reveals content with a snap, which is exactly what `clearLoading`'s 100ms delay exists to avoid (#86, #94).
+
+So, before editing here:
+
+- A new Sass rule keyed on `body.is-loading` widens what a script failure blanks. That is the cost of adding one.
+- None of the three tagged scripts can be renamed, moved, or given `async`/`defer` without the inline gate and its `onerror` moving too.
+- Reordering the `<!-- Scripts -->` block can change *which* scripts need the attribute. The rule is not "these three files" but "every script whose absence stops `clearLoading` from being bound".
+- Anything that makes `clearLoading` unreachable once the scripts have loaded brings the blank page back, and `onerror` will not catch it.
 
 ### Adding, renaming or removing a page
 

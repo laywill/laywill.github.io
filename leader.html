@@ -78,23 +78,29 @@
         <h2>By the Numbers</h2>
         <div class="items style1 medium onscroll-fade-in">
           <section>
-            <span class="icon style2 major fa-users"></span>
-            <h3>0 &rarr; 9</h3>
-            <p>Engineers recruited into the Bristol team in 24 months, set against business strategy and
-              recruitment need.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-users"></span>
+              <h3>0 &rarr; 9</h3>
+              <p>Engineers recruited into the Bristol team in 24 months, set against business strategy and
+                recruitment need.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-line-chart"></span>
-            <h3>+12%</h3>
-            <p>Average lift in team-feedback scores from management and communication initiatives, making
-              this the most satisfied team in the Group and the only one ahead of target on every
-              satisfaction metric.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-line-chart"></span>
+              <h3>+12%</h3>
+              <p>Average lift in team-feedback scores from management and communication initiatives, making
+                this the most satisfied team in the Group and the only one ahead of target on every
+                satisfaction metric.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-sitemap"></span>
-            <h3>7 Teams</h3>
-            <p>Roke plus 6 industry-partner sub-contractors on Project ZODIAC, engineered as a scaled-agile
-              structure through to a MoD event that secured a &pound;40m follow-on contract.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-sitemap"></span>
+              <h3>7 Teams</h3>
+              <p>Roke plus 6 industry-partner sub-contractors on Project ZODIAC, engineered as a scaled-agile
+                structure through to a MoD event that secured a &pound;40m follow-on contract.</p>
+            </div>
           </section>
         </div>
       </div>
@@ -181,22 +187,28 @@
         <h2>Additional Skills</h2>
         <div class="items style1 medium onscroll-fade-in">
           <section>
-            <span class="icon style2 major fa-comments-o"></span>
-            <h3>Coaching &amp; Development</h3>
-            <p>Performance management, career coaching and pastoral care, from graduate engineers through
-              to senior hires.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-comments-o"></span>
+              <h3>Coaching &amp; Development</h3>
+              <p>Performance management, career coaching and pastoral care, from graduate engineers through
+                to senior hires.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-briefcase"></span>
-            <h3>Stakeholder &amp; Multi-Supplier Delivery</h3>
-            <p>Running delivery across multiple sub-contractors and industry partners, with risk owned and
-              tracked through a RAID log.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-briefcase"></span>
+              <h3>Stakeholder &amp; Multi-Supplier Delivery</h3>
+              <p>Running delivery across multiple sub-contractors and industry partners, with risk owned and
+                tracked through a RAID log.</p>
+            </div>
           </section>
           <section>
-            <span class="icon style2 major fa-user-plus"></span>
-            <h3>Recruitment &amp; Hiring</h3>
-            <p>Setting recruitment needs against business strategy, and interviewing engineering
-              candidates.</p>
+            <div class="inner">
+              <span class="icon style2 major fa-user-plus"></span>
+              <h3>Recruitment &amp; Hiring</h3>
+              <p>Setting recruitment needs against business strategy, and interviewing engineering
+                candidates.</p>
+            </div>
           </section>
         </div>
       </div>
@@ -258,12 +270,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/jquery.min.js"></script>
+  <!-- onerror on the three scripts whose failure leaves body.is-loading set for good: jquery and skel both throw inside main.js before it binds clearLoading, and main.js may never arrive at all -->
+  <script src="assets/js/jquery.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/jquery.scrollex.min.js"></script>
   <script src="assets/js/jquery.scrolly.min.js"></script>
-  <script src="assets/js/skel.min.js"></script>
+  <script src="assets/js/skel.min.js" onerror="document.body.classList.remove('is-loading')"></script>
   <script src="assets/js/util.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/main.js" onerror="document.body.classList.remove('is-loading')"></script>
 
 </body>
 
