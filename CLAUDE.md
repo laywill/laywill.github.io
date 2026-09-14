@@ -73,6 +73,8 @@ The skeleton every page follows:
 
 The footer is a **sibling** of `#wrapper`, not a child. `assets/sass/layout/_wrapper.scss` gives `#wrapper > *` the 1px inset rule that separates sections, which the footer therefore misses; it is restored by a `~ footer` rule — keyed on the tag rather than `#footer` so it survives an id change, and using `~` rather than `+` so inserting anything between the two doesn't silently drop it.
 
+The `.items` grid carries a structural rule of its own: **every `<section>` inside a `.items` block must contain a `<div class="inner">` wrapping its whole body.** `main.js` used to build that wrapper with `wrapInner` inside its ready callback, so it did not exist at first paint and the CSS gating the fade had nothing to match — the grid painted at full opacity, blanked when the JS ran, then faded (#103). It is now authored into the markup, which means nothing generates it and nothing in CI checks for it. A section missing its wrapper is visible while its siblings are still hidden, and loses its `:last-child` margin reset at the `xsmall` breakpoint.
+
 HTML is 2-space indented. djlint runs with `profile: html` and ignores `H021` (inline styles — the Pexels/Unsplash credit badges carry them) and `H023` (entity references).
 
 #### The `is-loading` gate couples every page to `main.js`
