@@ -1,3 +1,7 @@
+This licence covers the site's own content and the HTML5 UP "Story" template
+it is built on. It does not cover bundled third-party assets (fonts, icon
+sets, etc) - see THIRD-PARTY.md for those.
+
 Creative Commons Attribution 3.0 Unported
 http://creativecommons.org/licenses/by/3.0/
 
