@@ -76,6 +76,21 @@ repos:
         files: (?i)\.(jpg|jpeg)$
 
   ########################################
+  # Page index consistency
+  ########################################
+  # static.yml's cp allowlist, sitemap.xml and each page's canonical must
+  # agree (#146). The invariant spans files, so a change to any one of them
+  # re-checks the whole tree rather than only what is staged.
+  - repo: local
+    hooks:
+      - id: check-canonicals
+        name: check canonicals against the deploy allowlist and sitemap.xml
+        entry: node scripts/check-canonicals.mjs
+        language: system
+        pass_filenames: false
+        files: ^(.*\.html|sitemap\.xml|CNAME|\.github/workflows/static\.yml|scripts/check-canonicals\.mjs)$
+
+  ########################################
   # Linters to validate beautifiers output
   ########################################
   - repo: https://github.com/pre-commit/pre-commit-hooks

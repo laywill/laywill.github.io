@@ -104,8 +104,6 @@
 			width: 25%;
 
 			.image {
-				@include vendor('transition', 'opacity #{_duration(transition)} ease-in-out');
-
 				display: block;
 				width: 100%;
 				border-radius: 0;
