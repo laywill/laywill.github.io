@@ -17,12 +17,13 @@ const EXCEPTIONS = new Set(['under_construction.html', 'google519c92453ea72bf0.h
 const read = (file) => readFile(path.join(ROOT, file), 'utf8')
 
 // The .html operands of every `cp ... _site/` in static.yml. Backslash
-// continuations are joined first so a multi-line cp reads as one command.
+// continuations are joined first so a multi-line cp reads as one command, and
+// a leading `run:` is dropped so a single-line step counts too.
 function deployedPages (workflow) {
   const pages = new Set()
   const joined = workflow.replace(/\\\r?\n/g, ' ')
   for (const line of joined.split(/\r?\n/)) {
-    const words = line.trim().split(/\s+/)
+    const words = line.trim().replace(/^(?:-\s+)?run:\s*/, '').split(/\s+/)
     if (words[0] !== 'cp' || words.at(-1) !== '_site/') continue
     for (const word of words.slice(1, -1)) {
       if (word.endsWith('.html')) pages.add(word)
@@ -56,10 +57,12 @@ async function main () {
   const deployed = deployedPages(await read('.github/workflows/static.yml'))
   if (deployed.size === 0) fail('.github/workflows/static.yml', 'no .html files found in a `cp ... _site/` command')
 
-  // sitemap <loc> -> the file it names. The root URL is index.html.
+  // sitemap <loc> -> the file it names. The root URL is index.html. Comments
+  // are matched and skipped, as in canonicals().
   const expected = new Map()
   const sitemap = await read('sitemap.xml')
-  for (const [, loc] of sitemap.matchAll(/<loc>\s*([^<]*?)\s*<\/loc>/g)) {
+  for (const [match, loc] of sitemap.matchAll(/<!--[\s\S]*?(?:-->|$)|<loc>\s*([^<]*?)\s*<\/loc>/g)) {
+    if (match.startsWith('<!--')) continue
     if (!loc.startsWith(base)) {
       fail('sitemap.xml', `<loc>${loc}</loc> is not under ${base}`)
       continue
