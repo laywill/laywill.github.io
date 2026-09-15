@@ -25,6 +25,16 @@ Everything below describes `master`. Branch off `master` and PR back into `maste
 
 Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `fix/71-footer-layout-consistency`), [Conventional Commits](https://www.conventionalcommits.org/), every piece of work traces to a GitHub issue.
 
+The same `<type>` is used in the branch, the commit and the PR title, and should match the issue's label. The standard Conventional Commits types all apply. `fix` corresponds to the `bug` label and `feat` has no label. This repo adds three types of its own, each with a label of the same name:
+
+| Type | Use it for |
+| --- | --- |
+| `content` | Copy, page text, meta descriptions, images and alt text. Changes what the site says, not how it works. |
+| `infra` | Hosting, DNS, SEO plumbing, and tooling that isn't a CI workflow (`ci`) or a dependency bump (`build`). |
+| `design` | Visual design and components. |
+
+Scopes are free-form. `seo` is the common one, e.g. `content(seo): …`.
+
 ## Commands
 
 Node 22 (matching the workflows; there is no `.nvmrc` on this branch).
