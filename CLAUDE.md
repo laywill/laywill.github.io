@@ -34,6 +34,8 @@ Draft and ready-for-review mean different things here, so that the PR list shows
 
 A PR that needs a decision from William before it can be finished stays in draft and gets the `needs-william` label.
 
+By default the review is a separate pass, so that it doesn't share the author's blind spots: a fresh agent, `/code-review`, or a new session. The agent that opened the PR may review it only when the change is simple enough that a second pass would add nothing, such as a one-line copy fix or a version bump. When it does, the summary comment says the review was done by the author.
+
 The review before marking ready:
 
 1. **Scope against the issue.** Check every acceptance criterion in the linked issue against the whole branch tree, not only the diff. A criterion like "no page presents X as current" is usually broken in a file the PR never touched.
