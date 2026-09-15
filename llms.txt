@@ -7,7 +7,7 @@ Personal site for William Lay, an Engineering Team Leader & Tech Lead, Productio
 ## Professional Pages
 
 - [Engineering & Tech Leadership](engineer.html) - Overview of engineering work and technical leadership
-- [Firmware Engineering](engineer-firmware.html) - VHDL, Verilog, and SystemVerilog work
+- [Firmware Engineering](engineer-firmware.html) - The FPGA firmware, DSP and microelectronics background William's engineering career was built on
 - [DevOps Engineering](engineer-devops.html) - Cloud infrastructure, Terraform, Ansible, and automation
 - [AI Engineering](engineer-ai.html) - AI and machine learning projects
 - [Leadership & Team Management](leader.html) - Technical team leadership and mentoring
