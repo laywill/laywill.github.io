@@ -127,7 +127,7 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 4. **`sitemap.html`** — the human site map, linked from every footer.
 5. **`llms.txt`** — the LLM-facing index.
 
-`under_construction.html` is the one deliberate exception: deployed, but linked from nothing and absent from all three indexes. `google519c92453ea72bf0.html` is a site-verification stub, intentionally not valid HTML, and excluded from linting.
+`under_construction.html` is the one deliberate exception: deployed, but linked from nothing, absent from `sitemap.xml`, `sitemap.html` and `llms.txt`, and carrying `<meta name="robots" content="noindex" />` so a URL discovered some other way still stays out of search results. Don't contradict that signal: `robots.txt` must never `Disallow` it, because a crawler that cannot fetch the page never sees the `noindex`, and the page gets no `<link rel="canonical">`, because a self-canonical tells search engines the opposite. `google519c92453ea72bf0.html` is a site-verification stub, intentionally not valid HTML, and excluded from linting.
 
 ## CI/CD
 
