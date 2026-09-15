@@ -119,15 +119,16 @@ So, before editing here:
 
 ### Adding, renaming or removing a page
 
-A page exists in five places. Miss one and either the deploy drops it or the link check fails:
+A page exists in each of these places. Miss one and either the deploy drops it, the link check fails, or search engines index the wrong URL:
 
 1. The `.html` file itself.
 2. **`.github/workflows/static.yml`** — the `cp` allowlist in "Assemble site artifact". The deploy publishes an explicit list, not the tree; an unlisted page simply doesn't ship.
 3. **`sitemap.xml`** — the machine sitemap.
 4. **`sitemap.html`** — the human site map, linked from every footer.
 5. **`llms.txt`** — the LLM-facing index.
+6. **`<link rel="canonical">`** in the page's own `<head>`, directly after the `favicon.svg` link — absolute, and byte-identical to the page's `sitemap.xml` `<loc>` (`index.html` → `https://williamlay.co.uk/`). A rename must update it: a stale canonical is a strong hint to index a URL that no longer exists, and nothing in CI checks it yet (#146).
 
-`under_construction.html` is the one deliberate exception: deployed, but linked from nothing, absent from `sitemap.xml`, `sitemap.html` and `llms.txt`, and carrying `<meta name="robots" content="noindex" />` so a URL discovered some other way still stays out of search results. Don't contradict that signal: `robots.txt` must never `Disallow` it, because a crawler that cannot fetch the page never sees the `noindex`, and the page gets no `<link rel="canonical">`, because a self-canonical tells search engines the opposite. `google519c92453ea72bf0.html` is a site-verification stub, intentionally not valid HTML, and excluded from linting.
+`under_construction.html` is the one deliberate exception: deployed, but linked from nothing, absent from `sitemap.xml`, `sitemap.html` and `llms.txt`, and carrying `<meta name="robots" content="noindex" />` so a URL discovered some other way still stays out of search results. Don't contradict that signal: `robots.txt` must never `Disallow` it, because a crawler that cannot fetch the page never sees the `noindex`, and the page gets no `<link rel="canonical">`, because a self-canonical tells search engines the opposite. `google519c92453ea72bf0.html` is a site-verification stub, intentionally not valid HTML, excluded from linting, and likewise carries no canonical.
 
 ## CI/CD
 
