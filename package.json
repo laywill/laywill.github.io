@@ -8,7 +8,8 @@
     "css": "sass --no-source-map --style=expanded assets/sass/main.scss assets/css/main.css",
     "css:check": "npm run css && git diff --exit-code -- assets/css/main.css",
     "optimize-images": "node scripts/optimize-images.mjs",
-    "check-jpeg-eoi": "node scripts/check-jpeg-eoi.mjs images"
+    "check-jpeg-eoi": "node scripts/check-jpeg-eoi.mjs images",
+    "check-canonicals": "node scripts/check-canonicals.mjs"
   },
   "devDependencies": {
     "sass": "1.104.0",
