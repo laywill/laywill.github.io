@@ -88,7 +88,7 @@ repos:
         entry: node scripts/check-canonicals.mjs
         language: system
         pass_filenames: false
-        files: ^(.*\.html|sitemap\.xml|CNAME|\.github/workflows/static\.yml|scripts/check-canonicals\.mjs)$
+        files: ^(.*\.html|sitemap\.xml|CNAME|\.github/workflows/static\.yml|scripts/(check-canonicals|static-allowlist)\.mjs)$
 
   ########################################
   # Linters to validate beautifiers output

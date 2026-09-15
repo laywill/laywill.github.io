@@ -7,30 +7,10 @@
 
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-
-// Deployed but deliberately unindexed; see CLAUDE.md.
-const EXCEPTIONS = new Set(['under_construction.html', 'google519c92453ea72bf0.html'])
+import { ROOT, UNINDEXED, deployedPages } from './static-allowlist.mjs'
 
 const read = (file) => readFile(path.join(ROOT, file), 'utf8')
-
-// The .html operands of every `cp ... _site/` in static.yml. Backslash
-// continuations are joined first so a multi-line cp reads as one command, and
-// a leading `run:` is dropped so a single-line step counts too.
-function deployedPages (workflow) {
-  const pages = new Set()
-  const joined = workflow.replace(/\\\r?\n/g, ' ')
-  for (const line of joined.split(/\r?\n/)) {
-    const words = line.trim().replace(/^(?:-\s+)?run:\s*/, '').split(/\s+/)
-    if (words[0] !== 'cp' || words.at(-1) !== '_site/') continue
-    for (const word of words.slice(1, -1)) {
-      if (word.endsWith('.html')) pages.add(word)
-    }
-  }
-  return pages
-}
 
 // rel=canonical hrefs in a page, ignoring anything inside an HTML comment.
 function canonicals (html) {
@@ -54,8 +34,7 @@ async function main () {
   const fail = (file, message) => failures.push(`FAIL ${file}: ${message}`)
 
   const base = `https://${(await read('CNAME')).trim()}/`
-  const deployed = deployedPages(await read('.github/workflows/static.yml'))
-  if (deployed.size === 0) fail('.github/workflows/static.yml', 'no .html files found in a `cp ... _site/` command')
+  const deployed = new Set(await deployedPages())
 
   // sitemap <loc> -> the file it names. The root URL is index.html. Comments
   // are matched and skipped, as in canonicals().
@@ -73,17 +52,17 @@ async function main () {
   }
 
   for (const file of deployed) {
-    if (!EXCEPTIONS.has(file) && !expected.has(file)) {
+    if (!UNINDEXED.has(file) && !expected.has(file)) {
       fail(file, 'deployed by static.yml but has no <loc> in sitemap.xml')
     }
   }
   for (const [file, loc] of expected) {
-    if (EXCEPTIONS.has(file)) fail(file, `is a documented exception but sitemap.xml lists ${loc}`)
+    if (UNINDEXED.has(file)) fail(file, `is a documented exception but sitemap.xml lists ${loc}`)
     else if (!deployed.has(file)) fail(file, `in sitemap.xml as ${loc} but not deployed by static.yml`)
   }
 
   for (const [file, loc] of expected) {
-    if (EXCEPTIONS.has(file)) continue
+    if (UNINDEXED.has(file)) continue
     const html = await read(file).catch(() => null)
     if (html === null) {
       fail(file, `in sitemap.xml as ${loc} but the file does not exist`)
@@ -97,7 +76,7 @@ async function main () {
     }
   }
 
-  for (const file of EXCEPTIONS) {
+  for (const file of UNINDEXED) {
     const html = await read(file).catch(() => null)
     if (html !== null && canonicals(html).length > 0) {
       fail(file, 'is deliberately unindexed and must not carry a rel="canonical"')
@@ -114,4 +93,7 @@ async function main () {
   console.log(`${expected.size} indexed page(s) checked: allowlist, sitemap.xml and canonicals agree.`)
 }
 
-main()
+main().catch(err => {
+  console.error(err)
+  process.exit(1)
+})
