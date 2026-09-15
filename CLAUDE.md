@@ -83,7 +83,7 @@ JavaScript is jQuery-era, loaded as plain `<script>` tags in a fixed order: jQue
 
 ### Page structure
 
-Every page is standalone, with no templating or shared partials. The footer, the social links, the inline gate at the top of `<body>` and the `<!-- Scripts -->` block are expected to stay **byte-identical across every page**, so changing any of them means editing every page.
+Every page is standalone, with no templating or shared partials. The footer, the social links, the Source Sans Pro preloads in `<head>`, the inline gate at the top of `<body>` and the `<!-- Scripts -->` block are expected to stay **byte-identical across every page**, so changing any of them means editing every page.
 
 ```html
 <main id="wrapper" class="divided">   <!-- sections -->   </main>

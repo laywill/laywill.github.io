@@ -12,6 +12,7 @@ files they cover, not under either licence above:
 
   Font Awesome 4.6.3 icon fonts   SIL OFL 1.1   assets/fonts/LICENSE-FontAwesome.txt
   Font Awesome 4.6.3 CSS          MIT           assets/fonts/LICENSE-FontAwesome.txt
+  Source Sans Pro fonts           SIL OFL 1.1   assets/fonts/LICENSE-SourceSansPro.txt
 
 --------------------------------------------------------------------------------
 
