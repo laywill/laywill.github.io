@@ -34,8 +34,10 @@ function deployedPages (workflow) {
 // rel=canonical hrefs in a page, ignoring anything inside an HTML comment.
 function canonicals (html) {
   const hrefs = []
-  const uncommented = html.replace(/<!--[\s\S]*?-->/g, '')
-  for (const [tag] of uncommented.matchAll(/<link\b[^>]*>/gi)) {
+  // Comments are matched alongside tags, not stripped first, so a <link>
+  // inside one is consumed by the comment match and skipped.
+  for (const [tag] of html.matchAll(/<!--[\s\S]*?(?:-->|$)|<link\b[^>]*>/gi)) {
+    if (tag.startsWith('<!--')) continue
     const attrs = {}
     for (const m of tag.matchAll(/([^\s=/<>"']+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>"']+))/g)) {
       attrs[m[1].toLowerCase()] = m[2] ?? m[3] ?? m[4]
