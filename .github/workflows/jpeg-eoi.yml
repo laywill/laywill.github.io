@@ -1,0 +1,43 @@
+---
+name: JPEG EOI
+
+# Every decoder stops reading a JPEG at its end-of-image (FFD9) marker, so
+# bytes committed after it are invisible until someone measures file size
+# (#101: 18 gallery thumbnails carried ~70MB of an overwritten-but-never-
+# truncated original this way). The pre-commit hook is the fast local check;
+# this is the backstop for commits made with --no-verify or through the web
+# UI, matching css.yml's role for assets/css/main.css.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: jpeg-eoi-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check:
+    name: no JPEG has data after its EOI marker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Check images/ for trailing bytes after EOI
+        run: npm run check-jpeg-eoi
