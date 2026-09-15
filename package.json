@@ -9,7 +9,8 @@
     "css:check": "npm run css && git diff --exit-code -- assets/css/main.css",
     "optimize-images": "node scripts/optimize-images.mjs",
     "check-jpeg-eoi": "node scripts/check-jpeg-eoi.mjs images",
-    "check-canonicals": "node scripts/check-canonicals.mjs"
+    "check-canonicals": "node scripts/check-canonicals.mjs",
+    "check-render": "node scripts/check-render.mjs"
   },
   "devDependencies": {
     "sass": "1.104.0",
