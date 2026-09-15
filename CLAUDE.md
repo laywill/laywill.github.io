@@ -21,7 +21,7 @@ You are a senior software engineer collaborating with a peer. Prioritize thoroug
 
 Everything below describes `main`. Branch off `main` and PR back into `main` — **not** into `master`, despite it being the repo default. A `no-commit-to-branch` pre-commit hook blocks direct commits to both.
 
-Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `feat/42-landing-hero`), [Conventional Commits](https://www.conventionalcommits.org/), every piece of work traces to a GitHub issue.
+Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `feat/42-landing-hero`), every piece of work traces to a GitHub issue. Commits and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/) using only the spec's standard types, and the branch uses the same `<type>`. Issues take whichever repo labels fit best. Labels and commit types are separate: `content`, `design` and `infra` are labels, not commit types.
 
 ## Commands
 
