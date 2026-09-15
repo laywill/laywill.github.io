@@ -54,6 +54,7 @@ npm run css                 # compile assets/sass/ -> assets/css/main.css
 npm run css:check           # rebuild, then fail if the result differs from what's committed
 npm run optimize-images -- <dir>   # resize/recompress in place; deploy runs it on _site/images
 npm run check-jpeg-eoi      # fail if any images/ JPEG has bytes after its EOI marker
+npm run check-canonicals    # fail unless static.yml's allowlist, sitemap.xml and canonicals agree
 ```
 
 No dev server, bundler or test framework. Open the HTML files directly or serve the repo root statically; pages are served as authored.
@@ -139,9 +140,11 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 
 `under_construction.html` is the deliberate exception: deployed, but linked from nothing and absent from all three indexes. `google519c92453ea72bf0.html` is a site-verification stub, intentionally invalid HTML and excluded from linting.
 
+`npm run check-canonicals` (pre-commit hook and `canonicals.yml`) fails unless the allowlist's pages, less those two, match `sitemap.xml`'s `<loc>`s and each page's `rel="canonical"` equals its `<loc>`.
+
 ## CI/CD
 
-Besides `css.yml` and `jpeg-eoi.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml` and `scorecard.yml`.
+Besides `css.yml`, `jpeg-eoi.yml` and `canonicals.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml` and `scorecard.yml`.
 
 - **`static.yml` deploys only from `v*` tags** (plus manual dispatch); a push to `master` publishes nothing. It copies an allowlist into `_site/`, then strips `images/will/JPEGs/` and `images/gallery/photographer/product/`: full-resolution originals kept for reference, never served.
 - The deploy job disables setup-node's package-manager cache on purpose, because it builds the production artefact. Don't re-enable it. Caching is fine in the CI-only workflows.
