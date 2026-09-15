@@ -143,7 +143,7 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 
 `npm run check-canonicals` (pre-commit hook and `canonicals.yml`) fails unless the allowlist's pages, less those two, match `sitemap.xml`'s `<loc>`s and each page's `rel="canonical"` equals its `<loc>`.
 
-Both that check and `check-render` read the allowlist through `scripts/static-allowlist.mjs`, which also names those two exceptions: `UNINDEXED` (deployed, absent from the indexes) and `NOT_A_PAGE` (not real HTML, so nothing renders it). They had a parser each until #162 and the copies drifted, so a new exception goes there, once.
+Both that check and `check-render` read the allowlist through `scripts/static-allowlist.mjs`, which also holds the exceptions, as two overlapping sets: `UNINDEXED` (deployed but absent from the indexes, so it carries no `rel="canonical"`) holds both files above, while `NOT_A_PAGE` (not real HTML, so nothing renders it) holds the verification stub alone — which is therefore in both. The two checks had a parser each until #162 and the copies drifted, so a new exception goes there, once.
 
 ## CI/CD
 

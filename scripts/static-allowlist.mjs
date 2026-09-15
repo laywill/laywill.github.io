@@ -1,8 +1,9 @@
 // The `cp ... _site/` allowlist in .github/workflows/static.yml is the one
 // list of pages the site serves. check-canonicals.mjs and check-render.mjs
-// both derive from it, and until #162 each carried its own parser: the copies
-// drifted, and #156's review fixed a single-line `run: cp` case the other
-// never handled. One parser, one set of exceptions, here.
+// both derive from it, and until #162 each carried its own parser. They had
+// already drifted: the render check's regex read only the first `cp ... _site/`
+// and threw when it matched none, so a page added in a later cp command would
+// deploy but never be rendered. One parser, one set of exceptions, here.
 //
 // A module, not an entry point.
 
