@@ -3,13 +3,34 @@
 @import 'libs/mixins';
 @import 'libs/skel';
 @import 'font-awesome.min.css';
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i');
 
 /*
 	Story by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
+
+// Source Sans Pro, self-hosted and preloaded by every page so it is in place at
+// first paint (#96). Latin subset, upright 300 and 400 only: the site renders
+// no italics. Files and unicode-range are Google Fonts' latin subset.
+
+	@font-face {
+		font-family: 'Source Sans Pro';
+		font-style: normal;
+		font-weight: 300;
+		font-display: swap;
+		src: url('../fonts/source-sans-pro-latin-300.woff2') format('woff2');
+		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	}
+
+	@font-face {
+		font-family: 'Source Sans Pro';
+		font-style: normal;
+		font-weight: 400;
+		font-display: swap;
+		src: url('../fonts/source-sans-pro-latin-400.woff2') format('woff2');
+		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	}
 
 	@include skel-breakpoints((
 		xlarge: '(max-width: 1680px)',
