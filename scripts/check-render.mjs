@@ -116,21 +116,30 @@ async function launchChrome (userDataDir) {
     'about:blank'
   ], { stdio: ['ignore', 'ignore', 'pipe'] })
 
-  const wsUrl = await new Promise((resolve, reject) => {
-    let stderr = ''
-    const timer = setTimeout(() => reject(new Error(`Chrome printed no DevTools URL:\n${stderr}`)), PAGE_TIMEOUT_MS)
+  let stderr = ''
+  const wsUrl = await withTimeout(new Promise((resolve, reject) => {
     chrome.stderr.on('data', chunk => {
       stderr += chunk
       const match = stderr.match(/DevTools listening on (ws:\/\/\S+)/)
-      if (match) {
-        clearTimeout(timer)
-        resolve(match[1])
-      }
+      if (match) resolve(match[1])
     })
+    chrome.on('error', reject)
     chrome.on('exit', code => reject(new Error(`Chrome exited (${code}):\n${stderr}`)))
+  }), 'the DevTools URL').catch(async err => {
+    await stopChrome(chrome)
+    throw err
   })
   chrome.stderr.resume()
   return { chrome, wsUrl }
+}
+
+// Wait for the exit, not just the signal: on Windows the user-data-dir stays
+// locked until Chrome has gone, so removing it straight after kill() fails.
+async function stopChrome (chrome) {
+  if (chrome.exitCode !== null || chrome.signalCode !== null || !chrome.pid) return
+  const exited = new Promise(resolve => chrome.once('exit', resolve))
+  chrome.kill()
+  await withTimeout(exited, 'Chrome to exit').catch(() => chrome.kill('SIGKILL'))
 }
 
 // Minimal CDP client over one browser-level socket, with flattened sessions.
@@ -145,13 +154,16 @@ async function connect (wsUrl) {
   const pending = new Map()
   const waiters = new Set()
 
+  let closed = null
+
   ws.addEventListener('message', ({ data }) => {
     const msg = JSON.parse(data)
     if (msg.id !== undefined) {
-      const { resolve, reject } = pending.get(msg.id)
+      const call = pending.get(msg.id)
+      if (!call) return
       pending.delete(msg.id)
-      if (msg.error) reject(new Error(`${msg.error.message} (${msg.error.code})`))
-      else resolve(msg.result)
+      if (msg.error) call.reject(new Error(`${msg.error.message} (${msg.error.code})`))
+      else call.resolve(msg.result)
       return
     }
     for (const w of waiters) {
@@ -162,14 +174,28 @@ async function connect (wsUrl) {
     }
   })
 
+  // If Chrome dies, fail every outstanding call now rather than one timeout
+  // per call for the rest of the run.
+  ws.addEventListener('close', () => {
+    closed = new Error('lost the DevTools connection to Chrome')
+    for (const call of [...pending.values(), ...waiters]) call.reject(closed)
+    pending.clear()
+    waiters.clear()
+  })
+
   return {
     send (method, params = {}, sessionId) {
+      if (closed) return Promise.reject(closed)
       const id = nextId++
       ws.send(JSON.stringify({ id, method, params, sessionId }))
       return withTimeout(new Promise((resolve, reject) => pending.set(id, { resolve, reject })), method)
+        .finally(() => pending.delete(id))
     },
     waitFor (method, sessionId) {
-      return withTimeout(new Promise(resolve => waiters.add({ method, sessionId, resolve })), method)
+      if (closed) return Promise.reject(closed)
+      const waiter = { method, sessionId }
+      return withTimeout(new Promise((resolve, reject) => waiters.add(Object.assign(waiter, { resolve, reject }))), method)
+        .finally(() => waiters.delete(waiter))
     },
     close () { ws.close() }
   }
@@ -249,6 +275,8 @@ async function checkPage (cdp, origin, page, viewport) {
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: FORCE_EAGER }, sessionId)
 
     const loaded = cdp.waitFor('Page.loadEventFired', sessionId)
+    // Not awaited if navigation fails; don't let its timeout go unhandled.
+    loaded.catch(() => {})
     const nav = await cdp.send('Page.navigate', { url: `${origin}/${page}` }, sessionId)
     if (nav.errorText) {
       fail(null, `navigation failed: ${nav.errorText}`)
@@ -321,7 +349,7 @@ async function main () {
     }
     cdp.close()
   } finally {
-    chrome?.kill()
+    if (chrome) await stopChrome(chrome)
     server.close()
     await rm(userDataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }).catch(() => {})
   }

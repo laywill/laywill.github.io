@@ -145,7 +145,6 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 Besides `css.yml` and `jpeg-eoi.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml`, `scorecard.yml` and `render.yml`.
 
 - **`render.yml`** runs `scripts/check-render.mjs`: every page in `static.yml`'s allowlist, in the runner's Chrome at desktop and 375px, fails on a broken image, an `<img>` whose attributes or `object-fit: fill` box break its aspect ratio (#105), or `is-loading` left set. It serves the repo tree, where images are unresized masters, so it compares ratios, never sizes.
-
 - **`static.yml` deploys only from `v*` tags** (plus manual dispatch); a push to `master` publishes nothing. It copies an allowlist into `_site/`, then strips `images/will/JPEGs/` and `images/gallery/photographer/product/`: full-resolution originals kept for reference, never served.
 - The deploy job disables setup-node's package-manager cache on purpose, because it builds the production artefact. Don't re-enable it. Caching is fine in the CI-only workflows.
 
