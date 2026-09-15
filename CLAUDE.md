@@ -25,6 +25,24 @@ Everything below describes `master`. Branch off `master` and PR back into `maste
 
 Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `fix/71-footer-layout-consistency`), every piece of work traces to a GitHub issue. Commits and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/) using only the spec's standard types, and the branch uses the same `<type>`. Issues take whichever repo labels fit best. Labels and commit types are separate: `content`, `design` and `infra` are labels, not commit types.
 
+## Pull requests: draft means unreviewed
+
+Draft and ready-for-review mean different things here, so that the PR list shows William which PRs need his attention.
+
+- **Draft**: posted for visibility. It may be incomplete and nobody has reviewed it. Agents open every PR as a draft (`gh pr create --draft`).
+- **Ready for review**: an agent has worked through the checklist below, fixed what it found, and posted a summary. It is now waiting for William. Run `gh pr ready <n>` only at that point, never as part of opening the PR.
+
+A PR that needs a decision from William before it can be finished stays in draft and gets the `needs-william` label.
+
+The review before marking ready:
+
+1. **Scope against the issue.** Check every acceptance criterion in the linked issue against the whole branch tree, not only the diff. A criterion like "no page presents X as current" is usually broken in a file the PR never touched.
+2. **Conventions.** The PR title uses a standard Conventional Commits type, since it becomes the squash commit on `master`. Also check the page-structure rules below: byte-identical shared regions, the `.items` `inner` wrapper, and the five places a page lives.
+3. **CI** is green on the head commit, MegaLinter included.
+4. **Rendering**, for anything that changes what a page looks like. Check at desktop and at phone width (375px). Headless Chrome will not size its window below roughly 500px, so a `--window-size=400,…` screenshot shows clipping that isn't real. Render the page inside a 375px `<iframe>` instead. The scroll-in fades leave off-screen content invisible in a headless capture, so render a throwaway copy with the scripts removed and `*{opacity:1!important}` injected. Only opacity changes, not layout.
+5. **Fix what is mechanical; don't decide matters of judgement.** Wording, tone and design choices go to William as questions.
+6. **Post a summary comment** on the PR covering what was checked, what changed and why (with commit refs), and a list of the decisions left for William. If there are none, say so.
+
 ## Commands
 
 Node 22 (matching the workflows; there is no `.nvmrc` on this branch).
