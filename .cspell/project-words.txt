@@ -20,6 +20,8 @@ devcontainers
 Duplicati
 gimmie
 Giraudel
+Hutter
+Lasovsky
 laywill
 Nikhomkhai
 Panumas
