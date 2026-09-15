@@ -39,7 +39,7 @@ The review before marking ready:
 1. **Scope against the issue.** Check every acceptance criterion in the linked issue against the whole branch tree, not only the diff. A criterion like "no page presents X as current" is usually broken in a file the PR never touched.
 2. **Conventions.** The PR title uses a standard Conventional Commits type, since it becomes the squash commit on `master`. Also check the page-structure rules below: byte-identical shared regions, the `.items` `inner` wrapper, and the five places a page lives.
 3. **CI** is green on the head commit, MegaLinter included.
-4. **Rendering**, for anything that changes what a page looks like. Check at desktop and at phone width (375px). Headless Chrome will not size its window below roughly 500px, so a `--window-size=400,…` screenshot shows clipping that isn't real. Render the page inside a 375px `<iframe>` instead. The scroll-in fades leave off-screen content invisible in a headless capture, so render a throwaway copy with the scripts removed and `*{opacity:1!important}` injected. Only opacity changes, not layout.
+4. **Rendering**, for anything that changes what a page looks like. `render.yml` already fails on distorted or broken images and a stuck `is-loading`; it doesn't judge how a page looks. Check at desktop and at phone width (375px). Headless Chrome will not size its window below roughly 500px, so a `--window-size=400,…` screenshot shows clipping that isn't real. Render the page inside a 375px `<iframe>` instead. The scroll-in fades leave off-screen content invisible in a headless capture, so render a throwaway copy with the scripts removed and `*{opacity:1!important}` injected. Only opacity changes, not layout.
 5. **Fix what is mechanical; don't decide matters of judgement.** Wording, tone and design choices go to William as questions.
 6. **Comment inline where a finding has a line.** A decision left for William goes as an inline review comment on the line it concerns, so it gets its own thread he can answer and resolve. Post it as a `COMMENT` review, since GitHub rejects approve and request-changes from a PR's own author. Inline comments can only target lines in the diff; anything outside it, like the untouched files in step 1, goes in the summary. Fixes already made need no inline comment, since the fix commit would mark it outdated straight away.
 7. **Post a summary comment** on the PR covering what was checked, what changed and why (with commit refs), and a list of the decisions left for William, linking the inline threads. If there are none, say so.
@@ -54,6 +54,7 @@ npm run css                 # compile assets/sass/ -> assets/css/main.css
 npm run css:check           # rebuild, then fail if the result differs from what's committed
 npm run optimize-images -- <dir>   # resize/recompress in place; deploy runs it on _site/images
 npm run check-jpeg-eoi      # fail if any images/ JPEG has bytes after its EOI marker
+npm run check-render        # render every page in headless Chrome (CHROME_PATH overrides)
 ```
 
 No dev server, bundler or test framework. Open the HTML files directly or serve the repo root statically; pages are served as authored.
@@ -141,7 +142,9 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 
 ## CI/CD
 
-Besides `css.yml` and `jpeg-eoi.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml` and `scorecard.yml`.
+Besides `css.yml` and `jpeg-eoi.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml`, `scorecard.yml` and `render.yml`.
+
+- **`render.yml`** runs `scripts/check-render.mjs`: every page in `static.yml`'s allowlist, in the runner's Chrome at desktop and 375px, fails on a broken image, an `<img>` whose attributes or `object-fit: fill` box break its aspect ratio (#105), or `is-loading` left set. It serves the repo tree, where images are unresized masters, so it compares ratios, never sizes.
 
 - **`static.yml` deploys only from `v*` tags** (plus manual dispatch); a push to `master` publishes nothing. It copies an allowlist into `_site/`, then strips `images/will/JPEGs/` and `images/gallery/photographer/product/`: full-resolution originals kept for reference, never served.
 - The deploy job disables setup-node's package-manager cache on purpose, because it builds the production artefact. Don't re-enable it. Caching is fine in the CI-only workflows.

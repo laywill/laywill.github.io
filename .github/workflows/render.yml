@@ -1,0 +1,44 @@
+---
+name: Render
+
+# Every other gate is static, so a page that lints clean but lays out wrong
+# goes green (#118): #105 stretched every gallery thumbnail and passed. This
+# renders each deployed page in headless Chrome at desktop and phone width.
+# The runner image ships Chrome, so there is no browser install step.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check:
+    name: pages render with undistorted images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Show Chrome version
+        run: command -v google-chrome && google-chrome --version
+
+      - name: Render every page and check its images
+        run: npm run check-render
