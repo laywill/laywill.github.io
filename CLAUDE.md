@@ -30,11 +30,11 @@ Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `fix/71-footer-layout
 Draft and ready-for-review mean different things here, so that the PR list shows William which PRs need his attention.
 
 - **Draft**: posted for visibility. It may be incomplete and nobody has reviewed it. Agents open every PR as a draft (`gh pr create --draft`).
-- **Ready for review**: an agent has worked through the checklist below, fixed what it found, and posted a summary. It is now waiting for William. Run `gh pr ready <n>` only at that point, never as part of opening the PR.
+- **Ready for review**: an agent has worked through the checklist below, fixed what it found, and posted a summary, or the change is trivial as defined below. It is now waiting for William. Run `gh pr ready <n>` only at that point, never as part of opening the PR.
 
 A PR that needs a decision from William before it can be finished stays in draft and gets the `needs-william` label.
 
-By default the review is a separate pass, so that it doesn't share the author's blind spots: a fresh agent, `/code-review`, or a new session. The agent that opened the PR may review it only when the change is simple enough that a second pass would add nothing, such as a one-line copy fix or a version bump. When it does, the summary comment says the review was done by the author.
+The review is a separate pass, so that it doesn't share the author's blind spots: a fresh agent, `/code-review`, or a new session. A trivial change skips it and goes straight to ready once CI is green, with a one-line comment saying no agent review was done; William asks for one if he wants it. Trivial is defined by what the PR touches, not by the author's confidence in it: a copy fix confined to text, a dependency version bump, or a docs-only change that alters no page, style, script or workflow. Anything else gets the separate pass.
 
 The review before marking ready:
 
@@ -43,7 +43,8 @@ The review before marking ready:
 3. **CI** is green on the head commit, MegaLinter included.
 4. **Rendering**, for anything that changes what a page looks like. Check at desktop and at phone width (375px). Headless Chrome will not size its window below roughly 500px, so a `--window-size=400,…` screenshot shows clipping that isn't real. Render the page inside a 375px `<iframe>` instead. The scroll-in fades leave off-screen content invisible in a headless capture, so render a throwaway copy with the scripts removed and `*{opacity:1!important}` injected. Only opacity changes, not layout.
 5. **Fix what is mechanical; don't decide matters of judgement.** Wording, tone and design choices go to William as questions.
-6. **Post a summary comment** on the PR covering what was checked, what changed and why (with commit refs), and a list of the decisions left for William. If there are none, say so.
+6. **Comment inline where a finding has a line.** A decision left for William goes as an inline review comment on the line it concerns, so it gets its own thread he can answer and resolve. Post it as a `COMMENT` review, since GitHub rejects approve and request-changes from a PR's own author. Inline comments can only target lines in the diff; anything outside it, like the untouched files in step 1, goes in the summary. Fixes already made need no inline comment, since the fix commit would mark it outdated straight away.
+7. **Post a summary comment** on the PR covering what was checked, what changed and why (with commit refs), and a list of the decisions left for William, linking the inline threads. If there are none, say so.
 
 ## Commands
 
