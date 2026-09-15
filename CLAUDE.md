@@ -23,7 +23,7 @@ Everything below describes `master`. Branch off `master` and PR back into `maste
 
 `main` is developed from this same working directory, which is why `.gitignore` carries `node_modules/`, `dist/` and `.astro/` and `.mega-linter.yml` excludes them — v2 build artefacts must never be committed here or published by the Pages deploy.
 
-Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `fix/71-footer-layout-consistency`), [Conventional Commits](https://www.conventionalcommits.org/), every piece of work traces to a GitHub issue.
+Conventions: branches `<type>/<issue-number>-<slug>` (e.g. `fix/71-footer-layout-consistency`), every piece of work traces to a GitHub issue. Commits and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/) using only the spec's standard types, and the branch uses the same `<type>`. Issues take whichever repo labels fit best. Labels and commit types are separate: `content`, `design` and `infra` are labels, not commit types.
 
 ## Commands
 
