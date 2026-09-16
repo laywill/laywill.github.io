@@ -74,7 +74,12 @@ function linkedPage (href, base) {
   const [file] = target.split(/[?#]/)
   if (file === '') return null
   if (file === '/') return 'index.html'
-  return file.endsWith('.html') ? file.replace(/^\//, '') : null
+  // A leading ./ or / names the file the bare name does, so all three forms
+  // reduce to one. The extension test ignores case so a .HTML link names the
+  // page it points at and is reported as undeployed, rather than being
+  // dropped as "not a page" and leaving only the vaguer "does not link"
+  // failure; the host is case-sensitive, so such a link is broken either way.
+  return /\.html$/i.test(file) ? file.replace(/^\.?\//, '') : null
 }
 
 async function main () {
