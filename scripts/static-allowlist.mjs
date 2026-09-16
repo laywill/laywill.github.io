@@ -28,7 +28,7 @@ export const NOT_A_PAGE = new Set(['google519c92453ea72bf0.html'])
 // they appear. Backslash continuations are joined first so a multi-line cp
 // reads as one command, and a leading `run:` is dropped so a single-line step
 // counts too.
-export function parseAllowlist (workflow) {
+function parseAllowlist (workflow) {
   const pages = new Set()
   const joined = workflow.replace(/\\\r?\n/g, ' ')
   for (const line of joined.split(/\r?\n/)) {
