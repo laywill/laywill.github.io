@@ -324,7 +324,18 @@ async function checkPage (cdp, origin, page, viewport) {
 }
 
 async function main () {
-  const pages = await listPages()
+  // Reported here rather than through main()'s catch, which exists for the
+  // unexpected: an unreadable or unparseable allowlist is a page-list problem,
+  // and check-canonicals answers it with the same pointer.
+  let pages
+  try {
+    pages = await listPages()
+  } catch (err) {
+    console.error(`FAIL .github/workflows/static.yml: ${err.message}`)
+    console.error('\nSee "Adding, renaming or removing a page" in CLAUDE.md.')
+    process.exit(1)
+  }
+
   const server = await serve()
   const origin = `http://127.0.0.1:${server.address().port}`
   const userDataDir = await mkdtemp(path.join(os.tmpdir(), 'check-render-'))

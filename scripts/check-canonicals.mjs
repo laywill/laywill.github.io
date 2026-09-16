@@ -33,8 +33,28 @@ async function main () {
   const failures = []
   const fail = (file, message) => failures.push(`FAIL ${file}: ${message}`)
 
+  // Every failing exit goes through here, so the pointer to the five-places
+  // list is always in reach - it is the one thing someone hitting this needs.
+  const report = () => {
+    for (const failure of failures) console.error(failure)
+    console.error('\nstatic.yml\'s cp allowlist, sitemap.xml and each page\'s canonical must agree.')
+    console.error('See "Adding, renaming or removing a page" in CLAUDE.md.')
+    process.exit(1)
+  }
+
   const base = `https://${(await read('CNAME')).trim()}/`
-  const deployed = new Set(await deployedPages())
+
+  // An unreadable or unparseable allowlist leaves nothing to reconcile
+  // against, so report it and stop: carrying on with an empty set blames every
+  // <loc> in sitemap.xml for being undeployed, one cause dressed as fourteen
+  // failures.
+  let deployed
+  try {
+    deployed = new Set(await deployedPages())
+  } catch (err) {
+    fail('.github/workflows/static.yml', err.message)
+    report()
+  }
 
   // sitemap <loc> -> the file it names. The root URL is index.html. Comments
   // are matched and skipped, as in canonicals().
@@ -83,12 +103,7 @@ async function main () {
     }
   }
 
-  if (failures.length > 0) {
-    for (const failure of failures) console.error(failure)
-    console.error('\nstatic.yml\'s cp allowlist, sitemap.xml and each page\'s canonical must agree.')
-    console.error('See "Adding, renaming or removing a page" in CLAUDE.md.')
-    process.exit(1)
-  }
+  if (failures.length > 0) report()
 
   console.log(`${expected.size} indexed page(s) checked: allowlist, sitemap.xml and canonicals agree.`)
 }
