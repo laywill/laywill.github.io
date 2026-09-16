@@ -18,9 +18,8 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)))
+import { ROOT, NOT_A_PAGE, deployedPages } from './static-allowlist.mjs'
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900, mobile: false },
@@ -52,15 +51,9 @@ const CONTENT_TYPES = {
   '.xml': 'application/xml'
 }
 
-// The deploy allowlist is the one list of served pages, so read it rather
-// than keep a second copy. The Google verification stub isn't a page.
-async function listPages () {
-  const workflow = await readFile(path.join(ROOT, '.github/workflows/static.yml'), 'utf8')
-  const cp = workflow.match(/\bcp ((?:[^\n]*\\\r?\n)*[^\n]*?) _site\/\r?\n/)
-  if (!cp) throw new Error('could not find the page allowlist in static.yml')
-  return cp[1].split(/[\s\\]+/)
-    .filter(f => f.endsWith('.html') && !/^google[0-9a-f]+\.html$/.test(f))
-}
+// Everything static.yml deploys, less the site-verification stub, which is
+// deliberately invalid HTML rather than a page.
+const listPages = async () => (await deployedPages()).filter(f => !NOT_A_PAGE.has(f))
 
 function serve () {
   const server = createServer(async (req, res) => {
@@ -331,7 +324,18 @@ async function checkPage (cdp, origin, page, viewport) {
 }
 
 async function main () {
-  const pages = await listPages()
+  // Reported here rather than through main()'s catch, which exists for the
+  // unexpected: an unreadable or unparseable allowlist is a page-list problem,
+  // and check-canonicals answers it with the same pointer.
+  let pages
+  try {
+    pages = await listPages()
+  } catch (err) {
+    console.error(`FAIL .github/workflows/static.yml: ${err.message}`)
+    console.error('\nSee "Adding, renaming or removing a page" in CLAUDE.md.')
+    process.exit(1)
+  }
+
   const server = await serve()
   const origin = `http://127.0.0.1:${server.address().port}`
   const userDataDir = await mkdtemp(path.join(os.tmpdir(), 'check-render-'))
