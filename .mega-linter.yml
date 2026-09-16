@@ -107,4 +107,8 @@ SPELL_CSPELL_FILTER_REGEX_EXCLUDE: '(\.cspell\.json|\.cspell/|\.gitignore)'
 # 3. Not source at all. Binary assets, the PDF CV, MegaLinter's own reports, the
 #    Google site-verification stub (which is deliberately not valid HTML), and
 #    the Astro build output and worktrees that share this working directory.
-FILTER_REGEX_EXCLUDE: '(^|/)(\.git|\.venv|\.claude|\.pytest_cache|node_modules|dist|\.astro|images|docs|megalinter-reports)/|^assets/js/(jquery\.min|jquery\.scrollex\.min|jquery\.scrolly\.min|skel\.min)\.js$|^assets/css/(main|font-awesome\.min)\.css$|^LICENSE\.txt$|^google[0-9a-f]+\.html$|^\.lycheecache$'
+#    The stub is excluded by its exact name rather than a `google*.html`
+#    pattern, so that a second one fails the checks that need to know about it
+#    instead of being skipped silently. scripts/static-allowlist.mjs matches it
+#    the same way (#162).
+FILTER_REGEX_EXCLUDE: '(^|/)(\.git|\.venv|\.claude|\.pytest_cache|node_modules|dist|\.astro|images|docs|megalinter-reports)/|^assets/js/(jquery\.min|jquery\.scrollex\.min|jquery\.scrolly\.min|skel\.min)\.js$|^assets/css/(main|font-awesome\.min)\.css$|^LICENSE\.txt$|^google519c92453ea72bf0\.html$|^\.lycheecache$'
