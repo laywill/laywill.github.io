@@ -51,6 +51,44 @@ function anchorHrefs (html) {
   return hrefs
 }
 
+// sitemap.html's page list: the whole id="pages" section, matching close tag
+// included. The rest of the page is chrome every page carries - the #navigate
+// buttons and the footer's own site map and terms links - so reading the whole
+// document let the list drop a page the nav or footer happened to link and
+// still pass (#165).
+//
+// The id is the handle rather than the bare <section> nested inside it,
+// because the div and section wrappers between them are presentational and get
+// re-nested, while the id is what the banner's "Tell Me More" link already
+// depends on. Taking the section whole also means a link added to its heading
+// still counts as part of the list.
+//
+// Sections nest, so the slice ends at the matching close rather than the first
+// one, and comments are matched alongside tags as in tags(), so a list that
+// has been commented out reads as absent. Absent returns null, never an empty
+// slice: the caller turns null into a named failure, where an empty slice
+// would be a scoping regex that quietly matches nothing - the defect this
+// check exists to close.
+function pageListSection (html) {
+  const boundary = /<!--[\s\S]*?(?:-->|$)|<section\b[^>]*>|<\/section\s*>/gi
+  let start = -1
+  let depth = 0
+  for (const m of html.matchAll(boundary)) {
+    if (m[0].startsWith('<!--')) continue
+    const isOpen = !m[0].startsWith('</')
+    if (start < 0) {
+      if (isOpen && /[\s"']id\s*=\s*(["']?)pages\1(?=[\s>])/i.test(m[0])) {
+        start = m.index
+        depth = 1
+      }
+      continue
+    }
+    depth += isOpen ? 1 : -1
+    if (depth === 0) return html.slice(start, m.index + m[0].length)
+  }
+  return null
+}
+
 // Link targets in llms.txt. It is markdown-shaped prose, so a page can be
 // linked either as a markdown destination or as a bare URL; both count.
 function linkTargets (text) {
@@ -161,10 +199,17 @@ async function main () {
   // been renamed or deliberately unindexed. Both are matched on the target
   // alone, since neither file has a position or wording to key off.
   const indexed = [...deployed].filter(file => !UNINDEXED.has(file))
-  const indexes = [
-    ['sitemap.html', anchorHrefs(await read('sitemap.html'))],
-    ['llms.txt', linkTargets(await read('llms.txt'))]
-  ]
+  const indexes = []
+  // A missing page list is reported once and the rest of the file skipped,
+  // rather than reading as fourteen unlinked pages: one cause, one failure.
+  // llms.txt is still checked, so the two indexes never hide each other.
+  const pageList = pageListSection(await read('sitemap.html'))
+  if (pageList === null) {
+    fail('sitemap.html', 'has no id="pages" section, so the page list this check reads is gone, renamed or commented out')
+  } else {
+    indexes.push(['sitemap.html', anchorHrefs(pageList)])
+  }
+  indexes.push(['llms.txt', linkTargets(await read('llms.txt'))])
   for (const [index, hrefs] of indexes) {
     const linked = new Set()
     for (const href of hrefs) {
