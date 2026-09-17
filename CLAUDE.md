@@ -131,7 +131,7 @@ Before editing here:
 
 ### Adding, renaming or removing a page
 
-A page exists in five places. Miss one and either the deploy drops it or the link check fails:
+A page exists in five places. Miss one and either the deploy drops it or the link check fails. All five are machine-checked, places 2 to 5 by `check-canonicals` against each other and place 1 by every check that has to open the file:
 
 1. The `.html` file itself.
 2. **`.github/workflows/static.yml`**: the `cp` allowlist in "Assemble site artifact". An unlisted page doesn't ship.
@@ -141,7 +141,7 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 
 `under_construction.html` is the deliberate exception: deployed, but linked from nothing and absent from all three indexes. `google519c92453ea72bf0.html` is a site-verification stub, intentionally invalid HTML and excluded from linting.
 
-`npm run check-canonicals` (pre-commit hook and `canonicals.yml`) fails unless the allowlist's pages, less those two, match `sitemap.xml`'s `<loc>`s and each page's `rel="canonical"` equals its `<loc>`.
+`npm run check-canonicals` (pre-commit hook and `canonicals.yml`) fails unless the allowlist's pages, less those two, match `sitemap.xml`'s `<loc>`s, each page's `rel="canonical"` equals its `<loc>`, and both hand-written indexes link exactly that set of pages and no other (#165). The indexes are matched on the link target alone, since they are prose: a relative href, a root-relative one and a full `https://williamlay.co.uk/` URL all name the same page, and a link inside an HTML comment names none. In `sitemap.html` only the `id="pages"` section counts, so the nav buttons and the footer can't stand in for a page missing from the list — which is why the list carries a `sitemap.html` entry of its own, as `llms.txt` does. **That id is load-bearing**: renaming or dropping the section fails the check by name rather than quietly leaving nothing to match. lychee can't do this job — it only checks that the links an index already carries resolve, never that the page it forgot is there.
 
 Both that check and `check-render` read the allowlist through `scripts/static-allowlist.mjs`, which also holds the exceptions, as two overlapping sets: `UNINDEXED` (deployed but absent from the indexes, so it carries no `rel="canonical"`) holds both files above, while `NOT_A_PAGE` (not real HTML, so nothing renders it) holds the verification stub alone — which is therefore in both. The two checks had a parser each until #162 and the copies drifted, so a new exception goes there, once.
 

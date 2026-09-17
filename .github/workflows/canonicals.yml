@@ -1,9 +1,10 @@
 ---
 name: Canonicals
 
-# static.yml's cp allowlist, sitemap.xml and each page's rel=canonical must
-# agree (#146). The pre-commit hook is the fast local check; this is the
-# backstop for commits made with --no-verify or through the web UI.
+# static.yml's cp allowlist, sitemap.xml, each page's rel=canonical and the
+# sitemap.html and llms.txt indexes must agree (#146, #165). The pre-commit
+# hook is the fast local check; this is the backstop for commits made with
+# --no-verify or through the web UI.
 on:
   push:
     branches:
@@ -21,7 +22,7 @@ permissions: {}
 
 jobs:
   check:
-    name: allowlist, sitemap.xml and canonicals agree
+    name: allowlist, sitemap.xml, canonicals and indexes agree
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,5 +37,5 @@ jobs:
         with:
           node-version: 22
 
-      - name: Check canonicals against the allowlist and sitemap.xml
+      - name: Check canonicals and page indexes against the allowlist
         run: npm run check-canonicals
