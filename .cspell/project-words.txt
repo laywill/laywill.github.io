@@ -14,6 +14,7 @@
 # People and projects credited in the site or its tooling
 ajlkn
 Bakshi
+Bianco
 communistopoly
 devcontainer
 devcontainers
