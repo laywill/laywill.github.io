@@ -300,12 +300,26 @@ async function main () {
           })
         }
         await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-        return photo.naturalWidth
+        return {
+          photoWidth: photo.naturalWidth,
+          // Waiting on document.fonts.ready is not the same as checking it
+          // worked: it resolves once the faces have settled, loaded or errored
+          // alike, so a 404 on a woff2 would otherwise write a card silently
+          // set in Helvetica. The card uses both declared weights, so every
+          // face in the set is expected to have loaded.
+          unloadedFaces: [...document.fonts]
+            .filter(face => face.status !== 'loaded')
+            .map(face => face.family + ' ' + face.weight + ' (' + face.status + ')')
+        }
       })()`,
-      awaitPromise: true
+      awaitPromise: true,
+      returnByValue: true
     }, sessionId)
 
-    if (!result.value) throw new Error(`${SOURCE} did not load`)
+    if (!result.value.photoWidth) throw new Error(`${SOURCE} did not load`)
+    if (result.value.unloadedFaces.length > 0) {
+      throw new Error(`font face(s) did not load: ${result.value.unloadedFaces.join(', ')}`)
+    }
 
     const { data } = await cdp.send('Page.captureScreenshot', {
       format: 'png',
