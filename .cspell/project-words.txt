@@ -37,6 +37,7 @@ Unraid
 Andorra
 ARCD
 Audiotechnik
+Datchworth
 IPAF
 ISTAR
 Milos
@@ -44,6 +45,7 @@ Quatro
 Resolume
 Selex
 Sennheiser
+Tewin
 tlnp
 
 # The 2017 stack: skel breakpoint names, jQuery plugins, Sass, and the
