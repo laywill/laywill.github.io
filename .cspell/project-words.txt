@@ -89,12 +89,13 @@ zizmor
 # AI tooling named in the copy
 Ollama
 
-# Cars, coffee and travel hobby pages
+# Cars, coffee, travel and bell ringing hobby pages
 Hoffmann
 Inverness
 Lopes
 Nurburgring
 Pexels
+RWNYC
 Skye
 Spiske
 tiddled
