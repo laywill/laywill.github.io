@@ -145,6 +145,8 @@ A page exists in five places. Miss one and either the deploy drops it or the lin
 
 Both that check and `check-render` read the allowlist through `scripts/static-allowlist.mjs`, which also holds the exceptions, as two overlapping sets: `UNINDEXED` (deployed but absent from the indexes, so it carries no `rel="canonical"`) holds both files above, while `NOT_A_PAGE` (not real HTML, so nothing renders it) holds the verification stub alone — which is therefore in both. The two checks had a parser each until #162 and the copies drifted, so a new exception goes there, once.
 
+That "once" covers the checks, not the linter. A second verification stub has to be named in every place that matches the current one, since each matches by exact filename rather than by a `google*.html` pattern: the `cp` allowlist in `.github/workflows/static.yml`, `UNINDEXED` and `NOT_A_PAGE` in `scripts/static-allowlist.mjs`, and `FILTER_REGEX_EXCLUDE` in `.mega-linter.yml`. Matching by name is deliberate, so a stub nobody registered fails loudly instead of being skipped silently, but it means a stub added to the workflow and the module alone still turns MegaLinter red on HTML that is invalid on purpose (#170).
+
 ## CI/CD
 
 Besides `css.yml`, `jpeg-eoi.yml` and `canonicals.yml` above, the gate is `mega-linter.yml`, `codeql.yml`, `dependency-review.yml`, `scorecard.yml` and `render.yml`.
