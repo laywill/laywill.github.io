@@ -14,6 +14,7 @@
 # People and projects credited in the site or its tooling
 ajlkn
 Bakshi
+Bianco
 communistopoly
 devcontainer
 devcontainers
@@ -36,6 +37,7 @@ Unraid
 Andorra
 ARCD
 Audiotechnik
+Datchworth
 IPAF
 ISTAR
 Milos
@@ -43,6 +45,7 @@ Quatro
 Resolume
 Selex
 Sennheiser
+Tewin
 tlnp
 
 # The 2017 stack: skel breakpoint names, jQuery plugins, Sass, and the
@@ -86,12 +89,13 @@ zizmor
 # AI tooling named in the copy
 Ollama
 
-# Cars, coffee and travel hobby pages
+# Cars, coffee, travel and bell ringing hobby pages
 Hoffmann
 Inverness
 Lopes
 Nurburgring
 Pexels
+RWNYC
 Skye
 Spiske
 tiddled

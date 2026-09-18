@@ -27,3 +27,9 @@ instagram\.com
 # 34786169023, at a 15s timeout. That is a cloud/geo block, not slowness, so
 # no timeout value would fix it. The links are correct; check them locally.
 bb\.ringingworld\.co\.uk
+
+# hertsmemories.org.uk answers a plain curl from a UK connection with 200 in
+# ~0.3s, with or without a browser user-agent, but returns 403 to a GitHub
+# runner (run 35286114170). Same geo/datacenter block as bb.ringingworld above,
+# not a broken link and not slowness. Check it locally.
+hertsmemories\.org\.uk
