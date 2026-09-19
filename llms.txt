@@ -20,7 +20,7 @@ Personal site for William Lay, an Engineering Team Leader & Tech Lead, Productio
 ## Personal Interests
 
 - [Travel](travel.html) - Travel experiences and photography
-- [Coffee](coffee.html) - Coffee interests
+- [Coffee](coffee.html) - Home brewing: French press, AeroPress and Moka pot recipes, kit, and favourite beans
 - [Bellringing](bellringing.html) - Change ringing and bellringing
 - [Cars](cars.html) - Automotive interests
 
