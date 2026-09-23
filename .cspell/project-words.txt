@@ -90,15 +90,29 @@ zizmor
 Ollama
 
 # Cars, coffee, travel and bell ringing hobby pages
+Arcelia
+Bodum
+Chevez
+Dualit
+Dumlao
+Erick
 Hoffmann
 Inverness
+Kirunga
 Lopes
+Moka
+Neyra
+Ninaber
 Nurburgring
 Pexels
 RWNYC
 Skye
 Spiske
+Tarime
 tiddled
+Venecia
+# "cafeti&egrave;re" splits at the entity, leaving this stem
+cafeti
 
 # Workflow copy
 fulls
