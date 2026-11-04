@@ -1,9 +1,10 @@
 # Hosts that cannot be checked from CI, and why.
 #
 # Every entry here is a host that refuses unauthenticated or datacenter
-# traffic, not a link that is broken. lychee's --accept is global rather than
-# per-domain, so accepting these status codes would accept them everywhere and
-# mask a genuine break on some other host. Skipping the domain is the only
+# traffic, or that a browser reaches but lychee can't, not a link that is
+# broken. lychee's --accept is global rather than per-domain, so accepting
+# these status codes would accept them everywhere and mask a genuine break on
+# some other host. Skipping the domain is the only
 # per-domain lever lychee offers. See .github/workflows/links.yml for the
 # matching --accept note.
 #
@@ -33,3 +34,10 @@ bb\.ringingworld\.co\.uk
 # runner (run 35286114170). Same geo/datacenter block as bb.ringingworld above,
 # not a broken link and not slowness. Check it locally.
 hertsmemories\.org\.uk
+
+# www.ringingworld.co.uk serves its leaf certificate without the RapidSSL
+# intermediate. Browsers fetch the missing intermediate themselves (AIA);
+# lychee's rustls doesn't, so every link fails with UnknownIssuer (#194). Drop
+# this once `openssl s_client -connect www.ringingworld.co.uk:443` shows a
+# depth=1 certificate.
+www\.ringingworld\.co\.uk

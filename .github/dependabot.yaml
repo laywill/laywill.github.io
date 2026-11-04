@@ -26,3 +26,27 @@ updates:
       interval: "weekly"
     labels:
       - "chore"
+  # Maintain npm devDependencies (sass, sharp and their transitive deps)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "chore"
+    ignore:
+      # The sass pin must match additional_dependencies in
+      # .pre-commit-config.yaml, which Dependabot can't edit. Bump both by hand.
+      # This also suppresses sass security PRs; osv-scanner still flags them.
+      - dependency-name: "sass"
+    groups:
+      # osv-scanner fails CI on any open advisory, so a PR fixing one advisory
+      # stays red while another is unfixed (#194). One PR fixes them all.
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      npm:
+        applies-to: version-updates
+        patterns:
+          - "*"
