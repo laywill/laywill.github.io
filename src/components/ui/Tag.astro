@@ -1,0 +1,80 @@
+---
+/*
+ * Tag.astro — the mono domain-tag pill (docs/overhaul/component-library.md,
+ * "UI primitives"; docs/overhaul/design-direction.md, "4. Split panes").
+ *
+ * Used for the toolbox rows: languages blue, cloud/infra teal, delivery
+ * tooling yellow, practices orange (quoted, per the semantic colour map —
+ * orange carries "strings and human content").
+ *
+ * CRITICAL: the pill's colour must never be the only carrier of its
+ * category (component-library.md rule 4 / design-direction.md correction 6).
+ * This component satisfies half of that by rendering the accent through
+ * both border and text colour rather than a filled background, but it
+ * cannot satisfy the invariant alone — a pill has no room for a category
+ * word of its own. The CALLER is responsible for labelling the category in
+ * text (the toolbox row's `--accent-teal` heading in design-direction.md
+ * §4). Do not delete that row label on the assumption the pill colour
+ * carries the meaning; it doesn't, by design.
+ */
+import { Icon } from "astro-icon/components";
+import { accentVar, type Accent } from "../../lib/accents";
+
+interface Props {
+  /** Domain colour. Default "blue". */
+  accent?: Accent;
+  /** Iconify name for an optional leading brand mark, e.g. "simple-icons:typescript". */
+  icon?: string;
+  /** Render the label in typographic quotes — practices are strings, per the colour map. */
+  quoted?: boolean;
+  /** Element to render. "li" when inside a tag list. Default "span". */
+  as?: "span" | "li";
+  class?: string;
+}
+
+const {
+  accent = "blue",
+  icon,
+  quoted = false,
+  as: Element = "span",
+  class: className,
+}: Props = Astro.props;
+---
+
+<Element
+  class:list={["tag", className]}
+  style={`--tag-accent: ${accentVar(accent)}`}
+>
+  {icon && <Icon name={icon} aria-hidden="true" class="glyph" />}
+  {/* Quote marks are content, not styling — "quoted as a string" is how
+  the design encodes a practice tag, so a screen reader should read them
+  as characters, not have them suppressed as decoration. */}
+  {quoted ? <>&ldquo;<slot />&rdquo;</> : <slot />}
+</Element>
+
+<style>
+  /* One rule, coloured through a locally-scoped custom property rather
+  than one CSS rule per accent — the pattern accents.ts documents for
+  accentVar(). Border and text both take the accent; the fill stays
+  --bg-sidebar so the pill never becomes a colour-only cue via a filled
+  background. */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    color: var(--tag-accent);
+    background-color: var(--bg-sidebar);
+    border: 1px solid var(--tag-accent);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3xs) var(--space-2xs);
+  }
+
+  .glyph {
+    width: 1em;
+    height: 1em;
+    flex: none;
+  }
+</style>

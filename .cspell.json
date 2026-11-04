@@ -83,7 +83,19 @@
     "wayfinding",
     "letterspaced",
     "letterspacing",
-    "namesection"
+    "namesection",
+    "amazonwebservices",
+    "githubactions",
+    "gnubash",
+    "circleci",
+    "argo",
+    "lightboxes",
+    "teardown",
+    "subresource",
+    "subresources",
+    "polyfill",
+    "polyfilling",
+    "deque"
   ],
   "ignorePaths": [
     ".git",

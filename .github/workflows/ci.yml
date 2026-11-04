@@ -34,3 +34,14 @@ jobs:
     uses: ./.github/workflows/link-check.yml
     permissions:
       contents: read
+
+  # Runs against the same dist artifact the link check uses, for the same
+  # reason: the built HTML is the only markup worth checking. See
+  # docs/overhaul/component-library.md for what this covers and what it
+  # deliberately does not.
+  a11y:
+    name: Accessibility
+    needs: build
+    uses: ./.github/workflows/a11y.yml
+    permissions:
+      contents: read

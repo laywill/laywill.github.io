@@ -1,0 +1,232 @@
+---
+/*
+ * Career as `git log --graph`, newest first. An <ol> because the ordering
+ * is the point — this is a sequence of transitions, not an unordered set of
+ * facts — and each item's node gutter (spine + shape) is pure decoration
+ * around content that is fully restated in text, so it is `aria-hidden` and
+ * not focusable, per component-library.md rule 5.
+ *
+ * `refKind` drives node SHAPE, not just colour, per the design-direction.md
+ * split-panes spec ("the git metaphor carries real information ... or drop
+ * it"). The four shapes are the four the component contract names —
+ * filled / hollow / forked / merged — mapped onto the four refKinds by
+ * what they mean in git, not by the order the union lists them in:
+ *
+ *   head    → filled circle   (the tip of the branch, fully realised)
+ *   initial → hollow circle   (a root commit — nothing built on it yet)
+ *   branch  → triangle/fork   (a new line splitting off the spine)
+ *   merge   → diamond         (two lines closing back into one)
+ *
+ * Each shape also gets its own accent so colour and shape both change
+ * together (never colour alone): head reuses --accent-blue, the spine's own
+ * colour, because HEAD sits on the mainline; merge takes --accent-yellow
+ * (an action, per the semantic colour map's "functions and actions");
+ * branch takes --accent-teal (a type/category — a new line of work);
+ * initial takes --accent-green (an aside — the quiet, unremarkable start).
+ */
+import type { CareerEntry } from "../../data/career";
+import { CAREER } from "../../data/career";
+
+interface Props {
+  entries?: readonly CareerEntry[];
+  headingLevel?: 3 | 4;
+  class?: string;
+}
+
+const { entries = CAREER, headingLevel = 3, class: className } = Astro.props;
+
+// Astro renders a capitalised variable bound to a tag-name string as that
+// element, which is how a heading level becomes a prop without duplicating
+// the whole component per level.
+const RoleHeading = `h${headingLevel}` as "h3" | "h4";
+---
+
+{/*
+  House rule (see also Gallery.astro, IconGrid.astro, CertBadges.astro):
+  role="list" restores list semantics an engine or the cascade otherwise
+  drops. Two separate causes, both present here: `list-style: none` on the
+  list itself is a known Safari/VoiceOver-only defect; `.entry` below sets
+  `display: grid` on each <li>, which in EVERY engine removes the implicit
+  listitem role per HTML-AAM, since the role mapping is keyed to the
+  computed display value, not the element. `role="list"` is correct on an
+  <ol> as much as a <ul>: WAI-ARIA has one list role, with no separate
+  ordered variant — the sequence itself is still conveyed by DOM/reading
+  order, which role="list" does not disturb.
+*/}
+<ol class:list={["career-graph", className]} role="list">
+  {
+    entries.map((entry: CareerEntry) => (
+      <li class="entry">
+        {/*
+          Decorative: the shape and its colour repeat information already
+          stated in the visible ref text (entry.ref says "merge: ..." /
+          "branch: ..." in words), so aria-hiding it cannot lose meaning —
+          it can only stop a screen-reader user hearing it twice.
+        */}
+        <div class="gutter" aria-hidden="true">
+          <span class={`node node--${entry.refKind}`} />
+        </div>
+        <div class="content">
+          <p class="commit-line">
+            <span class="hash">{entry.hash}</span>{" "}
+            <span class="ref">
+              ({entry.ref}, {entry.dates})
+            </span>
+          </p>
+          <RoleHeading class="role-line">
+            <span class="role">{entry.role}</span>
+            <span class="employer"> · {entry.employer}</span>
+          </RoleHeading>
+          <p class="outcome">{entry.outcome}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .career-graph {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .entry {
+    display: grid;
+    /*
+     * The gutter column is a fixed, narrow measure so it never competes
+     * with the text column for space — at the 360px floor the content
+     * column still gets the overwhelming majority of the width, which is
+     * what "must not squeeze the text into overflow" requires. `minmax(0,
+     * 1fr)` (not a bare `1fr`) stops the content column's own contents
+     * (the mono commit line especially) forcing a wider intrinsic size on
+     * the grid track, which is the usual cause of unexpected horizontal
+     * scroll in a grid.
+     */
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    column-gap: var(--space-sm);
+    padding-block: var(--space-sm);
+  }
+
+  .gutter {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* The spine: one continuous line behind every node, in --accent-blue per
+  the design spec. Drawn per-row and relying on adjacent rows' lines
+  butting together (padding, not margin, separates rows) rather than one
+  line spanning the whole list, so trimming it at the first and last row
+  is a two-selector fix instead of separate absolutely-positioned markup. */
+  .gutter::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background-color: var(--accent-blue);
+    transform: translateX(-50%);
+  }
+
+  .entry:first-child .gutter::before {
+    top: 50%;
+  }
+
+  .entry:last-child .gutter::before {
+    bottom: 50%;
+  }
+
+  .node {
+    position: relative;
+    z-index: var(--z-base);
+    /* border-box so the hollow node's 2px border doesn't render larger
+    than the other, borderless shapes. */
+    box-sizing: border-box;
+    /* Optically aligns the node with the cap-height of the commit-line
+    text next to it, rather than the row's full height. */
+    margin-top: 0.35rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .node--head {
+    border-radius: 50%;
+    background-color: var(--accent-blue);
+  }
+
+  .node--initial {
+    border-radius: 50%;
+    /* Transparent, not a background colour, so "hollow" reads correctly
+    regardless of which surface (--bg-editor or --bg-sidebar) the pane this
+    renders inside happens to use. */
+    background-color: transparent;
+    border: 2px solid var(--accent-green);
+  }
+
+  .node--merge {
+    /* A square rotated 45°, i.e. a diamond — two lines closing into one. */
+    background-color: var(--accent-yellow);
+    border-radius: var(--radius-sm);
+    transform: rotate(45deg);
+  }
+
+  .node--branch {
+    /* A triangle pointing away from the spine — a line splitting off it. */
+    width: 0.85rem;
+    height: 0.75rem;
+    background-color: var(--accent-teal);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+
+  .content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .commit-line {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    /* Long hashes/refs must wrap rather than force the grid track wider —
+    part of the 360px no-scroll requirement. */
+    overflow-wrap: break-word;
+  }
+
+  .hash {
+    color: var(--accent-yellow);
+  }
+
+  .ref {
+    color: var(--accent-green);
+  }
+
+  .role-line {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: var(--font-size-base);
+  }
+
+  .role {
+    color: var(--accent-lightblue);
+  }
+
+  .employer {
+    color: var(--accent-orange);
+  }
+
+  .outcome {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--font-size-base);
+    color: var(--fg-secondary);
+  }
+</style>

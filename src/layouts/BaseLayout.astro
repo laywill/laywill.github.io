@@ -13,12 +13,20 @@ interface Props {
    * always preloaded, since every page renders body copy.
    */
   preloadDisplay?: boolean;
+  /**
+   * Keep the page out of search indexes. Used by the component preview
+   * harness, which is a development artefact rather than site content: it
+   * should build, link-check and pass the accessibility run like everything
+   * else, but it should never be a search result for William's name.
+   */
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "Personal site of William Lay.",
   preloadDisplay = false,
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -29,6 +37,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="dark" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
 
@@ -52,7 +61,42 @@ const {
   </body>
 </html>
 
-<style>
+<!--
+  is:global is load-bearing, not decoration. Astro scopes a plain <style> to
+  the elements in this component's own template, so a bare `*` selector here
+  would have matched <html> and <body> and nothing else - every component
+  would have kept the content-box default while this block appeared to have
+  fixed it. That is exactly what happened: .content-col in AppShell.astro
+  combines width: 100% with padding-inline, and was 32px wider than the
+  viewport at every breakpoint until this block was made global. Caught by
+  driving a real browser, not by any check in this repo.
+
+  The html/body rules below work either way, since those elements are in this
+  template - but they live in the same block so the reset is one thing in one
+  place rather than two blocks with a subtle difference between them.
+-->
+<style is:global>
+  /*
+   * Global box-sizing reset. This belongs here, once, rather than in each
+   * component: two components already set `box-sizing: border-box` locally
+   * (src/components/media/Gallery.astro and
+   * src/components/content/CareerGraph.astro) to stop padding/border adding
+   * to a sized box rather than being carved out of it. That each landed on
+   * the identical fix independently is the tell that content-box is the
+   * wrong default for this codebase, not a per-component quirk. Every
+   * future component that combines a width with padding or a border needs
+   * the same fix, so it is the default itself that is the landmine —
+   * fixing it globally means no component has to remember to opt in, and
+   * none can forget to. The two local declarations above are now redundant
+   * but harmless (same value, more specific selector) and are left for
+   * their owning components to remove.
+   */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html,
   body {
     margin: 0;
