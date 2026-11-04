@@ -2,9 +2,9 @@
 #
 # Every entry here is a host that refuses unauthenticated or datacenter
 # traffic, or that a browser reaches but lychee can't, not a link that is
-# broken. lychee's --accept is global rather than
-# per-domain, so accepting these status codes would accept them everywhere and
-# mask a genuine break on some other host. Skipping the domain is the only
+# broken. lychee's --accept is global rather than per-domain, so accepting
+# these status codes would accept them everywhere and mask a genuine break on
+# some other host. Skipping the domain is the only
 # per-domain lever lychee offers. See .github/workflows/links.yml for the
 # matching --accept note.
 #

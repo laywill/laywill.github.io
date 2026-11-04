@@ -37,6 +37,7 @@ updates:
     ignore:
       # The sass pin must match additional_dependencies in
       # .pre-commit-config.yaml, which Dependabot can't edit. Bump both by hand.
+      # This also suppresses sass security PRs; osv-scanner still flags them.
       - dependency-name: "sass"
     groups:
       # osv-scanner fails CI on any open advisory, so a PR fixing one advisory
